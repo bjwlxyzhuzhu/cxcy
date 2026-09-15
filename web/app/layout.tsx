@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import DailyBonus from "@/components/DailyBonus";
 
@@ -13,7 +14,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}<DailyBonus /></body>
+      <body suppressHydrationWarning>
+        <Script src="/runtime-config.js" strategy="beforeInteractive" />
+        {children}
+        <DailyBonus />
+      </body>
     </html>
   );
 }

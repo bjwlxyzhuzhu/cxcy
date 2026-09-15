@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getUser } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { apimart } from "@/lib/ai/apimart";
+import { getApimart } from "@/lib/ai/apimart";
 import { getCredits, deductCredits } from "@/lib/credits";
 import { COST, MODELS } from "@/lib/ai/models";
 
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     baseUrl = data.base_url;
     usingOwnKey = true;
   } else {
-    client = apimart;
+    client = getApimart();
     model = MODELS.tts;
     baseUrl = process.env.APIMART_BASE_URL || "";
     usingOwnKey = false;

@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveAIClient } from "@/lib/ai/resolve";
 import { getCredits, deductCredits } from "@/lib/credits";
 import { COST } from "@/lib/ai/models";
-import { apimart } from "@/lib/ai/apimart";
+import { getApimart } from "@/lib/ai/apimart";
 import { webSearch } from "@/lib/ai/websearch";
 import { webfetchBlock } from "@/lib/ai/webfetch";
 import { ASK_GATES, parseRadar, logEvidence, excerpt } from "@/lib/evidence";
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
   const sources: { title: string; source: string }[] = [];
   if (lastUser) {
     try {
-      const emb = await apimart.embeddings.create({ model: EMBED_MODEL, input: lastUser });
+      const emb = await getApimart().embeddings.create({ model: EMBED_MODEL, input: lastUser });
       const vec = emb.data[0].embedding as number[];
       const admin = createAdminClient();
       const { data } = await admin.rpc("match_knowledge", {

@@ -1,7 +1,7 @@
 import "server-only";
 import OpenAI from "openai";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { apimart } from "./apimart";
+import { getApimart } from "./apimart";
 import { MODELS } from "./models";
 import type { Purpose } from "./providers";
 
@@ -29,7 +29,7 @@ export async function resolveAIClient(userId: string, purpose: Purpose) {
 
   // 配图固定走 APIMart（gpt-image-2）
   if (purpose === "image") {
-    return { client: apimart, model: MODELS.image, usingOwnKey: false as const };
+    return { client: getApimart(), model: MODELS.image, usingOwnKey: false as const };
   }
 
   // 平台默认「思考/对话」模型：优先用专配的对话提供方（如 DeepSeek），否则回退 APIMart
@@ -37,5 +37,5 @@ export async function resolveAIClient(userId: string, purpose: Purpose) {
   if (chatBase && chatKey) {
     return { client: new OpenAI({ baseURL: chatBase, apiKey: chatKey }), model: MODELS.chat, usingOwnKey: false as const };
   }
-  return { client: apimart, model: MODELS.chat, usingOwnKey: false as const };
+  return { client: getApimart(), model: MODELS.chat, usingOwnKey: false as const };
 }

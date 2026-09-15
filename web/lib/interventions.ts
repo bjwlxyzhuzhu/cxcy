@@ -5,7 +5,7 @@ import "server-only";
 // 硬约束：反谄媚（禁止表扬垫场）、对事不对人（只评产出证据，不评人格特质）、必配可执行方案。
 import OpenAI from "openai";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { apimart } from "@/lib/ai/apimart";
+import { getApimart } from "@/lib/ai/apimart";
 import { MODELS } from "@/lib/ai/models";
 
 type EvRow = {
@@ -102,7 +102,7 @@ const OWL_SYSTEM = `你是「夜枭督导」🦉——一位驻场的资深创�
 async function owlWrite(fact: string): Promise<{ sharp: string; evidence: string; advice: string } | null> {
   try {
     const base = process.env.CHAT_BASE_URL, key = process.env.CHAT_API_KEY;
-    const client = base && key ? new OpenAI({ baseURL: base, apiKey: key }) : apimart;
+    const client = base && key ? new OpenAI({ baseURL: base, apiKey: key }) : getApimart();
     const res = await client.chat.completions.create({
       model: MODELS.chat,
       messages: [
