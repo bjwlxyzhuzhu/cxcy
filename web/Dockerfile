@@ -14,6 +14,12 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm build
 
+FROM node:20-alpine AS prod-deps
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
+COPY package.json pnpm-lock.yaml .npmrc ./
+RUN pnpm install --prod --frozen-lockfile
+
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
@@ -26,5 +32,8 @@ COPY --from=builder /app/scripts/seed.mjs ./scripts/seed.mjs
 COPY --from=builder /app/db/migrations ./db/migrations
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+# The standalone trace bundles dependencies used by Next routes, but does not
+# expose every package to standalone maintenance scripts such as seed.mjs.
+COPY --from=prod-deps /app/node_modules ./node_modules
 EXPOSE 3000
 CMD ["./scripts/start-container.sh", "node", "server.js"]
