@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商业版图连连看</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(900px 500px at 50% 0,#10233a,#070b12 60%);color:#e2e8f0;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:14px}
+  .topbar{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .topbar a{color:#7dd3fc;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:21px;background:linear-gradient(90deg,#38bdf8,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
+  .sub{color:#93c5fd;font-size:12px;text-align:center;margin:3px 0 10px}
+  .hud{width:100%;max-width:640px;display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:6px}
+  .hud b{color:#fbbf24}
+  .timebar{width:100%;max-width:640px;height:7px;background:#1e293b;border-radius:5px;overflow:hidden;margin-bottom:8px}
+  .timebar i{display:block;height:100%;background:linear-gradient(90deg,#34d399,#fbbf24,#ef4444);width:100%;transition:width .3s linear}
+  .gamebox{position:relative}
+  canvas{display:block;background:#0a1424;border:2px solid #1e3a5f;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.5);touch-action:manipulation}
+  .bar{display:flex;gap:10px;margin-top:12px}
+  .btn{background:linear-gradient(90deg,#0ea5e9,#10b981);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer}
+  .btn.ghost{background:#13233f;border:1px solid #1e3a5f}
+  .overlay{position:absolute;inset:0;background:rgba(7,11,18,.93);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;z-index:6}
+  .overlay h2{font-size:24px;margin-bottom:10px;background:linear-gradient(90deg,#38bdf8,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .overlay p{color:#bfdbfe;font-size:13px;line-height:1.8;margin-bottom:5px}
+</style>
+</head>
+<body>
+  <div class="topbar"><a href="index.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">复杂游戏 · 连连看</span></div>
+  <h1>🔗 商业版图连连看</h1>
+  <p class="sub">把相同的创业要素用「不超过2个拐角」的折线连通，建立资源对接并消除。清空全盘即胜！</p>
+
+  <div class="hud">
+    <span>⏱ <b id="time">300</b>s</span>
+    <span>🔗 连击 <b id="combo">0</b></span>
+    <span>得分 <b id="score">0</b></span>
+    <span>剩余 <b id="remain">0</b></span>
+  </div>
+  <div class="timebar"><i id="tbar"></i></div>
+
+  <div class="gamebox">
+    <canvas id="cv" width="520" height="420"></canvas>
+    <div class="overlay" id="overlay">
+      <h2>🔗 准备连接</h2>
+      <p>点击两个相同图标，若能用 ≤2 个拐角连通即可消除。<br>没招了会自动重排，卡住就用「提示」。</p>
+      <button class="btn" id="startBtn" style="margin-top:14px">开始</button>
+    </div>
+  </div>
+
+  <div class="bar">
+    <button class="btn ghost" id="hint">💡 提示</button>
+    <button class="btn ghost" id="shuffle">🔀 重排</button>
+    <button class="btn ghost" id="restart">↺ 重来</button>
+  </div>
+
+<script src="engine.js"></script>
+<script>
+"use strict";
+/* ============ 商业版图连连看 ============
+   ≤2拐角 BFS 连通判定 · 死局检测+保证有解洗牌 · 提示 · 连击 · 计时
+========================================== */
+const ICONS=["💡","🎯","👥","💰","📜","🚀","🏆","🤝","📊","🔧"];
+const NAMES=["产品","市场","团队","资金","专利","增长","品牌","合作","数据","技术"];
+const IW=10,IH=8;                 // 内部 10×8 = 80 张牌
+const COLS=IW+2,ROWS=IH+2;        // 含一圈空白边框，便于绕外侧走线
+const CELL=50, OX=10, OY=10;      // 画布内边距
+const TIME=300;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const overlay=document.getElementById('overlay');
+
+let grid,sel,score,combo,comboTimer,timeLeft,state="ready",remain;
+let flashPath=null,flashT=0,hintCells=null,hintT=0;
+let acc=0,lastT=0,rafId=null;
+const rand=(a,b)=>a+Math.random()*(b-a);
+
+function buildBoard(){
+  grid=Array.from({length:ROWS},()=>Array(COLS).fill(0));
+  // 生成成对的牌值
+  const total=IW*IH;
+  const vals=[];
+  let t=0;
+  for(let i=0;i<total/2;i++){vals.push(ICONS.length?(t%ICONS.length)+1:1);vals.push((t%ICONS.length)+1);t++;}
+  // 打乱
+  for(let i=vals.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[vals[i],vals[j]]=[vals[j],vals[i]];}
+  let k=0;
+  for(let r=1;r<=IH;r++)for(let c=1;c<=IW;c++)grid[r][c]=vals[k++];
+  // 保证开局有解
+  let guard=0;while(!findAnyMove()&&guard++<30)shuffleBoard();
+  countRemain();
+}
+function countRemain(){remain=0;for(let r=1;r<=IH;r++)for(let c=1;c<=IW;c++)if(grid[r][c])remain++;document.getElementById('remain').textContent=remain;}
+
+// —— ≤2拐角 BFS：返回路径(含端点)或 null ——
+const DIRS=[[-1,0],[1,0],[0,-1],[0,1]];
+function findPath(r1,c1,r2,c2){
+  if(r1===r2&&c1===c2)return null;
+  if(grid[r1][c1]!==grid[r2][c2]||grid[r1][c1]===0)return null;
+  const seen=new Set();
+  const q=[{r:r1,c:c1,dir:-1,turns:0,path:[[r1,c1]]}];
+  while(q.length){
+    const cur=q.shift();
+    for(let d=0;d<4;d++){
+      const nr=cur.r+DIRS[d][0],nc=cur.c+DIRS[d][1];
+      if(nr<0||nc<0||nr>=ROWS||nc>=COLS)continue;
+      const turns=cur.turns+((cur.dir!==-1&&cur.dir!==d)?1:0);
+      if(turns>2)continue;
+      const isTarget=(nr===r2&&nc===c2);
+      if(!isTarget&&grid[nr][nc]!==0)continue;   // 中途必须空
+      const key=nr+","+nc+","+d+","+turns;
+      if(seen.has(key))continue;seen.add(key);
+      const np=cur.path.concat([[nr,nc]]);
+      if(isTarget)return np;
+      q.push({r:nr,c:nc,dir:d,turns,path:np});
+    }
+  }
+  return null;
+}
+function findAnyMove(){
+  const cells=[];
+  for(let r=1;r<=IH;r++)for(let c=1;c<=IW;c++)if(grid[r][c])cells.push([r,c]);
+  for(let i=0;i<cells.length;i++)for(let j=i+1;j<cells.length;j++){
+    const[a,b]=[cells[i],cells[j]];
+    if(grid[a[0]][a[1]]===grid[b[0]][b[1]]&&findPath(a[0],a[1],b[0],b[1]))return[a,b];
+  }
+  return null;
+}
+function shuffleBoard(){
+  const cells=[],vals=[];
+  for(let r=1;r<=IH;r++)for(let c=1;c<=IW;c++)if(grid[r][c]){cells.push([r,c]);vals.push(grid[r][c]);}
+  for(let i=vals.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[vals[i],vals[j]]=[vals[j],vals[i]];}
+  cells.forEach((p,i)=>grid[p[0]][p[1]]=vals[i]);
+}
+function ensureSolvable(){let g=0;while(!findAnyMove()&&g++<30){if(remain<=0)break;shuffleBoard();}}
+
+// —— 交互 ——
+function cellAt(px,py){
+  const c=Math.floor((px-OX)/CELL)+1, r=Math.floor((py-OY)/CELL)+1;
+  if(r<1||r>IH||c<1||c>IW)return null;
+  return[r,c];
+}
+function click(px,py){
+  if(state!=="play")return;
+  const cell=cellAt(px,py);if(!cell)return;
+  const[r,c]=cell;if(!grid[r][c])return;
+  if(!sel){sel=[r,c];Sound.sfx('select');return;}
+  if(sel[0]===r&&sel[1]===c){sel=null;return;}   // 取消
+  if(grid[sel[0]][sel[1]]===grid[r][c]){
+    const path=findPath(sel[0],sel[1],r,c);
+    if(path){
+      grid[sel[0]][sel[1]]=0;grid[r][c]=0;
+      flashPath=path;flashT=0.28;
+      if(comboTimer>0)combo++;else combo=1;comboTimer=5;
+      score+=10*combo;
+      countRemain();updateHUD();Sound.sfx(combo>1?'clear':'match');
+      sel=null;
+      if(remain<=0){win();return;}
+      ensureSolvable();
+      return;
+    }
+  }
+  sel=[r,c];Sound.sfx('select'); // 不同或连不上→改选
+}
+function doHint(){
+  if(state!=="play")return;
+  const mv=findAnyMove();
+  if(mv){hintCells=mv;hintT=1.5;Sound.sfx('tick');}
+}
+function win(){state="win";GameKit.stop();Sound.sfx('win');
+  const lb=GameKit.finish(score);
+  overlay.style.display="flex";
+  overlay.innerHTML=`<h2>🎉 全盘清空！</h2><p>你完成了所有资源对接！</p>
+   <p>得分 <b style="color:#fbbf24">${score}</b> · 剩余时间 <b style="color:#fbbf24">${Math.ceil(timeLeft)}</b>s</p>
+   ${lb.rank?`<p style="color:#34d399;font-size:13px">🏆 排行榜第 ${lb.rank} 名！</p>`:''}
+   <div style="background:#0a1424;border-radius:10px;padding:6px 10px;margin:8px auto;max-width:240px">${lb.html}</div>
+   <button class="btn" id="again" style="margin-top:6px">再玩一局</button>`;
+  document.getElementById('again').onclick=start;
+}
+function timeUp(){state="over";GameKit.stop();Sound.sfx('gameover');
+  const lb=GameKit.finish(score);
+  overlay.style.display="flex";
+  overlay.innerHTML=`<h2>⏰ 时间到</h2><p>还剩 ${remain} 张没连完。</p>
+   <p>得分 <b style="color:#fbbf24">${score}</b></p>
+   ${lb.rank?`<p style="color:#34d399;font-size:13px">🏆 排行榜第 ${lb.rank} 名！</p>`:''}
+   <div style="background:#0a1424;border-radius:10px;padding:6px 10px;margin:8px auto;max-width:240px">${lb.html}</div>
+   <button class="btn" id="again" style="margin-top:6px">再来一局</button>`;
+  document.getElementById('again').onclick=start;
+}
+
+// —— 渲染 ——
+function render(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  if(state==="ready")return;
+  for(let r=1;r<=IH;r++)for(let c=1;c<=IW;c++){
+    const v=grid[r][c];if(!v)continue;
+    const x=OX+(c-1)*CELL,y=OY+(r-1)*CELL;
+    const isSel=sel&&sel[0]===r&&sel[1]===c;
+    const isHint=hintCells&&hintT>0&&((hintCells[0][0]===r&&hintCells[0][1]===c)||(hintCells[1][0]===r&&hintCells[1][1]===c))&&Math.floor(Date.now()/200)%2;
+    ctx.fillStyle=isSel?"#0e7490":isHint?"#854d0e":"#16263f";
+    roundRect(x+3,y+3,CELL-6,CELL-6,8);ctx.fill();
+    ctx.strokeStyle=isSel?"#22d3ee":"#26344f";ctx.lineWidth=isSel?3:1.5;
+    roundRect(x+3,y+3,CELL-6,CELL-6,8);ctx.stroke();
+    ctx.font="24px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(ICONS[v-1],x+CELL/2,y+CELL/2+1);
+  }
+  // 连接线
+  if(flashPath&&flashT>0){
+    ctx.strokeStyle="#fde047";ctx.lineWidth=4;ctx.lineCap="round";ctx.lineJoin="round";
+    ctx.globalAlpha=Math.min(1,flashT*4);
+    ctx.beginPath();
+    flashPath.forEach((p,i)=>{const x=OX+(p[1]-1)*CELL+CELL/2,y=OY+(p[0]-1)*CELL+CELL/2;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    ctx.stroke();ctx.globalAlpha=1;
+  }
+}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+function updateHUD(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('combo').textContent=combo;
+  document.getElementById('time').textContent=Math.ceil(timeLeft);
+  document.getElementById('tbar').style.width=(timeLeft/TIME*100)+'%';
+}
+function update(dt){
+  if(state!=="play")return;
+  const s=dt/1000;
+  timeLeft-=s;if(timeLeft<=0){timeLeft=0;updateHUD();timeUp();return;}
+  if(comboTimer>0){comboTimer-=s;if(comboTimer<=0)combo=0;}
+  if(flashT>0)flashT-=s;
+  if(hintT>0)hintT-=s;
+  updateHUD();
+}
+function frame(now){const dt=now-lastT;lastT=now;acc+=Math.min(dt,100);while(acc>=STEP){update(STEP);acc-=STEP;}render();rafId=requestAnimationFrame(frame);}
+const STEP=1000/60;
+
+function start(){
+  buildBoard();sel=null;score=0;combo=0;comboTimer=0;timeLeft=TIME;flashPath=null;hintCells=null;
+  state="play";overlay.style.display="none";updateHUD();GameKit.begin();
+  if(!rafId){lastT=performance.now();rafId=requestAnimationFrame(frame);}
+}
+cv.addEventListener('mousedown',e=>{const r=cv.getBoundingClientRect();click((e.clientX-r.left)*(cv.width/r.width),(e.clientY-r.top)*(cv.height/r.height));});
+cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0],r=cv.getBoundingClientRect();click((t.clientX-r.left)*(cv.width/r.width),(t.clientY-r.top)*(cv.height/r.height));},{passive:false});
+document.getElementById('startBtn').onclick=start;
+document.getElementById('hint').onclick=doHint;
+document.getElementById('shuffle').onclick=()=>{if(state==="play"){shuffleBoard();ensureSolvable();sel=null;Sound.sfx('select');}};
+document.getElementById('restart').onclick=start;
+render();
+GameKit.mount({key:'llk',title:'🔗 商业版图连连看',bgm:'llk',help:`
+  <h3>🎯 目标</h3><p>把棋盘上相同的创业要素，用「不超过 2 个拐角」的折线连通，建立<b>资源对接</b>并消除。在 300 秒内清空全盘即胜！</p>
+  <h3>🎮 操作</h3><ul><li>点击第一张牌选中，再点相同图标的第二张</li><li>若能 ≤2 拐角连通即消除，<b>连线可走棋盘外圈</b></li><li>「💡提示」高亮一对可消 ·「🔀重排」打乱（保证有解）</li></ul>
+  <h3>💡 高分攻略</h3>
+  <div class="tip">① <b>抢连击</b>：5 秒内连续消除，连击倍率叠加，分数翻倍增长，手速要快。</div>
+  <div class="tip">② <b>先消"封闭区"</b>：被包围、只能靠外圈绕线的牌优先处理，越拖越难连。</div>
+  <div class="tip">③ 卡住别乱点，先<b>开提示</b>找思路；真没招了系统会自动重排，但会断连击。</div>
+  <div class="tip">④ 边角和最外圈的牌最容易连（拐角少），可作为"周转"清理顺序。</div>`});
+</script>
+</body>
+</html>

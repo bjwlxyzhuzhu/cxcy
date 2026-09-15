@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商业模式画布拼图</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#0b1120,#1a2238);color:#e2e8f0;min-height:100vh;padding:20px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .topbar a{color:#94a3b8;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:23px;background:linear-gradient(90deg,#34d399,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#94a3b8;font-size:14px;margin:6px 0 14px}
+  .canvas{display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:minmax(96px,auto);gap:8px}
+  .block{background:#111c33;border:1.5px dashed #334155;border-radius:10px;padding:8px;transition:.2s;min-height:96px}
+  .block.hl{border-color:#34d399;background:#0d2a23}
+  .block .bt{font-size:12px;font-weight:700;color:#7dd3fc;margin-bottom:6px}
+  .block .bt small{color:#64748b;font-weight:400}
+  .slot{display:flex;flex-wrap:wrap;gap:5px}
+  /* layout: BMC standard */
+  .kp{grid-row:1/3}.ka{grid-column:2;grid-row:1}.kr{grid-column:2;grid-row:2}
+  .vp{grid-column:3;grid-row:1/3}.cr{grid-column:4;grid-row:1}.ch{grid-column:4;grid-row:2}
+  .cs{grid-column:5;grid-row:1/3}.cost{grid-column:1/4;grid-row:3}.rev{grid-column:4/6;grid-row:3}
+  .pool{margin-top:16px;background:#111c33;border:1px solid #334155;border-radius:12px;padding:12px}
+  .pool h3{font-size:13px;color:#94a3b8;margin-bottom:8px}
+  .cards{display:flex;flex-wrap:wrap;gap:8px}
+  .card{background:#1e293b;border:1px solid #475569;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;transition:.15s;user-select:none}
+  .card:hover{border-color:#34d399}
+  .card.sel{background:#065f46;border-color:#34d399;transform:scale(1.05)}
+  .card.placed{font-size:12px;padding:4px 8px}
+  .card.ok{background:#064e3b;border-color:#22c55e}
+  .card.no{background:#5b1d1d;border-color:#ef4444}
+  .bar{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .btn{background:linear-gradient(90deg,#10b981,#06b6d4);color:#fff;border:none;border-radius:9px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer}
+  .btn.ghost{background:#1e293b;border:1px solid #475569}
+  .msg{font-size:14px;color:#cbd5e1}
+  @media(max-width:680px){.canvas{grid-template-columns:repeat(2,1fr)}.kp,.ka,.kr,.vp,.cr,.ch,.cs,.cost,.rev{grid-column:auto;grid-row:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a href="basic.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">创新创业系列 · 02</span></div>
+  <h1>🧩 商业模式画布拼图</h1>
+  <p class="sub">案例：<b>「萌芽」少儿在线编程平台</b>。点击下方卡片，再点击对应的画布区块完成放置。全部放好后点击「检查」。</p>
+
+  <div class="canvas">
+    <div class="block kp" data-k="kp"><div class="bt">重要合作 <small>KP</small></div><div class="slot"></div></div>
+    <div class="block ka" data-k="ka"><div class="bt">关键业务 <small>KA</small></div><div class="slot"></div></div>
+    <div class="block kr" data-k="kr"><div class="bt">核心资源 <small>KR</small></div><div class="slot"></div></div>
+    <div class="block vp" data-k="vp"><div class="bt">价值主张 <small>VP</small></div><div class="slot"></div></div>
+    <div class="block cr" data-k="cr"><div class="bt">客户关系 <small>CR</small></div><div class="slot"></div></div>
+    <div class="block ch" data-k="ch"><div class="bt">渠道通路 <small>CH</small></div><div class="slot"></div></div>
+    <div class="block cs" data-k="cs"><div class="bt">客户细分 <small>CS</small></div><div class="slot"></div></div>
+    <div class="block cost" data-k="cost"><div class="bt">成本结构 <small>C$</small></div><div class="slot"></div></div>
+    <div class="block rev" data-k="rev"><div class="bt">收入来源 <small>R$</small></div><div class="slot"></div></div>
+  </div>
+
+  <div class="pool">
+    <h3>📦 待放置的卡片</h3>
+    <div class="cards" id="pool"></div>
+  </div>
+
+  <div class="bar">
+    <button class="btn" id="check">✓ 检查答案</button>
+    <button class="btn ghost" id="reset">↺ 重置</button>
+    <span class="msg" id="msg"></span>
+  </div>
+</div>
+
+<script>
+const items=[
+  {t:"6-12岁孩子的家长",k:"cs"},{t:"中小学信息课老师",k:"cs"},
+  {t:"游戏化学编程，趣味不枯燥",k:"vp"},{t:"AI老师1对1实时纠错",k:"vp"},
+  {t:"自研课程内容",k:"kr"},{t:"AI教学引擎",k:"kr"},
+  {t:"录制与更新课程",k:"ka"},{t:"维护学习社区",k:"ka"},
+  {t:"少儿出版社IP授权",k:"kp"},{t:"学校与培训机构",k:"kp"},
+  {t:"小程序+APP",k:"ch"},{t:"短视频平台引流",k:"ch"},
+  {t:"班主任社群陪伴",k:"cr"},{t:"成长积分体系",k:"cr"},
+  {t:"课程订阅会员费",k:"rev"},{t:"B端学校采购",k:"rev"},
+  {t:"研发与师资成本",k:"cost"},{t:"获客与营销投放",k:"cost"}
+];
+let selected=null,checked=false;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function build(){
+  const pool=document.getElementById('pool');pool.innerHTML='';
+  document.querySelectorAll('.slot').forEach(s=>s.innerHTML='');
+  shuffle(items.slice()).forEach((it,i)=>{
+    const c=document.createElement('div');c.className='card';c.textContent=it.t;c.dataset.k=it.k;c.dataset.id=i;
+    c.onclick=()=>pick(c);pool.appendChild(c);
+  });
+  selected=null;checked=false;document.getElementById('msg').textContent='';
+}
+function pick(card){
+  if(checked)return;
+  if(selected===card){card.classList.remove('sel');selected=null;clearHL();return;}
+  if(selected)selected.classList.remove('sel');
+  selected=card;card.classList.add('sel');
+  clearHL();document.querySelectorAll('.block').forEach(b=>b.classList.add('hl'));
+}
+function clearHL(){document.querySelectorAll('.block').forEach(b=>b.classList.remove('hl'))}
+document.querySelectorAll('.block').forEach(b=>{
+  b.onclick=()=>{
+    if(!selected||checked)return;
+    selected.classList.remove('sel');selected.classList.add('placed');
+    b.querySelector('.slot').appendChild(selected);
+    selected=null;clearHL();
+  };
+});
+document.getElementById('check').onclick=()=>{
+  let total=0,right=0;
+  document.querySelectorAll('.block').forEach(b=>{
+    b.querySelectorAll('.card').forEach(c=>{
+      total++;
+      if(c.dataset.k===b.dataset.k){c.classList.add('ok');right++;}
+      else c.classList.add('no');
+    });
+  });
+  checked=true;
+  const remain=document.querySelectorAll('#pool .card').length;
+  const msg=document.getElementById('msg');
+  msg.innerHTML=`得分 <b style="color:#34d399">${right}/${items.length}</b> · 放置 ${total} 张，剩余 ${remain} 张未放。`+
+    (right===items.length?' 🏆 完美！你已掌握商业模式画布！':right>=12?' 👍 不错，再调整几张红色卡片。':' 💪 继续加油，对照红色卡片想想它属于哪一块。');
+};
+document.getElementById('reset').onclick=build;
+build();
+</script>
+</body>
+</html>

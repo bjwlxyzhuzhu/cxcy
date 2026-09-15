@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创新点子轮盘 · SCAMPER</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(900px 500px at 50% 0,#0c4a6e,#082f49 60%,#020617);color:#e0f2fe;min-height:100vh;padding:20px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .topbar a{color:#7dd3fc;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:23px;background:linear-gradient(90deg,#38bdf8,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#bae6fd;font-size:14px;margin:6px 0 18px}
+  .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  .reel{background:#0b2a3d;border:2px solid #155e75;border-radius:14px;height:130px;overflow:hidden;position:relative}
+  .reel .label{position:absolute;top:6px;left:0;right:0;text-align:center;font-size:11px;color:#7dd3fc;z-index:2}
+  .strip{position:absolute;top:0;left:0;right:0;will-change:transform}
+  .cell{height:130px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:17px;font-weight:700;padding:10px}
+  .reel::after{content:"";position:absolute;inset:0;background:linear-gradient(#0b2a3d,transparent 25%,transparent 75%,#0b2a3d);pointer-events:none}
+  .btn{background:linear-gradient(90deg,#0ea5e9,#f59e0b);color:#062;border:none;border-radius:12px;padding:14px 30px;font-size:17px;font-weight:800;cursor:pointer;display:block;margin:0 auto}
+  .btn:disabled{opacity:.6}
+  .out{background:#0b2a3d;border:1px solid #155e75;border-radius:14px;padding:18px;margin-top:18px;min-height:120px;display:none}
+  .out.show{display:block;animation:fade .4s}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+  .out .combo{font-size:18px;font-weight:700;color:#fbbf24;margin-bottom:8px;line-height:1.5}
+  .out .q{color:#bae6fd;line-height:1.7;font-size:15px}
+  .out textarea{width:100%;margin-top:12px;background:#062235;border:1px solid #155e75;border-radius:10px;color:#e0f2fe;padding:10px;font-family:inherit;font-size:14px;resize:vertical;min-height:70px}
+  .counter{text-align:center;color:#7dd3fc;font-size:13px;margin-top:14px}
+  .save{background:#155e75;color:#e0f2fe;border:none;border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;margin-top:8px}
+  .ideas{margin-top:16px}
+  .idea{background:#062235;border-left:3px solid #fbbf24;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:14px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a href="basic.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">创新创业系列 · 04</span></div>
+  <h1>🎰 创新点子轮盘（SCAMPER 奔驰法）</h1>
+  <p class="sub">摇出「行业 × 创新手法 × 目标人群」，针对引导问题写下你的脑洞。创意是练出来的，多摇几次！</p>
+
+  <div class="reels">
+    <div class="reel"><div class="label">行业 / 产品</div><div class="strip" id="r0"></div></div>
+    <div class="reel"><div class="label">创新手法</div><div class="strip" id="r1"></div></div>
+    <div class="reel"><div class="label">目标人群</div><div class="strip" id="r2"></div></div>
+  </div>
+  <button class="btn" id="spin">🎲 摇一摇</button>
+
+  <div class="out" id="out">
+    <div class="combo" id="combo"></div>
+    <div class="q" id="q"></div>
+    <textarea id="note" placeholder="把你想到的创意写在这里…"></textarea>
+    <button class="save" id="save">＋ 收藏这个点子</button>
+  </div>
+  <div class="counter" id="counter"></div>
+  <div class="ideas" id="ideas"></div>
+</div>
+
+<script>
+const industries=["外卖配送","共享单车","在线教育","咖啡店","健身房","二手交易","宠物服务","老年陪护","民宿旅游","快递柜","婚庆服务","农产品电商"];
+const methods=[
+  {n:"S 替代",q:"如果把它最核心的某个环节换成完全不同的东西，会怎样？"},
+  {n:"C 合并",q:"把它和另一个完全不相关的行业/产品结合，会诞生什么新物种？"},
+  {n:"A 调整",q:"借鉴其它领域的成功做法，把它'移植'过来会怎样？"},
+  {n:"M 放大/缩小",q:"把它的规模、频率或某个特性放大10倍或缩小到极致，会怎样？"},
+  {n:"P 挪作他用",q:"它现有的资源/能力，还能用来服务什么意想不到的场景？"},
+  {n:"E 消除",q:"如果砍掉它最'理所当然'的某个部分，反而更受欢迎吗？"},
+  {n:"R 逆向",q:"把它的流程、角色或商业逻辑彻底反过来，会有什么机会？"}
+];
+const targets=["Z世代大学生","下沉市场宝妈","都市独居青年","退休老年人","小微企业主","残障人士","通勤上班族","二次元爱好者"];
+
+function fill(id,arr,getText){
+  const s=document.getElementById(id);s.innerHTML='';
+  for(let i=0;i<24;i++){const c=document.createElement('div');c.className='cell';c.textContent=getText(arr[(Math.random()*arr.length)|0]);s.appendChild(c);}
+}
+let count=0,ideas=[];
+function spin(){
+  document.getElementById('out').classList.remove('show');
+  const pick=[(Math.random()*industries.length)|0,(Math.random()*methods.length)|0,(Math.random()*targets.length)|0];
+  const arrs=[industries,methods,targets];
+  const texts=[x=>x,x=>x.n,x=>x];
+  document.getElementById('spin').disabled=true;
+  [0,1,2].forEach(k=>{
+    const s=document.getElementById('r'+k);
+    fill('r'+k,arrs[k],texts[k]);
+    // ensure final cell is the chosen one
+    const finalCell=s.children[20];finalCell.textContent=texts[k](arrs[k][pick[k]]);
+    s.style.transition='none';s.style.transform='translateY(0)';
+    void s.offsetHeight;
+    s.style.transition=`transform ${1.1+k*0.4}s cubic-bezier(.18,.7,.18,1)`;
+    s.style.transform='translateY(-'+(20*130)+'px)';
+  });
+  setTimeout(()=>{
+    document.getElementById('spin').disabled=false;
+    const ind=industries[pick[0]],m=methods[pick[1]],tg=targets[pick[2]];
+    document.getElementById('combo').textContent=`「${ind}」× ${m.n} × 面向【${tg}】`;
+    document.getElementById('q').textContent='👉 '+m.q;
+    document.getElementById('note').value='';
+    document.getElementById('out').classList.add('show');
+    document.getElementById('out').dataset.combo=`${ind} × ${m.n} × ${tg}`;
+  },1100+0.4*2*1000+200);
+}
+document.getElementById('spin').onclick=spin;
+document.getElementById('save').onclick=()=>{
+  const note=document.getElementById('note').value.trim();
+  if(!note){document.getElementById('note').focus();return;}
+  count++;
+  ideas.unshift({c:document.getElementById('out').dataset.combo,n:note});
+  render();
+};
+function render(){
+  document.getElementById('counter').textContent=count?`🌟 已收藏 ${count} 个创意`:'';
+  document.getElementById('ideas').innerHTML=ideas.map(i=>`<div class="idea"><b style="color:#fbbf24">${i.c}</b><br>${i.n.replace(/</g,'&lt;')}</div>`).join('');
+}
+// init reels with random faces
+[0,1,2].forEach(k=>{const arrs=[industries,methods,targets];const texts=[x=>x,x=>x.n,x=>x];fill('r'+k,arrs[k],texts[k]);document.getElementById('r'+k).style.transform='translateY(-130px)';});
+</script>
+</body>
+</html>

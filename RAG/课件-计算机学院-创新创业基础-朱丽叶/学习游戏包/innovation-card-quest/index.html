@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>创新创业基础 卡牌闯关</title>
+  <style>
+    :root {
+      --navy: #092b62;
+      --blue: #1159a6;
+      --blue-2: #2176cf;
+      --blue-soft: #e8f3ff;
+      --cyan: #0f8f86;
+      --cyan-soft: #e6f8f5;
+      --orange: #e46f28;
+      --orange-soft: #fff0e5;
+      --green: #2d8b57;
+      --green-soft: #eaf7ef;
+      --red: #b93434;
+      --red-soft: #fff0f0;
+      --ink: #17304f;
+      --muted: #64758d;
+      --line: #c9ddf2;
+      --paper: #ffffff;
+      --bg: #f5f9fd;
+      --shadow: 0 10px 26px rgba(11, 56, 112, 0.13);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(33, 118, 207, 0.08) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(33, 118, 207, 0.06) 1px, transparent 1px),
+        var(--bg);
+      background-size: 34px 34px;
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+
+    button {
+      font: inherit;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 13px 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .brand {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 58px;
+      height: 58px;
+      border-radius: 8px;
+      border: 2px solid var(--blue);
+      background: var(--blue-soft);
+      display: grid;
+      place-items: center;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 30px;
+      color: var(--navy);
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .pill {
+      min-width: 108px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: var(--paper);
+      font-weight: 800;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .pill.orange {
+      background: var(--orange);
+    }
+
+    .btn {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      background: var(--blue-soft);
+      color: var(--navy);
+      border: 1px solid var(--line);
+      font-weight: 800;
+    }
+
+    .btn.primary {
+      background: var(--orange);
+      color: var(--paper);
+      border-color: var(--orange);
+    }
+
+    .btn.blue {
+      background: var(--blue);
+      color: var(--paper);
+      border-color: var(--blue);
+    }
+
+    main {
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .side,
+    .stage,
+    .panel,
+    .game-card,
+    .brief,
+    .scene,
+    .play-area,
+    .deck,
+    .choice-panel {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .side {
+      position: sticky;
+      top: 94px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0 0 8px;
+      color: var(--navy);
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .map-svg {
+      width: 100%;
+      max-width: 100%;
+      display: block;
+    }
+
+    .level-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .level-tab {
+      width: 100%;
+      min-height: 50px;
+      display: grid;
+      grid-template-columns: 36px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--ink);
+      padding: 8px 10px;
+    }
+
+    .level-tab.active {
+      background: var(--blue);
+      color: var(--paper);
+      border-color: var(--blue);
+    }
+
+    .level-tab.locked {
+      opacity: .48;
+      cursor: not-allowed;
+    }
+
+    .level-no {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--orange-soft);
+      color: var(--orange);
+      font-weight: 900;
+    }
+
+    .level-tab.active .level-no {
+      background: var(--paper);
+      color: var(--blue);
+    }
+
+    .level-title {
+      font-weight: 800;
+      font-size: 14px;
+      min-width: 0;
+    }
+
+    .level-score {
+      font-size: 12px;
+      opacity: .9;
+    }
+
+    .board {
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-head {
+      background: var(--navy);
+      color: var(--paper);
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .hero-head h2 {
+      margin: 0;
+      font-size: clamp(20px, 2.3vw, 30px);
+    }
+
+    .hero-head p {
+      margin: 6px 0 0;
+      color: #dbeeff;
+      line-height: 1.45;
+    }
+
+    .level-badge {
+      min-width: 116px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .35);
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .hero-body {
+      padding: 18px 20px 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .brief-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .brief {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--blue-soft);
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .brief strong {
+      color: var(--navy);
+    }
+
+    .brief p {
+      margin: 0;
+      line-height: 1.58;
+    }
+
+    .goal-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .goal {
+      min-height: 38px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .goal::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+      flex: 0 0 auto;
+    }
+
+    .scene {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdff;
+      display: grid;
+      place-items: center;
+      min-height: 210px;
+      padding: 12px;
+    }
+
+    .scene svg {
+      width: min(100%, 420px);
+      max-height: 250px;
+    }
+
+    .play-area {
+      display: grid;
+      grid-template-columns: 1fr 290px;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .cards-zone {
+      display: grid;
+      gap: 12px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      color: var(--navy);
+      font-weight: 900;
+    }
+
+    .deck {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .card {
+      min-height: 154px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      box-shadow: 0 4px 12px rgba(20, 61, 110, .08);
+      padding: 10px;
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      text-align: left;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      right: -26px;
+      bottom: -30px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(33, 118, 207, .08);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--blue-2);
+    }
+
+    .card.selected {
+      border-color: var(--orange);
+      background: var(--orange-soft);
+    }
+
+    .card.correct {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .card.wrong {
+      border-color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .card .type {
+      width: fit-content;
+      padding: 4px 7px;
+      border-radius: 6px;
+      color: var(--paper);
+      background: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .card h3 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.42;
+      font-size: 13px;
+    }
+
+    .selected-zone {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdff;
+      min-height: 142px;
+      padding: 12px;
+      display: grid;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .selected-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .selected-chip {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+      align-items: center;
+      min-height: 36px;
+      padding: 7px 9px;
+      border-radius: 8px;
+      background: var(--blue-soft);
+      border: 1px solid var(--line);
+      color: var(--navy);
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .remove {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--red);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .sidebox {
+      display: grid;
+      gap: 12px;
+    }
+
+    .tip-card,
+    .result-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      line-height: 1.55;
+    }
+
+    .tip-card strong,
+    .result-card strong {
+      color: var(--navy);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .tip-card p,
+    .result-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .result-card.good {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .result-card.warn {
+      border-color: var(--orange);
+      background: var(--orange-soft);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badges {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .badge {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--muted);
+      padding: 6px;
+    }
+
+    .badge.earned {
+      background: var(--green-soft);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--green);
+      transition: width .25s ease;
+    }
+
+    @media (max-width: 1100px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        position: static;
+      }
+
+      .level-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .play-area,
+      .brief-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        padding: 10px 12px;
+        width: 100%;
+      }
+
+      .status {
+        justify-content: flex-start;
+        gap: 8px;
+      }
+
+      .status > * {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 0;
+      }
+
+      main {
+        padding: 12px;
+      }
+
+      .brand {
+        grid-template-columns: 46px 1fr;
+      }
+
+      .logo {
+        width: 46px;
+        height: 46px;
+      }
+
+      .brand p {
+        display: none;
+      }
+
+      .brand h1 {
+        font-size: 19px;
+      }
+
+      .pill,
+      .btn {
+        height: 38px;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      .hero-head {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+
+      .hero-body {
+        padding: 14px;
+      }
+
+      .panel {
+        padding: 12px;
+      }
+
+      .scene svg {
+        width: 100%;
+      }
+
+      .deck,
+      .badges,
+      .level-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img" aria-label="卡牌游戏图标">
+              <rect x="12" y="8" width="30" height="42" rx="5" fill="#fff" stroke="#1159a6" stroke-width="3"></rect>
+              <rect x="22" y="14" width="30" height="42" rx="5" fill="#e8f3ff" stroke="#e46f28" stroke-width="3"></rect>
+              <path d="M29 26h16M29 35h16M29 44h10" stroke="#1159a6" stroke-width="3" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <h1>创新创业基础 卡牌闯关游戏</h1>
+            <p>抽取课程能力卡，解决区域产业项目难题，完成从问题到路演的学习闭环。</p>
+          </div>
+        </div>
+        <div class="status">
+          <div class="pill" id="totalScore">总分 0</div>
+          <div class="pill orange" id="levelState">第1关</div>
+          <button class="btn" type="button" id="copyBtn">复制成绩</button>
+          <button class="btn" type="button" id="resetBtn">重置</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <aside class="side">
+        <section class="panel">
+          <svg class="map-svg" viewBox="0 0 300 220" role="img" aria-label="课程项目闯关路线图">
+            <rect x="8" y="8" width="284" height="204" rx="8" fill="#fbfdff" stroke="#c9ddf2"></rect>
+            <path d="M48 150C72 78 112 66 142 104s54 62 112-20" fill="none" stroke="#1159a6" stroke-width="5" stroke-linecap="round"></path>
+            <circle cx="48" cy="150" r="20" fill="#fff" stroke="#e46f28" stroke-width="4"></circle>
+            <circle cx="142" cy="104" r="20" fill="#fff" stroke="#1159a6" stroke-width="4"></circle>
+            <circle cx="254" cy="84" r="20" fill="#fff" stroke="#0f8f86" stroke-width="4"></circle>
+            <text x="48" y="156" text-anchor="middle" font-size="16" fill="#e46f28" font-weight="700">问</text>
+            <text x="142" y="110" text-anchor="middle" font-size="16" fill="#1159a6" font-weight="700">创</text>
+            <text x="254" y="90" text-anchor="middle" font-size="16" fill="#0f8f86" font-weight="700">赛</text>
+            <text x="150" y="42" text-anchor="middle" font-size="17" fill="#17304f" font-weight="700">卡牌=项目行动</text>
+            <text x="150" y="190" text-anchor="middle" font-size="13" fill="#64758d">选对行动，项目才能升级</text>
+          </svg>
+        </section>
+
+        <nav class="level-list" id="levelList" aria-label="关卡列表"></nav>
+
+        <section class="panel">
+          <h3>已获得徽章</h3>
+          <div class="badges" id="badges"></div>
+        </section>
+
+        <section class="panel">
+          <h3>通关进度</h3>
+          <div class="progress"><span id="progressBar"></span></div>
+          <p id="progressText">完成每关60分以上可稳定进入下一关。</p>
+        </section>
+      </aside>
+
+      <section class="board">
+        <article class="hero">
+          <div class="hero-head">
+            <div>
+              <h2 id="levelTitle">关卡标题</h2>
+              <p id="levelSubtitle">关卡说明</p>
+            </div>
+            <div class="level-badge" id="levelScore">0/100</div>
+          </div>
+          <div class="hero-body">
+            <div class="brief-grid">
+              <div class="brief">
+                <strong>项目情境</strong>
+                <p id="scenarioText"></p>
+                <strong>本关目标</strong>
+                <div class="goal-list" id="goalList"></div>
+              </div>
+              <div class="scene" id="sceneSvg"></div>
+            </div>
+
+            <div class="play-area">
+              <div class="cards-zone">
+                <div class="section-title">
+                  <span>课程行动卡</span>
+                  <span id="pickLimit">选择卡牌</span>
+                </div>
+                <div class="deck" id="deck"></div>
+              </div>
+
+              <aside class="sidebox">
+                <div class="selected-zone">
+                  <div class="section-title">
+                    <span>已选策略组合</span>
+                    <span id="selectedCount">0</span>
+                  </div>
+                  <div class="selected-list" id="selectedList"></div>
+                </div>
+
+                <div class="tip-card">
+                  <strong>提示</strong>
+                  <p id="tipText">本关提示</p>
+                </div>
+
+                <div class="actions">
+                  <button class="btn primary" type="button" id="submitBtn">提交本关</button>
+                  <button class="btn blue" type="button" id="hintBtn">显示关键线索</button>
+                  <button class="btn" type="button" id="nextBtn">下一关</button>
+                </div>
+
+                <div class="result-card" id="resultCard">
+                  <strong>闯关反馈</strong>
+                  <p id="resultText">选择卡牌后提交，系统会根据课程逻辑给出反馈。</p>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const cards = [
+      { id: "opportunity", name: "机会雷达", type: "识别", text: "锁定真实用户、具体场景和高频痛点。" },
+      { id: "interview", name: "用户访谈", type: "调研", text: "通过访谈获得一手需求证据。" },
+      { id: "survey", name: "问卷量表", type: "调研", text: "用可分析问题验证群体需求。" },
+      { id: "competitor", name: "竞品拆解", type: "分析", text: "比较替代方案，找到差异化入口。" },
+      { id: "mvp", name: "MVP原型", type: "产品", text: "先做最小可行版本验证关键假设。" },
+      { id: "canvas", name: "商业画布", type: "商业", text: "梳理客户、价值、渠道和收入。" },
+      { id: "aiAgent", name: "AI智能体", type: "AI", text: "让AI参与诊断、生成、质询和复盘。" },
+      { id: "factCheck", name: "数据核验", type: "AI", text: "核查AI输出和公开资料，避免幻觉。" },
+      { id: "ethics", name: "伦理合规", type: "合规", text: "处理隐私、版权、学术诚信和责任边界。" },
+      { id: "ip", name: "知识产权", type: "成果", text: "判断软著、专利、版权和权属安排。" },
+      { id: "testing", name: "第三方检测", type: "成果", text: "用检测或测试报告增强可信度。" },
+      { id: "proof", name: "应用证明", type: "成果", text: "用试点单位反馈证明实际价值。" },
+      { id: "finance", name: "成本收益", type: "商业", text: "估算收入、成本、毛利和现金流。" },
+      { id: "team", name: "团队分工", type: "执行", text: "明确角色、进度、责任和协作机制。" },
+      { id: "pitch", name: "路演证据链", type: "表达", text: "把调研、原型、测试、应用串成答辩故事。" },
+      { id: "social", name: "社会价值", type: "思政", text: "说明服务地方、科技向善和课程思政价值。" }
+    ];
+
+    const levels = [
+      {
+        title: "钛文创机会识别",
+        subtitle: "把宝鸡钛谷材料优势转化成可验证的消费品机会。",
+        scene: "宝鸡钛企业想开发面向年轻用户的钛文创礼品。团队知道钛材轻、耐腐蚀、有地方产业特色，但还没有清晰用户、产品原型和价值表达。",
+        goals: ["找到第一批目标用户", "验证钛文创的核心购买理由", "做出可展示的MVP"],
+        required: ["opportunity", "interview", "competitor", "mvp"],
+        traps: ["testing", "finance"],
+        pick: 4,
+        tip: "先验证谁会买、为什么买，再考虑规模化和检测。",
+        badge: "机会识别"
+      },
+      {
+        title: "眉县猕猴桃冷链复购",
+        subtitle: "用调研和数据把农产品体验问题讲清楚。",
+        scene: "眉县猕猴桃线上销售评价出现两极分化，部分用户反馈到货偏软、售后沟通慢。团队希望设计一套冷链体验优化服务。",
+        goals: ["找到差评背后的真实原因", "建立用户反馈和售后改进闭环", "形成合作社能执行的服务方案"],
+        required: ["interview", "survey", "factCheck", "canvas"],
+        traps: ["ip", "testing"],
+        pick: 4,
+        tip: "农产品项目先要有调研和流程优化，不能一上来就谈专利。",
+        badge: "需求验证"
+      },
+      {
+        title: "青铜器研学盒设计",
+        subtitle: "把周秦文化资源变成可体验、可传播的课程产品。",
+        scene: "团队计划围绕宝鸡青铜器文化设计研学盒。已有文化资源，但学生容易停留在讲故事，缺少任务、产品和商业闭环。",
+        goals: ["把文化故事转化为体验任务", "明确学校和研学机构的购买价值", "形成路演可展示样品"],
+        required: ["social", "mvp", "canvas", "pitch"],
+        traps: ["testing", "finance"],
+        pick: 4,
+        tip: "文旅文创项目要讲体验设计、课程思政和产品化。",
+        badge: "文创转化"
+      },
+      {
+        title: "AI双创助手上线",
+        subtitle: "让AI成为学习工具，而不是替写机器。",
+        scene: "团队想做一个AI双创助手，帮助学生生成项目诊断、访谈提纲和路演问答。但如果缺少核验和伦理设计，容易被评委质疑。",
+        goals: ["说明AI如何服务学习过程", "避免AI幻觉和数据隐私风险", "形成可持续迭代的智能体流程"],
+        required: ["aiAgent", "factCheck", "ethics", "ip"],
+        traps: ["finance", "testing"],
+        pick: 4,
+        tip: "AI项目必须主动讲核验、责任边界和知识产权。",
+        badge: "AI伦理"
+      },
+      {
+        title: "低空巡检服务试点",
+        subtitle: "把无人机巡检想法变成安全、合规、可交付的服务。",
+        scene: "团队计划为园区、农田或景区做无人机巡检服务。项目听起来前沿，但评委会追问安全、合规、成本和交付证明。",
+        goals: ["明确服务场景和边界", "准备安全合规与测试证据", "算清服务价格和成本"],
+        required: ["ethics", "testing", "finance", "proof"],
+        traps: ["social", "survey"],
+        pick: 4,
+        tip: "低空场景需要先稳住安全、合规和服务交付。",
+        badge: "合规交付"
+      },
+      {
+        title: "大创项目申报",
+        subtitle: "把课程项目写成可立项、可执行、可结题的大创申报书。",
+        scene: "学生团队准备申报大创项目，但申报书目前只有想法，没有研究内容、团队分工、进度安排和预期成果。",
+        goals: ["凝练研究问题和创新点", "设计任务分工和进度", "明确可验收成果"],
+        required: ["opportunity", "team", "mvp", "pitch"],
+        traps: ["testing", "finance"],
+        pick: 4,
+        tip: "大创项目重在可执行、可验收，不要只写宏大愿景。",
+        badge: "项目申报"
+      },
+      {
+        title: "挑战杯路演前夜",
+        subtitle: "把项目证据链补齐，准备评委追问。",
+        scene: "团队即将参加挑战杯校赛。项目有原型和调研，但答辩材料分散，评委可能追问创新点、竞品、知识产权和应用效果。",
+        goals: ["把证据整理成答辩故事", "准备知识产权和应用证明", "形成评委问答库"],
+        required: ["pitch", "ip", "proof", "competitor"],
+        traps: ["survey", "social"],
+        pick: 4,
+        tip: "赛前最需要证据链，而不是再增加新功能。",
+        badge: "路演攻防"
+      },
+      {
+        title: "商业闭环终局",
+        subtitle: "让项目从课程作品变成能持续运行的创业计划。",
+        scene: "团队准备提交商业计划书终稿。评委关心谁付钱、成本如何控制、如何获客、风险怎么处理，以及为什么这个团队能做成。",
+        goals: ["讲清商业模式和收入来源", "说明财务假设和风险控制", "呈现团队执行力与下一步计划"],
+        required: ["canvas", "finance", "team", "ethics", "pitch"],
+        traps: ["testing", "survey"],
+        pick: 5,
+        tip: "终局关卡要把商业、团队、风险和表达连成闭环。",
+        badge: "商业闭环"
+      }
+    ];
+
+    const state = JSON.parse(localStorage.getItem("cardQuestState") || "{}");
+    const scoreMap = state.scoreMap || {};
+    let unlocked = state.unlocked || 1;
+    let currentLevel = Math.min(state.currentLevel || 0, levels.length - 1);
+    let selectedCards = [];
+
+    function saveState() {
+      localStorage.setItem("cardQuestState", JSON.stringify({ scoreMap, unlocked, currentLevel }));
+    }
+
+    function totalScore() {
+      return Object.values(scoreMap).reduce((sum, value) => sum + value, 0);
+    }
+
+    function maxUnlocked() {
+      return Math.max(unlocked, Number(localStorage.getItem("cardQuestUnlocked") || 1));
+    }
+
+    function setUnlocked(value) {
+      unlocked = value;
+      state.unlocked = value;
+      localStorage.setItem("cardQuestUnlocked", String(value));
+    }
+
+    function sceneSvg(levelIndex) {
+      const colors = [
+        ["#e46f28", "#1159a6"],
+        ["#2d8b57", "#1159a6"],
+        ["#f5a623", "#0f8f86"],
+        ["#1159a6", "#e46f28"],
+        ["#0f8f86", "#2176cf"],
+        ["#2176cf", "#f5a623"],
+        ["#e46f28", "#092b62"],
+        ["#1159a6", "#2d8b57"]
+      ][levelIndex];
+      const labels = [
+        ["钛谷", "文创"],
+        ["果业", "冷链"],
+        ["青铜", "研学"],
+        ["AI", "核验"],
+        ["低空", "巡检"],
+        ["大创", "立项"],
+        ["挑战杯", "答辩"],
+        ["商业", "闭环"]
+      ][levelIndex];
+      return `
+        <svg viewBox="0 0 430 250" role="img" aria-label="关卡场景示意">
+          <rect x="12" y="12" width="406" height="226" rx="8" fill="#fff" stroke="#c9ddf2"></rect>
+          <circle cx="132" cy="128" r="64" fill="${colors[0]}" opacity=".16"></circle>
+          <circle cx="298" cy="128" r="64" fill="${colors[1]}" opacity=".16"></circle>
+          <path d="M70 130h95M265 130h95" stroke="${colors[0]}" stroke-width="8" stroke-linecap="round"></path>
+          <path d="M190 84h50v92h-50z" fill="#f8fcff" stroke="${colors[1]}" stroke-width="5"></path>
+          <path d="M203 108h24M203 126h24M203 144h18" stroke="${colors[1]}" stroke-width="5" stroke-linecap="round"></path>
+          <circle cx="132" cy="128" r="38" fill="#fff" stroke="${colors[0]}" stroke-width="5"></circle>
+          <circle cx="298" cy="128" r="38" fill="#fff" stroke="${colors[1]}" stroke-width="5"></circle>
+          <text x="132" y="134" text-anchor="middle" font-size="20" fill="${colors[0]}" font-weight="700">${labels[0]}</text>
+          <text x="298" y="134" text-anchor="middle" font-size="20" fill="${colors[1]}" font-weight="700">${labels[1]}</text>
+          <text x="215" y="218" text-anchor="middle" font-size="15" fill="#64758d">选择正确行动卡，推动项目升级</text>
+        </svg>`;
+    }
+
+    function render() {
+      const level = levels[currentLevel];
+      selectedCards = [];
+      document.getElementById("levelTitle").textContent = `${String(currentLevel + 1).padStart(2, "0")} ${level.title}`;
+      document.getElementById("levelSubtitle").textContent = level.subtitle;
+      document.getElementById("levelScore").textContent = `${scoreMap[currentLevel] || 0}/100`;
+      document.getElementById("scenarioText").textContent = level.scene;
+      document.getElementById("goalList").innerHTML = level.goals.map(goal => `<div class="goal">${goal}</div>`).join("");
+      document.getElementById("sceneSvg").innerHTML = sceneSvg(currentLevel);
+      document.getElementById("tipText").textContent = level.tip;
+      document.getElementById("pickLimit").textContent = `请选择 ${level.pick} 张卡`;
+      document.getElementById("selectedCount").textContent = `0/${level.pick}`;
+      document.getElementById("selectedList").innerHTML = "";
+      document.getElementById("resultCard").className = "result-card";
+      document.getElementById("resultText").textContent = "选择卡牌后提交，系统会根据课程逻辑给出反馈。";
+      renderDeck();
+      renderTabs();
+      renderBadges();
+      renderStatus();
+    }
+
+    function renderDeck() {
+      const deck = document.getElementById("deck");
+      deck.innerHTML = cards.map(card => `
+        <button type="button" class="card" data-id="${card.id}">
+          <span class="type">${card.type}</span>
+          <h3>${card.name}</h3>
+          <p>${card.text}</p>
+        </button>
+      `).join("");
+      deck.querySelectorAll(".card").forEach(cardEl => {
+        cardEl.addEventListener("click", () => toggleCard(cardEl.dataset.id));
+      });
+    }
+
+    function toggleCard(cardId) {
+      const level = levels[currentLevel];
+      const idx = selectedCards.indexOf(cardId);
+      if (idx >= 0) {
+        selectedCards.splice(idx, 1);
+      } else if (selectedCards.length < level.pick) {
+        selectedCards.push(cardId);
+      } else {
+        flashResult("warn", `本关只能选择 ${level.pick} 张卡。请先移除一张。`);
+      }
+      updateSelected();
+    }
+
+    function updateSelected() {
+      document.querySelectorAll(".card").forEach(cardEl => {
+        cardEl.classList.toggle("selected", selectedCards.includes(cardEl.dataset.id));
+      });
+      document.getElementById("selectedCount").textContent = `${selectedCards.length}/${levels[currentLevel].pick}`;
+      const list = document.getElementById("selectedList");
+      if (!selectedCards.length) {
+        list.innerHTML = `<div class="selected-chip">还没有选择行动卡</div>`;
+        return;
+      }
+      list.innerHTML = selectedCards.map(id => {
+        const card = cards.find(c => c.id === id);
+        return `<div class="selected-chip"><span>${card.name}</span><button type="button" class="remove" data-id="${id}">×</button></div>`;
+      }).join("");
+      list.querySelectorAll(".remove").forEach(btn => {
+        btn.addEventListener("click", () => toggleCard(btn.dataset.id));
+      });
+    }
+
+    function flashResult(kind, text) {
+      const card = document.getElementById("resultCard");
+      card.className = `result-card ${kind}`;
+      document.getElementById("resultText").textContent = text;
+    }
+
+    function submitLevel() {
+      const level = levels[currentLevel];
+      if (selectedCards.length !== level.pick) {
+        flashResult("warn", `还需要选择 ${level.pick - selectedCards.length} 张卡。`);
+        return;
+      }
+      let score = 0;
+      const chosen = new Set(selectedCards);
+      const missing = [];
+      const wrong = [];
+      level.required.forEach(id => {
+        if (chosen.has(id)) score += Math.floor(100 / level.required.length);
+        else missing.push(cards.find(c => c.id === id).name);
+      });
+      selectedCards.forEach(id => {
+        if (level.traps.includes(id)) {
+          score -= 12;
+          wrong.push(cards.find(c => c.id === id).name);
+        } else if (!level.required.includes(id)) {
+          score -= 4;
+          wrong.push(cards.find(c => c.id === id).name);
+        }
+      });
+      score = Math.max(0, Math.min(100, score));
+      scoreMap[currentLevel] = Math.max(scoreMap[currentLevel] || 0, score);
+
+      document.querySelectorAll(".card").forEach(cardEl => {
+        const id = cardEl.dataset.id;
+        cardEl.classList.remove("correct", "wrong");
+        if (level.required.includes(id) && selectedCards.includes(id)) cardEl.classList.add("correct");
+        if (!level.required.includes(id) && selectedCards.includes(id)) cardEl.classList.add("wrong");
+      });
+
+      const passed = score >= 60;
+      const currentUnlocked = maxUnlocked();
+      if (passed && currentLevel + 1 >= currentUnlocked && currentLevel + 1 < levels.length) {
+        setUnlocked(currentLevel + 2);
+      }
+      saveState();
+      renderTabs();
+      renderBadges();
+      renderStatus();
+      document.getElementById("levelScore").textContent = `${scoreMap[currentLevel] || 0}/100`;
+      const missingText = missing.length ? `缺少关键卡：${missing.join("、")}。` : "关键行动已覆盖。";
+      const wrongText = wrong.length ? ` 需要谨慎使用或暂不优先：${wrong.join("、")}。` : "";
+      flashResult(passed ? "good" : "warn", `本关得分 ${score}。${missingText}${wrongText}${passed ? " 已达到通关线。" : " 未达通关线，请调整卡组。"}`);
+    }
+
+    function showHint() {
+      const level = levels[currentLevel];
+      const names = level.required.map(id => cards.find(c => c.id === id).name);
+      flashResult("warn", `关键线索：本关最需要 ${names.join("、")}。`);
+    }
+
+    function nextLevel() {
+      const currentUnlocked = maxUnlocked();
+      if (currentLevel + 1 >= levels.length) {
+        flashResult("good", "已经到终局。可以复制成绩，或重置后让其他小组挑战。");
+        return;
+      }
+      if (currentLevel + 2 > currentUnlocked) {
+        flashResult("warn", "本关达到60分以上后才能稳定进入下一关。");
+        return;
+      }
+      currentLevel += 1;
+      saveState();
+      render();
+    }
+
+    function renderTabs() {
+      const currentUnlocked = maxUnlocked();
+      const list = document.getElementById("levelList");
+      list.innerHTML = levels.map((level, index) => {
+        const locked = index + 1 > currentUnlocked;
+        return `
+          <button type="button" class="level-tab ${index === currentLevel ? "active" : ""} ${locked ? "locked" : ""}" data-index="${index}" ${locked ? "disabled" : ""}>
+            <span class="level-no">${String(index + 1).padStart(2, "0")}</span>
+            <span class="level-title">${level.title}</span>
+            <span class="level-score">${scoreMap[index] || 0}/100</span>
+          </button>
+        `;
+      }).join("");
+      list.querySelectorAll(".level-tab:not(.locked)").forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentLevel = Number(btn.dataset.index);
+          saveState();
+          render();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+    }
+
+    function renderBadges() {
+      const badges = document.getElementById("badges");
+      badges.innerHTML = levels.map((level, index) => {
+        const earned = (scoreMap[index] || 0) >= 60;
+        return `<div class="badge ${earned ? "earned" : ""}">${earned ? "✓ " : ""}${level.badge}</div>`;
+      }).join("");
+    }
+
+    function renderStatus() {
+      const finished = levels.filter((_, idx) => (scoreMap[idx] || 0) >= 60).length;
+      document.getElementById("totalScore").textContent = `总分 ${totalScore()}`;
+      document.getElementById("levelState").textContent = `第${currentLevel + 1}关`;
+      document.getElementById("progressBar").style.width = `${Math.round(finished / levels.length * 100)}%`;
+      document.getElementById("progressText").textContent = `已稳定通关 ${finished}/${levels.length} 关。`;
+    }
+
+    function copyScore() {
+      const lines = levels.map((level, index) => `${index + 1}. ${level.title}: ${scoreMap[index] || 0}/100`);
+      const text = `创新创业基础卡牌闯关成绩\n总分：${totalScore()}\n${lines.join("\n")}`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => alert("成绩已复制。")).catch(() => alert(text));
+      } else {
+        alert(text);
+      }
+    }
+
+    function resetGame() {
+      localStorage.removeItem("cardQuestState");
+      localStorage.removeItem("cardQuestUnlocked");
+      Object.keys(scoreMap).forEach(k => delete scoreMap[k]);
+      currentLevel = 0;
+      setUnlocked(1);
+      saveState();
+      render();
+    }
+
+    document.getElementById("submitBtn").addEventListener("click", submitLevel);
+    document.getElementById("hintBtn").addEventListener("click", showHint);
+    document.getElementById("nextBtn").addEventListener("click", nextLevel);
+    document.getElementById("copyBtn").addEventListener("click", copyScore);
+    document.getElementById("resetBtn").addEventListener("click", resetGame);
+
+    if (!localStorage.getItem("cardQuestUnlocked")) setUnlocked(unlocked);
+    render();
+  </script>
+</body>
+</html>

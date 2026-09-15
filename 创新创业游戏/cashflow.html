@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>现金流大作战</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#052e16,#022c22,#0a0a0a);color:#dcfce7;min-height:100vh;padding:16px;overflow:hidden}
+  .wrap{max-width:680px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .topbar a{color:#86efac;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:21px;background:linear-gradient(90deg,#4ade80,#fde047);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hud{display:flex;gap:10px;margin:10px 0}
+  .hud .box{flex:1;background:#06281b;border:1px solid #166534;border-radius:10px;padding:8px 10px;text-align:center}
+  .hud .l{font-size:11px;color:#86efac}.hud .v{font-size:20px;font-weight:800}
+  #cash.low{color:#f87171;animation:pulse .6s infinite}
+  @keyframes pulse{50%{opacity:.4}}
+  #arena{position:relative;height:62vh;min-height:380px;background:#03150e;border:1px solid #166534;border-radius:16px;overflow:hidden;margin-top:6px}
+  .bub{position:absolute;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:800;font-size:13px;user-select:none;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+  .bub small{font-size:11px;font-weight:600}
+  .b-rev{background:radial-gradient(circle at 35% 30%,#86efac,#16a34a);color:#052e16}
+  .b-bill{background:radial-gradient(circle at 35% 30%,#fca5a5,#dc2626);color:#450a0a}
+  .b-inv{background:radial-gradient(circle at 35% 30%,#93c5fd,#2563eb);color:#0a1f44}
+  .pop{position:absolute;font-weight:800;font-size:15px;pointer-events:none;animation:rise .8s ease-out forwards}
+  @keyframes rise{to{transform:translateY(-40px);opacity:0}}
+  .overlay{position:absolute;inset:0;background:rgba(2,21,14,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;z-index:10}
+  .overlay h2{font-size:26px;margin-bottom:10px}
+  .overlay p{color:#bbf7d0;line-height:1.7;margin-bottom:6px;max-width:420px}
+  .btn{background:linear-gradient(90deg,#16a34a,#ca8a04);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:16px;font-weight:700;cursor:pointer;margin-top:14px}
+  .legend{font-size:12px;color:#86efac;display:flex;gap:14px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+  .legend b{color:#fde047}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a href="basic.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">创新创业系列 · 05</span></div>
+  <h1>💸 现金流大作战</h1>
+  <div class="hud">
+    <div class="box"><div class="l">💰 现金(万)</div><div class="v" id="cash">100</div></div>
+    <div class="box"><div class="l">🔥 月烧钱率</div><div class="v" id="burn">3.0</div></div>
+    <div class="box"><div class="l">⏱ 存活</div><div class="v" id="time">0s</div></div>
+  </div>
+  <div id="arena">
+    <div class="overlay" id="start">
+      <h2>🏦 守住你的现金流</h2>
+      <p>公司每秒都在烧钱。点击<b style="color:#4ade80">绿色订单</b>收款；<b style="color:#f87171">红色账单</b>务必在它飘到顶部前点掉，否则会被罚滞纳金；<b style="color:#60a5fa">蓝色投资</b>能降低烧钱率。现金归零即破产，撑得越久越强！</p>
+      <button class="btn" id="startBtn">开始经营</button>
+    </div>
+  </div>
+  <div class="legend"><span>🟢 订单 <b>+收入</b></span><span>🔴 账单 <b>点掉=小额支出 / 漏掉=大额罚款</b></span><span>🔵 投资 <b>降烧钱率</b></span></div>
+</div>
+
+<script>
+const arena=document.getElementById('arena');
+let cash,burn,t,running,bubbles,spawnTimer,raf,last,nextSpawn;
+function reset(){cash=100;burn=3.0;t=0;running=false;bubbles=[];last=0;nextSpawn=0;updateHUD();}
+function updateHUD(){
+  document.getElementById('cash').textContent=cash.toFixed(0);
+  document.getElementById('burn').textContent=burn.toFixed(1);
+  document.getElementById('time').textContent=Math.floor(t)+'s';
+  document.getElementById('cash').classList.toggle('low',cash<20);
+}
+function pop(x,y,txt,col){
+  const p=document.createElement('div');p.className='pop';p.style.left=x+'px';p.style.top=y+'px';p.style.color=col;p.textContent=txt;
+  arena.appendChild(p);setTimeout(()=>p.remove(),800);
+}
+function spawn(){
+  const r=Math.random();let type,val,emoji,cls,label;
+  if(r<0.5){type='rev';val=4+Math.random()*8|0;emoji='💰';cls='b-rev';label='+'+val;}
+  else if(r<0.85){type='bill';val=-(5+Math.random()*9|0);emoji='📄';cls='b-bill';label=val;}
+  else{type='inv';val=-(8+Math.random()*6|0);emoji='🚀';cls='b-inv';label='烧钱-0.6';}
+  const size=58+Math.random()*16;
+  const el=document.createElement('div');el.className='bub '+cls;el.style.width=el.style.height=size+'px';
+  el.innerHTML=emoji+'<small>'+label+'</small>';
+  const x=Math.random()*(arena.clientWidth-size);
+  el.style.left=x+'px';el.style.top=(arena.clientHeight)+'px';
+  const speed=(30+Math.random()*30)+ (t*0.6); // px/s, speeds up over time
+  const b={el,type,val,y:arena.clientHeight,size,speed,paid:false};
+  el.onclick=()=>{ if(!running||b.removed)return; collect(b); };
+  arena.appendChild(el);bubbles.push(b);
+}
+function collect(b){
+  b.removed=true;b.el.remove();
+  const rect={x:parseFloat(b.el.style.left),y:b.y};
+  if(b.type==='rev'){cash+=b.val;pop(rect.x,rect.y,'+'+b.val,'#4ade80');}
+  else if(b.type==='bill'){cash+=b.val;pop(rect.x,rect.y,b.val,'#fca5a5');}
+  else{cash+=b.val;burn=Math.max(0.6,burn-0.6);pop(rect.x,rect.y,'烧钱↓','#93c5fd');}
+  bubbles=bubbles.filter(x=>x!==b);updateHUD();
+  if(cash<=0)end();
+}
+function loop(ts){
+  if(!running)return;
+  if(!last)last=ts;const dt=(ts-last)/1000;last=ts;
+  t+=dt;
+  cash-=burn*dt; // continuous burn
+  // spawn cadence
+  nextSpawn-=dt;
+  if(nextSpawn<=0){spawn();nextSpawn=Math.max(0.5,1.4-t*0.02);}
+  // move bubbles
+  for(const b of bubbles.slice()){
+    b.y-=b.speed*dt;b.el.style.top=b.y+'px';
+    if(b.y< -b.size){
+      // reached top
+      b.removed=true;b.el.remove();bubbles=bubbles.filter(x=>x!==b);
+      if(b.type==='bill'){ // missed bill => penalty (late fee = double)
+        const fee=b.val*2;cash+=fee;pop(parseFloat(b.el.style.left||10),20,'滞纳金'+fee,'#ef4444');
+      }
+    }
+  }
+  updateHUD();
+  if(cash<=0){end();return;}
+  raf=requestAnimationFrame(loop);
+}
+function start(){
+  reset();
+  document.querySelectorAll('#arena .overlay, #arena .bub, #arena .pop').forEach(e=>e.remove());
+  running=true;last=0;nextSpawn=0.6;
+  raf=requestAnimationFrame(loop);
+}
+function end(){
+  running=false;cancelAnimationFrame(raf);
+  bubbles.forEach(b=>b.el.remove());bubbles=[];
+  cash=Math.max(0,cash);updateHUD();
+  let title,desc;
+  if(t>=60){title="🏆 现金流大师";desc="你撑过了一分钟以上，现金管理炉火纯青！真实创业中，能管好现金流的公司已经赢了一半。";}
+  else if(t>=35){title="🎉 稳健经营者";desc="不错的现金把控能力，再练练应对账单的反应速度。";}
+  else if(t>=15){title="🙂 仍需历练";desc="留意：漏掉红色账单的滞纳金是吞噬现金的元凶。";}
+  else{title="💥 资金链断裂";desc="烧钱太快、收入跟不上——这是 80% 创业公司倒下的真实原因。";}
+  const ov=document.createElement('div');ov.className='overlay';
+  ov.innerHTML=`<h2>${title}</h2><p>${desc}</p>
+    <p>存活 <b style="color:#fde047;font-size:22px">${Math.floor(t)} 秒</b></p>
+    <button class="btn" id="again">再战一局</button>`;
+  arena.appendChild(ov);
+  document.getElementById('again').onclick=start;
+}
+document.getElementById('startBtn').onclick=start;
+reset();
+window.addEventListener('resize',()=>{});
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创业模拟器 · 从0到IPO</title>
+<style>
+  :root{
+    --bg1:#0f172a; --bg2:#1e293b; --accent:#6366f1; --accent2:#8b5cf6;
+    --good:#22c55e; --bad:#ef4444; --warn:#f59e0b; --card:#1e293b; --text:#e2e8f0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#312e81 0%,var(--bg1) 55%);
+    color:var(--text);min-height:100vh;display:flex;justify-content:center;
+    padding:24px;
+  }
+  .wrap{width:100%;max-width:760px}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .topbar a{color:#94a3b8;text-decoration:none;font-size:14px}
+  .topbar a:hover{color:#fff}
+  h1{font-size:24px;background:linear-gradient(90deg,#a78bfa,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+  .stat{background:var(--card);border:1px solid #334155;border-radius:14px;padding:12px;text-align:center}
+  .stat .label{font-size:12px;color:#94a3b8}
+  .stat .val{font-size:20px;font-weight:700;margin-top:4px}
+  .bar{height:6px;border-radius:6px;background:#0f172a;margin-top:8px;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:6px;transition:width .5s}
+  .panel{background:var(--card);border:1px solid #334155;border-radius:18px;padding:22px}
+  .round{font-size:13px;color:#a78bfa;letter-spacing:1px;text-transform:uppercase}
+  .event-title{font-size:19px;font-weight:700;margin:8px 0 6px}
+  .event-desc{color:#cbd5e1;line-height:1.6;font-size:15px}
+  .choices{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+  .choice{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:14px 16px;cursor:pointer;transition:.2s;text-align:left;color:var(--text);font-size:15px}
+  .choice:hover{border-color:var(--accent);transform:translateY(-2px);background:#1e1b4b}
+  .feedback{margin-top:16px;padding:14px;border-radius:12px;background:#0f172a;border-left:4px solid var(--accent);display:none;line-height:1.6}
+  .feedback.show{display:block;animation:fade .4s}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  .delta{display:inline-block;margin-right:10px;font-weight:700;font-size:14px}
+  .btn{display:inline-block;margin-top:16px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:15px;cursor:pointer;font-weight:600}
+  .btn:hover{opacity:.9}
+  .end{text-align:center;padding:30px 10px}
+  .end h2{font-size:26px;margin-bottom:10px}
+  .end p{color:#cbd5e1;line-height:1.7;margin-bottom:6px}
+  .tip{font-size:12px;color:#64748b;margin-top:14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="basic.html">← 返回游戏大厅</a>
+    <span style="font-size:13px;color:#64748b">创新创业系列 · 01</span>
+  </div>
+  <h1>🚀 创业模拟器：从 0 到 IPO</h1>
+  <p style="color:#94a3b8;margin-top:6px;font-size:14px">用 8 个季度做出关键决策，平衡资金、用户、团队与口碑，带领公司成功上市。</p>
+
+  <div class="stats">
+    <div class="stat"><div class="label">💰 资金(万)</div><div class="val" id="s-cash">50</div><div class="bar"><i id="b-cash" style="background:var(--good)"></i></div></div>
+    <div class="stat"><div class="label">👥 用户(万)</div><div class="val" id="s-user">1</div><div class="bar"><i id="b-user" style="background:#38bdf8"></i></div></div>
+    <div class="stat"><div class="label">😊 团队士气</div><div class="val" id="s-mood">70</div><div class="bar"><i id="b-mood" style="background:var(--warn)"></i></div></div>
+    <div class="stat"><div class="label">⭐ 口碑</div><div class="val" id="s-rep">60</div><div class="bar"><i id="b-rep" style="background:var(--accent2)"></i></div></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+  <p class="tip">提示：资金归零或士气崩盘都会导致创业失败。每个选择没有绝对正确，权衡取舍才是创业。</p>
+</div>
+
+<script>
+const state={cash:50,user:1,mood:70,rep:60,round:0};
+const MAXR=8;
+const events=[
+  {t:"种子轮的诱惑",d:"一位天使投资人愿意投 100 万，但要占 30% 股权并要求你 3 个月内做出产品。",
+   c:[{x:"接受投资，快速冲刺",e:{cash:100,mood:-10,rep:5}},
+      {x:"婉拒，用自有资金稳健起步",e:{cash:0,mood:10,user:0.5}}]},
+  {t:"核心功能取舍",d:"团队精力有限，是先打磨一个'惊艳'功能，还是快速上线多个'够用'功能？",
+   c:[{x:"死磕一个尖叫点功能",e:{cash:-15,rep:15,user:1}},
+      {x:"快速铺开抢占市场",e:{cash:-10,user:3,rep:-5}}]},
+  {t:"第一位关键员工",d:"有位资深技术大牛想加入，但要求高薪+期权；也可以招两个性价比高的应届生。",
+   c:[{x:"重金请大牛",e:{cash:-20,mood:5,rep:10}},
+      {x:"招两名应届生培养",e:{cash:-8,mood:-5,user:1}}]},
+  {t:"增长黑客 vs 口碑",d:"一种刷量打法能让用户数据暴涨，但有夸大宣传风险。",
+   c:[{x:"投放增长打法",e:{user:5,rep:-20,cash:-12}},
+      {x:"做扎实的用户运营",e:{user:2,rep:15,cash:-6}}]},
+  {t:"竞品价格战",d:"对手大幅降价抢客户，你跟还是不跟？",
+   c:[{x:"跟进降价保份额",e:{cash:-18,user:3,mood:-8}},
+      {x:"坚持价值，做差异化",e:{user:-1,rep:12,cash:-4}}]},
+  {t:"团队危机",d:"连续加班后团队出现倦怠，有人提出离职。",
+   c:[{x:"放假团建，调整节奏",e:{cash:-10,mood:25,user:0}},
+      {x:"咬牙冲刺，事后再补",e:{user:2,mood:-20,rep:-3}}]},
+  {t:"A轮融资",d:"VC 抛出橄榄枝，但尽调发现你的口碑数据是关键。",
+   c:[{x:"全力冲刺 A 轮",e:{cash:120,mood:-8,rep:0}},
+      {x:"先做利润，延后融资",e:{cash:30,user:1,mood:5}}]},
+  {t:"上市前夜",d:"距离 IPO 只差临门一脚，是稳还是搏？",
+   c:[{x:"加大研发，冲击高估值",e:{cash:-25,rep:20,user:3}},
+      {x:"稳健经营，保证盈利",e:{cash:15,mood:10,rep:5}}]}
+];
+
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function render(){
+  document.getElementById('s-cash').textContent=Math.round(state.cash);
+  document.getElementById('s-user').textContent=state.user.toFixed(1);
+  document.getElementById('s-mood').textContent=Math.round(state.mood);
+  document.getElementById('s-rep').textContent=Math.round(state.rep);
+  document.getElementById('b-cash').style.width=clamp(state.cash/2,0,100)+'%';
+  document.getElementById('b-user').style.width=clamp(state.user*8,0,100)+'%';
+  document.getElementById('b-mood').style.width=clamp(state.mood,0,100)+'%';
+  document.getElementById('b-rep').style.width=clamp(state.rep,0,100)+'%';
+}
+function showEvent(){
+  const ev=events[state.round];
+  const p=document.getElementById('panel');
+  p.innerHTML=`<div class="round">第 ${state.round+1} / ${MAXR} 季度</div>
+    <div class="event-title">${ev.t}</div>
+    <div class="event-desc">${ev.d}</div>
+    <div class="choices"></div>
+    <div class="feedback" id="fb"></div>`;
+  const box=p.querySelector('.choices');
+  ev.c.forEach(ch=>{
+    const b=document.createElement('button');b.className='choice';b.textContent=ch.x;
+    b.onclick=()=>choose(ch);box.appendChild(b);
+  });
+}
+function choose(ch){
+  const e=ch.e;
+  state.cash+=e.cash||0; state.user=Math.max(0,state.user+(e.user||0));
+  state.mood=clamp(state.mood+(e.mood||0),0,100); state.rep=clamp(state.rep+(e.rep||0),0,100);
+  render();
+  const fb=document.getElementById('fb');
+  const fmt=(n,u)=>n>0?`<span class="delta" style="color:var(--good)">▲ ${u} +${n}</span>`:n<0?`<span class="delta" style="color:var(--bad)">▼ ${u} ${n}</span>`:'';
+  fb.innerHTML=`你选择了：<b>${ch.x}</b><br>${fmt(e.cash||0,'资金')}${fmt(e.user||0,'用户')}${fmt(e.mood||0,'士气')}${fmt(e.rep||0,'口碑')}
+    <br><button class="btn" id="next">${state.round>=MAXR-1?'查看结局 →':'进入下一季度 →'}</button>`;
+  fb.classList.add('show');
+  document.querySelectorAll('.choice').forEach(c=>{c.style.pointerEvents='none';c.style.opacity=.5});
+  document.getElementById('next').onclick=next;
+  if(state.cash<0||state.mood<=0){setTimeout(()=>gameOver(false),300);}
+}
+function next(){
+  state.round++;
+  if(state.round>=MAXR){endGame();return;}
+  showEvent();
+}
+function gameOver(win){
+  const p=document.getElementById('panel');
+  p.innerHTML=`<div class="end"><h2>💥 创业失败</h2>
+    <p>${state.cash<0?'资金链断裂，公司无力运营。':'团队士气崩盘，核心成员相继离开。'}</p>
+    <p style="color:#64748b">坚持到第 ${state.round+1} 季度</p>
+    <button class="btn" onclick="location.reload()">再来一次</button></div>`;
+}
+function endGame(){
+  const score=state.cash*0.5+state.user*15+state.mood*0.4+state.rep*0.6;
+  let title,desc;
+  if(score>=180){title="🏆 成功上市 IPO！";desc="估值飙升，敲钟那一刻你证明了一切。你是天生的创业者！";}
+  else if(score>=130){title="🎉 被巨头收购";desc="虽未独立上市，但你的公司被高价收购，财务自由达成。";}
+  else if(score>=90){title="🌱 稳健的中型公司";desc="公司活下来并实现盈利，这本身就是 90% 创业者做不到的事。";}
+  else{title="🤝 小而美的生意";desc="规模不大，但你积累了宝贵经验，下一次会更好。";}
+  const p=document.getElementById('panel');
+  p.innerHTML=`<div class="end"><h2>${title}</h2><p>${desc}</p>
+    <p style="margin-top:14px">综合评分：<b style="color:#a78bfa;font-size:22px">${Math.round(score)}</b></p>
+    <p style="color:#64748b">资金 ${Math.round(state.cash)}万 · 用户 ${state.user.toFixed(1)}万 · 士气 ${Math.round(state.mood)} · 口碑 ${Math.round(state.rep)}</p>
+    <button class="btn" onclick="location.reload()">再创业一次</button></div>`;
+}
+render();showEvent();
+</script>
+</body>
+</html>

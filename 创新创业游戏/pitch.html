@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30秒电梯演讲挑战</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#1a0b2e,#0f1729);color:#e9d5ff;min-height:100vh;padding:20px}
+  .wrap{max-width:760px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .topbar a{color:#a78bfa;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:23px;background:linear-gradient(90deg,#f472b6,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#c4b5fd;font-size:14px;margin:6px 0 16px}
+  .slot{background:#1e1640;border:1px solid #4c1d95;border-radius:12px;padding:14px;margin-bottom:12px}
+  .slot h3{font-size:14px;color:#f0abfc;margin-bottom:10px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{background:#150f2e;border:1px solid #3b2a6b;border-radius:9px;padding:10px 12px;font-size:14px;cursor:pointer;transition:.15s;line-height:1.5}
+  .opt:hover{border-color:#a78bfa}
+  .opt.sel{background:#3b0764;border-color:#e879f9}
+  .btn{background:linear-gradient(90deg,#db2777,#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px 26px;font-size:15px;font-weight:700;cursor:pointer;width:100%;margin-top:4px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .stage{display:none;text-align:center;background:#1e1640;border:1px solid #4c1d95;border-radius:16px;padding:24px;margin-top:10px}
+  .timer{font-size:48px;font-weight:800;font-variant-numeric:tabular-nums}
+  .pitch{text-align:left;background:#150f2e;border-radius:12px;padding:18px;margin:16px 0;line-height:1.9;font-size:16px;min-height:120px}
+  .result{display:none;text-align:center;background:#1e1640;border:1px solid #4c1d95;border-radius:16px;padding:26px;margin-top:10px}
+  .result h2{font-size:24px;margin-bottom:8px}
+  .score{font-size:40px;font-weight:800;color:#f0abfc}
+  .tag{display:inline-block;background:#3b0764;border-radius:20px;padding:4px 12px;font-size:12px;margin:3px;color:#f0abfc}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a href="basic.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">创新创业系列 · 03</span></div>
+  <h1>🎤 30秒电梯演讲挑战</h1>
+  <p class="sub">想象你和投资人共乘电梯，只有 30 秒。从每一环节选出你认为最打动人的一句，组装你的 Pitch。</p>
+
+  <div id="builder"></div>
+  <button class="btn" id="go" disabled>🛗 进入电梯，开始演讲</button>
+
+  <div class="stage" id="stage">
+    <div class="timer" id="timer">30</div>
+    <div class="pitch" id="pitch"></div>
+    <p style="color:#c4b5fd;font-size:13px">演讲进行中…保持自信！</p>
+  </div>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+const parts=[
+  {h:"① 开场钩子（你是谁/抓注意）",o:[
+    {t:"「你每天通勤浪费的2小时，本可以变成收入。」",s:9},
+    {t:"「大家好，我是来自XX大学的创业者。」",s:4},
+    {t:"「我们是一家科技公司，专注于创新。」",s:3}]},
+  {h:"② 痛点问题（谁在受苦）",o:[
+    {t:"「全国3000万灵活就业者，找不到稳定靠谱的零活。」",s:9},
+    {t:"「现在的市场存在很多问题。」",s:3},
+    {t:"「很多人都需要兼职。」",s:5}]},
+  {h:"③ 解决方案（你做了什么）",o:[
+    {t:"「我们用AI把任务和人精准匹配，10分钟接单。」",s:9},
+    {t:"「我们做了一个兼职平台。」",s:5},
+    {t:"「我们提供一站式综合服务解决方案。」",s:3}]},
+  {h:"④ 差异化（凭什么是你）",o:[
+    {t:"「匹配准确率比同行高40%，复购率行业第一。」",s:9},
+    {t:"「我们的团队很厉害，很有经验。」",s:4},
+    {t:"「我们和别人不太一样。」",s:2}]},
+  {h:"⑤ 市场与势能（多大盘子）",o:[
+    {t:"「千亿级灵活用工市场，年增速25%，我们已月入50万。」",s:9},
+    {t:"「这是一个很大的市场。」",s:3},
+    {t:"「市场前景非常广阔。」",s:3}]},
+  {h:"⑥ 行动号召（你要什么）",o:[
+    {t:"「我们想要300万天使轮，加速城市复制，期待与您细聊。」",s:9},
+    {t:"「希望大家多多支持我们。」",s:4},
+    {t:"「谢谢大家。」",s:2}]}
+];
+const picks=Array(parts.length).fill(null);
+const builder=document.getElementById('builder');
+parts.forEach((p,pi)=>{
+  const slot=document.createElement('div');slot.className='slot';
+  slot.innerHTML=`<h3>${p.h}</h3>`;
+  const box=document.createElement('div');box.className='opts';
+  p.o.forEach((o,oi)=>{
+    const b=document.createElement('div');b.className='opt';b.textContent=o.t;
+    b.onclick=()=>{
+      box.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');picks[pi]={...o};check();
+    };
+    box.appendChild(b);
+  });
+  slot.appendChild(box);builder.appendChild(slot);
+});
+function check(){document.getElementById('go').disabled=picks.includes(null);}
+document.getElementById('go').onclick=start;
+function start(){
+  document.getElementById('builder').style.display='none';
+  document.getElementById('go').style.display='none';
+  const stage=document.getElementById('stage');stage.style.display='block';
+  const pitchText=picks.map(p=>p.t.replace(/[「」]/g,'')).join(' ');
+  const pitchEl=document.getElementById('pitch');
+  let i=0;
+  const type=setInterval(()=>{pitchEl.textContent=pitchText.slice(0,i++);if(i>pitchText.length)clearInterval(type);},35);
+  let t=30;const tm=document.getElementById('timer');
+  const iv=setInterval(()=>{
+    t--;tm.textContent=t;
+    if(t<=10)tm.style.color='#f87171';
+    if(t<=0){clearInterval(iv);clearInterval(type);pitchEl.textContent=pitchText;finish(pitchText);}
+  },1000);
+  // also let it finish when typing done + small delay
+  setTimeout(()=>{},0);
+}
+function finish(text){
+  const base=picks.reduce((a,p)=>a+p.s,0); // max 54
+  const len=text.length;
+  // 30秒约能讲 130~150字，超出扣分
+  let timePenalty=0,timeNote="节奏刚好，从容自信。";
+  if(len>160){timePenalty=8;timeNote="内容偏多，电梯门开了你还没讲完，略仓促。";}
+  else if(len<70){timePenalty=4;timeNote="太短了，没充分利用30秒，略显单薄。";}
+  const score=Math.max(0,Math.round((base-timePenalty)/54*100));
+  let level,emoji;
+  if(score>=90){level="投资人当场要了微信";emoji="🏆";}
+  else if(score>=75){level="成功约到下一次深聊";emoji="🎉";}
+  else if(score>=55){level="对方礼貌点头，需打磨";emoji="🙂";}
+  else{level="电梯门关上，机会溜走了";emoji="😅";}
+  document.getElementById('stage').style.display='none';
+  const r=document.getElementById('result');r.style.display='block';
+  r.innerHTML=`<h2>${emoji} ${level}</h2>
+    <div class="score">${score}<span style="font-size:18px;color:#c4b5fd">分</span></div>
+    <p style="margin:12px 0;color:#c4b5fd">${timeNote}（共 ${len} 字）</p>
+    <div>
+      <span class="tag">钩子 ${picks[0].s}/9</span><span class="tag">痛点 ${picks[1].s}/9</span>
+      <span class="tag">方案 ${picks[2].s}/9</span><span class="tag">差异化 ${picks[3].s}/9</span>
+      <span class="tag">市场 ${picks[4].s}/9</span><span class="tag">号召 ${picks[5].s}/9</span>
+    </div>
+    <p style="margin-top:14px;font-size:13px;color:#a78bfa">💡 好的Pitch=具体数字+真实痛点+清晰差异+明确诉求</p>
+    <button class="btn" style="margin-top:16px" onclick="location.reload()">再讲一次</button>`;
+}
+</script>
+</body>
+</html>

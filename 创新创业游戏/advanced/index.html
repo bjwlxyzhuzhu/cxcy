@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>复杂游戏大厅 · 街机级</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(1000px 600px at 50% -10%,#3b1d5e,#070710 55%);color:#e2e8f0;min-height:100vh;padding:30px 20px}
+  .wrap{max-width:1040px;margin:0 auto}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .top a{color:#a5b4fc;text-decoration:none;font-size:14px}.top a:hover{color:#fff}
+  header{text-align:center;margin-bottom:6px}
+  h1{font-size:32px;font-weight:800;background:linear-gradient(90deg,#c084fc,#38bdf8,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tagline{color:#94a3b8;font-size:15px;margin-top:8px}
+  .meta{color:#64748b;font-size:13px;margin-top:4px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-top:28px}
+  .game{display:block;text-decoration:none;color:inherit;background:#15132a;border:1px solid #2e2a52;border-radius:18px;padding:22px;transition:.2s;position:relative;overflow:hidden}
+  .game::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--c1),transparent 62%);opacity:.14;transition:.2s}
+  .game:hover{transform:translateY(-5px);border-color:var(--c1);box-shadow:0 16px 36px rgba(0,0,0,.45)}
+  .game:hover::before{opacity:.26}
+  .ic{font-size:42px;margin-bottom:10px}
+  .badge{position:absolute;top:16px;right:16px;font-size:11px;background:#2e2a52;color:#c7d2fe;border-radius:20px;padding:3px 10px}
+  .title{font-size:20px;font-weight:700;margin-bottom:4px}
+  .genre{font-size:12px;color:#fbbf24;margin-bottom:10px}
+  .desc{font-size:13px;color:#a3a2c2;line-height:1.65}
+  .feat{margin-top:10px;display:flex;flex-wrap:wrap;gap:5px}
+  .feat span{font-size:10.5px;background:#0f0e22;border:1px solid #2e2a52;border-radius:6px;padding:2px 7px;color:#94a3b8}
+  footer{text-align:center;color:#475569;font-size:12px;margin-top:34px;line-height:1.9}
+  .note{background:#15132a;border:1px solid #2e2a52;border-radius:14px;padding:14px 18px;margin-top:24px;font-size:13px;color:#a3a2c2;line-height:1.8}
+  .note b{color:#c4b5fd}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../index.html">← 返回模式选择</a><span style="font-size:13px;color:#64748b">街机级 · Canvas 引擎</span></div>
+  <header>
+    <h1>🕹️ 复杂游戏大厅</h1>
+    <p class="tagline">5 款引擎级街机游戏 · 实时游戏循环 · 碰撞 / 物理 / AI / 弹幕 / 粒子</p>
+    <p class="meta">键盘 + 鼠标 + 触屏操作 · 双击任意游戏即可开玩，无需联网</p>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="note" style="border-color:#6d28d9;background:#160f2e">
+    🎁 <b style="color:#fbbf24">每款均已配备</b>：🎵 合成背景音乐 + 🔊 打击音效（右上角可开关）· 🏆 本地最高分排行榜 · 📖 玩法与攻略弹窗 · 🧑‍🚀 重新设计的创业者角色。
+  </div>
+  <div class="note">
+    💡 <b>主题设计</b>：每款游戏都把「创新创业」深度绑定进玩法机制——
+    俄罗斯方块的「消行＝盖楼层冲 IPO」、祖玛的「消除＝整合资源」、跑酷的「追逐墙＝资金链断裂」、
+    射击的「Boss＝行业巨头」、连连看的「连通＝资源对接」，而非简单换皮。
+  </div>
+
+  <footer>
+    宝鸡 · 双创 AI 实验室智能体大赛 &nbsp;|&nbsp; 创新创业复杂游戏系列<br>
+    建议使用 Chrome / Edge 浏览器 · 桌面端体验最佳
+  </footer>
+</div>
+
+<script>
+const games=[
+  {f:"tetris.html",ic:"🏢",t:"独角兽大厦",g:"俄罗斯方块 / Tetris",c:"#a855f7",
+   d:"部门方块层层垒成大厦，填满一行=盖好一层楼，冲击 40 层 IPO 敲钟。",
+   feat:["SRS旋转+踢墙","T-Spin","7-bag","Hold/Ghost","连击/B2B","事件方块"]},
+  {f:"shooter.html",ic:"🚀",t:"创业突围战",g:"弹幕射击 / Shmup",c:"#38bdf8",
+   d:"驾驶创业飞船穿越 5 个融资阶段的弹幕，击落竞品与债务弹，干掉行业巨头 Boss。",
+   feat:["参数化弹幕","武器5级","僚机","护盾","清屏炸弹","Boss多阶段"]},
+  {f:"runner.html",ic:"🏃",t:"创业马拉松",g:"跑酷闯关 / Runner",c:"#34d399",
+   d:"创始人狂奔冲向上市，跳坑、躲竞品、下滑钻壁垒，别被身后的资金链断裂追上。",
+   feat:["可变跳/二段跳","土狼时间","程序化关卡","追逐墙","视差背景","金币"]},
+  {f:"linkgame.html",ic:"🔗",t:"商业版图连连看",g:"连连看 / Lianliankan",c:"#0ea5e9",
+   d:"把相同的创业要素用 ≤2 个拐角的折线连通，建立资源对接，清空全盘。",
+   feat:["BFS路径判定","死局检测","保证有解洗牌","提示","连击","计时"]},
+  {f:"zuma.html",ic:"🔮",t:"资源链",g:"祖玛 / Zuma",c:"#f472b6",
+   d:"资源宝珠滑向破产黑洞，瞄准发射，3 颗同色整合资源，趁抵达终点前清空珠链。",
+   feat:["曲线轨道物理","珠链插入","塌落连锁","连击","危险区","随速加压"]}
+];
+const grid=document.getElementById('grid');
+games.forEach((g,i)=>{
+  const a=document.createElement('a');a.className='game';a.href=g.f;a.style.setProperty('--c1',g.c);
+  a.innerHTML=`<div class="badge">★ 复杂</div>
+    <div class="ic">${g.ic}</div>
+    <div class="title">${g.t}</div>
+    <div class="genre">${g.g}</div>
+    <div class="desc">${g.d}</div>
+    <div class="feat">${g.feat.map(f=>`<span>${f}</span>`).join('')}</div>`;
+  grid.appendChild(a);
+});
+</script>
+</body>
+</html>

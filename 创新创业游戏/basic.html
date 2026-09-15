@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基础版 · 创新创业游戏大厅</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(1000px 600px at 50% -10%,#0e4f5e,#06121a 55%);color:#e2e8f0;min-height:100vh;padding:22px 20px 40px}
+  .wrap{max-width:1040px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .topbar a{color:#67e8f9;text-decoration:none;font-size:14px}
+  .topbar a:hover{color:#fff}
+  .topbar .adv{color:#c084fc}
+  header{text-align:center;margin-bottom:8px}
+  h1{font-size:32px;font-weight:800;background:linear-gradient(90deg,#22d3ee,#34d399,#a7f3d0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tagline{color:#94a3b8;font-size:15px;margin-top:8px}
+  .meta{color:#64748b;font-size:13px;margin-top:4px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:26px}
+  .game{display:block;text-decoration:none;color:inherit;background:#0d1c2a;border:1px solid #1e3a4a;border-radius:18px;padding:20px;transition:.2s;position:relative;overflow:hidden}
+  .game::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--c1),transparent 60%);opacity:.13;transition:.2s}
+  .game:hover{transform:translateY(-5px);border-color:var(--c1);box-shadow:0 14px 30px rgba(0,0,0,.4)}
+  .game:hover::before{opacity:.25}
+  .num{position:absolute;top:14px;right:16px;font-size:30px;font-weight:800;color:#1e3a4a}
+  .ic{font-size:38px;margin-bottom:10px}
+  .title{font-size:18px;font-weight:700;margin-bottom:6px}
+  .type{display:inline-block;font-size:11px;background:#14323f;color:#a5f3fc;border-radius:20px;padding:2px 10px;margin-bottom:10px}
+  .desc{font-size:13px;color:#a3b2c2;line-height:1.6}
+  .toadv{display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;margin-top:22px;background:linear-gradient(100deg,#3b1d5e,#1e1b4b);border:1px solid #6d28d9;border-radius:18px;padding:18px 22px;transition:.2s;flex-wrap:wrap}
+  .toadv:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(109,40,217,.35)}
+  footer{text-align:center;color:#475569;font-size:12px;margin-top:30px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="index.html">← 返回模式选择</a>
+    <a class="adv" href="advanced/index.html">切换到进阶版 🕹️ →</a>
+  </div>
+  <header>
+    <h1>🎲 基础版 · 游戏大厅</h1>
+    <p class="tagline">10 款轻量教学小游戏，在玩中学会创业思维</p>
+    <p class="meta">点击任意卡片即可开始 · 每个游戏均可独立运行，无需联网</p>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <a class="toadv" href="advanced/index.html">
+    <div style="font-size:42px">🕹️</div>
+    <div style="flex:1;min-width:220px">
+      <div style="font-size:20px;font-weight:800;background:linear-gradient(90deg,#c084fc,#38bdf8,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent">想要更硬核？进阶版复杂游戏 →</div>
+      <div style="font-size:13px;color:#a3a2c2;margin-top:5px;line-height:1.6">5 款街机级游戏：俄罗斯方块 · 弹幕射击 · 跑酷闯关 · 连连看 · 祖玛。含音乐音效、排行榜与攻略。</div>
+    </div>
+    <div style="display:flex;gap:6px;font-size:24px">🏢 🚀 🏃 🔗 🔮</div>
+  </a>
+
+  <footer>
+    宝鸡 · 双创 AI 实验室智能体大赛 &nbsp;|&nbsp; 创新创业系列教学游戏（基础版）
+  </footer>
+</div>
+
+<script>
+const games=[
+  {n:"01",f:"sim.html",ic:"🚀",t:"创业模拟器",ty:"经营决策",c:"#8b5cf6",d:"用8个季度做关键抉择，平衡资金、用户、团队与口碑，带领公司冲击IPO。"},
+  {n:"02",f:"canvas.html",ic:"🧩",t:"商业模式画布拼图",ty:"拖拽分类",c:"#10b981",d:"把卡片放进九宫格画布，亲手搭建一个完整的商业模式。"},
+  {n:"03",f:"pitch.html",ic:"🎤",t:"30秒电梯演讲",ty:"组合构建",c:"#ec4899",d:"逐环节选出最打动人的话术，30秒内征服投资人。"},
+  {n:"04",f:"ideas.html",ic:"🎰",t:"创新点子轮盘",ty:"创意发散",c:"#0ea5e9",d:"用SCAMPER奔驰法摇出脑洞组合，练习创新思维。"},
+  {n:"05",f:"cashflow.html",ic:"💸",t:"现金流大作战",ty:"反应操作",c:"#22c55e",d:"边收订单边付账单，守住现金流不破产，撑得越久越强。"},
+  {n:"06",f:"market.html",ic:"⚔️",t:"市场争夺战",ty:"策略博弈",c:"#f59e0b",d:"分配预算到不同渠道，和AI对手争夺市场份额。"},
+  {n:"07",f:"quiz.html",ic:"🧠",t:"创业知识闯关",ty:"限时问答",c:"#3b82f6",d:"12道创业核心知识题，答得快、连得对，分数才高。"},
+  {n:"08",f:"match.html",ic:"🃏",t:"创业资源匹配",ty:"记忆翻牌",c:"#f472b6",d:"把创业难题和对应的关键资源配对，考验记忆与理解。"},
+  {n:"09",f:"roadshow.html",ic:"🎭",t:"融资路演·抉择之夜",ty:"分支剧情",c:"#a855f7",d:"每句话都在改变投资人兴趣，做出选择拿下Term Sheet。"},
+  {n:"10",f:"swot.html",ic:"📊",t:"SWOT分析挑战",ty:"逻辑分类",c:"#14b8a6",d:"把条目分入优势/劣势/机会/威胁四象限，掌握经典分析框架。"}
+];
+const grid=document.getElementById('grid');
+games.forEach(g=>{
+  const a=document.createElement('a');a.className='game';a.href=g.f;a.style.setProperty('--c1',g.c);
+  a.innerHTML=`<div class="num">${g.n}</div>
+    <div class="ic">${g.ic}</div>
+    <div class="title">${g.t}</div>
+    <span class="type" style="background:${g.c}33;color:${g.c}">${g.ty}</span>
+    <div class="desc">${g.d}</div>`;
+  grid.appendChild(a);
+});
+</script>
+</body>
+</html>

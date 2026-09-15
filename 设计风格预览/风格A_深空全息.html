@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>双创AI实验室 · 风格A 深空全息玻璃</title>
+<style>
+:root{--bg:#070b1a;--card:rgba(255,255,255,.055);--line:rgba(255,255,255,.12);--ink:#eef1fb;--mut:#9aa6c8;--cyan:#22d3ee;--violet:#7c5cff;--magenta:#ff5cf0;--amber:#f5a623}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:var(--bg);overflow-x:hidden;line-height:1.6}
+#stars{position:fixed;inset:0;z-index:-3}
+.bg{position:fixed;inset:0;z-index:-2;background:radial-gradient(900px 600px at 12% -8%,rgba(124,92,255,.28),transparent 60%),radial-gradient(800px 600px at 100% 0,rgba(34,211,238,.18),transparent 55%),radial-gradient(700px 500px at 50% 120%,rgba(255,92,240,.14),transparent 60%)}
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.45;z-index:-1;animation:float 16s ease-in-out infinite}
+.orb.a{width:360px;height:360px;background:#7c5cff;top:4%;left:-100px}.orb.b{width:320px;height:320px;background:#22d3ee;bottom:-40px;right:-80px;animation-delay:-8s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-34px)}}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+nav{display:flex;align-items:center;gap:14px;padding:18px 0}
+.logo{width:42px;height:42px;border-radius:13px;background:conic-gradient(from 0deg,var(--cyan),var(--violet),var(--magenta),var(--cyan));display:grid;place-items:center;font-weight:800;font-size:15px;color:#0a0e1f;box-shadow:0 0 22px rgba(124,92,255,.6);animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}.logo span{animation:spin 8s linear infinite reverse}
+.brand b{font-weight:800;font-size:18px}.brand small{display:block;font-size:10px;color:var(--mut);letter-spacing:1px}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);backdrop-filter:blur(12px)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);animation:blink 1.6s ease-in-out infinite}@keyframes blink{50%{opacity:.4}}
+.av{width:37px;height:37px;border-radius:50%;background:linear-gradient(135deg,#34507a,#22d3ee);display:grid;place-items:center;font-weight:600}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:center;padding:30px 0 14px}
+.tag{display:inline-block;font-size:13px;color:var(--cyan);border:1px solid rgba(34,211,238,.4);padding:6px 13px;border-radius:999px;background:rgba(34,211,238,.08);margin-bottom:18px}
+h1{font-size:44px;line-height:1.12;font-weight:800;letter-spacing:-.5px}
+.g{background:linear-gradient(120deg,var(--cyan),var(--violet) 50%,var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shine 5s linear infinite}@keyframes shine{to{background-position:200% center}}
+.sub{color:var(--mut);font-size:15px;margin:16px 0 20px;max-width:500px}
+.team{display:flex;gap:9px;flex-wrap:wrap}
+.buddy{font-size:13px;padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:var(--card);backdrop-filter:blur(10px);transition:.25s;cursor:default}
+.buddy:hover{transform:translateY(-4px);border-color:rgba(124,92,255,.7);background:rgba(124,92,255,.16);box-shadow:0 8px 24px rgba(124,92,255,.3)}
+.herofig{position:relative;border-radius:24px;aspect-ratio:1/1;display:grid;place-items:center;border:1px solid var(--line);background:radial-gradient(circle at 50% 45%,rgba(124,92,255,.12),transparent 60%);overflow:hidden;transform-style:preserve-3d;transition:transform .15s}
+.core{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#bfe9ff,#7c5cff 55%,#3b2a8a);box-shadow:0 0 70px rgba(124,92,255,.75),inset 0 0 40px rgba(255,255,255,.25);animation:pulse 3.4s ease-in-out infinite;position:relative;z-index:2}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(124,92,255,.4);animation:ripple 3.4s ease-out infinite}
+.ring.r2{animation-delay:1.1s}.ring.r3{animation-delay:2.2s}
+@keyframes ripple{0%{width:150px;height:150px;opacity:.9}100%{width:340px;height:340px;opacity:0}}
+.holo{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.08) 45%,transparent 60%);background-size:250% 250%;animation:holo 4s linear infinite;pointer-events:none}@keyframes holo{to{background-position:-200% 0}}
+.cap{font-size:12px;color:var(--mut);position:absolute;bottom:16px}
+.switchwrap{display:flex;justify-content:center;margin:36px 0 8px}
+.switch{position:relative;display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px;width:380px;backdrop-filter:blur(12px)}
+.switch button{flex:1;z-index:2;background:none;border:none;color:var(--mut);font-size:15px;font-weight:600;padding:12px 0;cursor:pointer;transition:color .3s;font-family:inherit}
+.switch button.on{color:#070b1a}
+.slider{position:absolute;top:6px;left:6px;width:calc(50% - 6px);height:calc(100% - 12px);border-radius:999px;background:linear-gradient(120deg,var(--cyan),var(--violet));transition:transform .4s cubic-bezier(.2,.9,.3,1.2);box-shadow:0 6px 22px rgba(124,92,255,.55)}
+.slider.r{transform:translateX(100%)}
+.zonecap{text-align:center;color:var(--mut);font-size:13px;margin:8px 0 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px}
+.mod{position:relative;border:1px solid var(--line);border-radius:20px;padding:20px;cursor:pointer;background:var(--card);backdrop-filter:blur(10px);transition:transform .25s,box-shadow .25s;opacity:0;transform:translateY(18px);animation:up .55s forwards;overflow:hidden}
+@keyframes up{to{opacity:1;transform:none}}
+.mod::before{content:"";position:absolute;inset:0;border-radius:20px;padding:1px;background:linear-gradient(130deg,var(--cyan),transparent 40%,transparent 60%,var(--magenta));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:.3s}
+.mod:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(0,0,0,.4)}.mod:hover::before{opacity:1}
+.mi{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;font-size:25px;margin-bottom:13px}
+.mod h3{font-size:16px;margin-bottom:5px}.mod p{font-size:13px;color:var(--mut)}
+.badge{display:inline-block;font-size:11px;margin-top:10px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+.fab{position:fixed;right:24px;bottom:24px;display:flex;align-items:center;gap:9px;padding:13px 19px;border-radius:999px;background:linear-gradient(120deg,var(--cyan),var(--violet));font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 12px 34px rgba(124,92,255,.55);animation:pulse 3.2s ease-in-out infinite}
+footer{color:var(--mut);font-size:12px;text-align:center;padding:32px 0;border-top:1px solid var(--line);margin-top:34px}
+@media(max-width:820px){.hero{grid-template-columns:1fr}h1{font-size:32px}}
+</style></head>
+<body>
+<canvas id="stars"></canvas><div class="bg"></div><div class="orb a"></div><div class="orb b"></div>
+<div class="wrap">
+  <nav><div class="logo"><span>双创</span></div><div class="brand"><b>双创AI实验室</b><small>DOUBLE INNOVATION AI LAB</small></div><div class="spacer"></div><span class="chip"><span class="dot"></span>积分 120</span><div class="av">朱</div></nav>
+  <section class="hero">
+    <div>
+      <span class="tag">创新创业教育 · 比赛 · AI 工具应用</span>
+      <h1>不是一个 AI，<br>是一群<span class="g">懂创赛的智能搭子</span></h1>
+      <p class="sub">选题、写作、做 PPT、磨路演、上战场——双创AI实验室的智能体集群，一路陪你从想法到夺奖。</p>
+      <div class="team"><span class="buddy">🎯 选题搭子</span><span class="buddy">✍️ 写作搭子</span><span class="buddy">🖼️ PPT搭子</span><span class="buddy">🎤 路演搭子</span><span class="buddy">⚖️ 答辩搭子</span><span class="buddy">📊 数据搭子</span><span class="buddy">🤝 组队搭子</span></div>
+    </div>
+    <div class="herofig" id="fig">
+      <div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div>
+      <div class="core"></div><div class="holo"></div><div class="cap">数字人「小航」· 全息形态</div>
+    </div>
+  </section>
+  <div class="switchwrap"><div class="switch"><div class="slider" id="sld"></div><button class="on" onclick="setZone(0)">📚 学习中心</button><button onclick="setZone(1)">🚀 应用中心</button></div></div>
+  <div class="zonecap" id="zc"></div>
+  <div class="grid" id="grid"></div>
+  <footer>风格A · 深空全息玻璃　|　深色玻璃拟态 + 全息流光 + 粒子星空 + 3D 倾斜　|　双创AI实验室</footer>
+</div>
+<div class="fab">💬 AI 客服 · 百问百答</div>
+<script>
+// 星空粒子
+const cv=document.getElementById('stars'),cx=cv.getContext('2d');let W,H,ps=[];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;ps=[...Array(120)].map(()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+.2,s:Math.random()*.4+.1,t:Math.random()*6}))}
+rs();addEventListener('resize',rs);
+(function draw(){cx.clearRect(0,0,W,H);ps.forEach(p=>{p.y-=p.s;p.t+=.03;if(p.y<0)p.y=H;const a=.4+.4*Math.sin(p.t);cx.globalAlpha=a;cx.fillStyle='#cfe0ff';cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill()});requestAnimationFrame(draw)})();
+// 3D 倾斜
+const fig=document.getElementById('fig');
+fig.addEventListener('mousemove',e=>{const r=fig.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;fig.style.transform=`perspective(800px) rotateY(${x*12}deg) rotateX(${-y*12}deg)`});
+fig.addEventListener('mouseleave',()=>fig.style.transform='none');
+// 模块
+const tint={cyan:'rgba(34,211,238,.16)',violet:'rgba(124,92,255,.18)',pink:'rgba(255,92,240,.16)',amber:'rgba(245,166,35,.18)',green:'rgba(94,224,160,.18)'};
+const Z=[{cap:'打基础、拿资源：学理论 · 读政策 · 看案例 · 拿模板 · 直达平台',m:[['📘','理论知识','五模块课件，AI 老师讲给你听','cyan','5 模块'],['📜','政策解读','双创赛事政策一键看懂，自动划重点','violet','实时'],['💡','案例库','50 个区域产业案例＋获奖项目拆解','pink','50+'],['🧰','模板库','BP、路演PPT、专利、合同随取随用','amber','20+'],['🎮','题库闯关','1000 题＋卡牌闯关，边玩边学','green','1000 题'],['🔗','平台直达','一键跳转攒经验拿证书（合规导流）','cyan','导流']]},{cap:'上战场、出成果：生成资料 · 模拟路演 · 协作组队',m:[['🎯','选题与赛道匹配','主动帮你定方向，怎么组队也给建议','violet','主动式'],['✍️','文本生成','商业计划书、专利、合同、文案一键起草','cyan','一键'],['🖼️','PPT 生成','大纲＋逐字稿＋GPT Image 2 配图出片','pink','配图'],['⚖️','模拟路演答辩','国赛评委连环追问、按细则挑硬伤','amber','评委级'],['📊','数据分析','调研数据自动出结论与可视化图表','green','可视化'],['🤝','组队协作','跨校组队广场，团队共编 PPT','violet','协作']]}];
+let zone=0;
+function render(){const g=document.getElementById('grid');g.innerHTML='';Z[zone].m.forEach((m,i)=>{const d=document.createElement('div');d.className='mod';d.style.animationDelay=(i*.06)+'s';d.innerHTML=`<div class="mi" style="background:${tint[m[3]]}">${m[0]}</div><h3>${m[1]}</h3><p>${m[2]}</p><span class="badge">${m[4]}</span>`;g.appendChild(d)});document.getElementById('zc').textContent=Z[zone].cap}
+function setZone(z){zone=z;document.getElementById('sld').classList.toggle('r',z===1);document.querySelectorAll('.switch button').forEach((b,i)=>b.classList.toggle('on',i===z));render()}
+render();
+</script></body></html>

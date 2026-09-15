@@ -1,0 +1,1375 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>创新创业基础在线习题库 1000题</title>
+  <style>
+    :root {
+      --navy: #0a2f65;
+      --blue: #145da8;
+      --blue-2: #2176cf;
+      --sky: #e8f3ff;
+      --orange: #e8732a;
+      --green: #138f72;
+      --red: #c53d36;
+      --ink: #172b49;
+      --muted: #64758d;
+      --line: #c8dbf0;
+      --paper: #ffffff;
+      --bg: #f5f9fd;
+      --shadow: 0 10px 26px rgba(12, 59, 116, .13);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(33, 118, 207, .08) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(33, 118, 207, .06) 1px, transparent 1px),
+        var(--bg);
+      background-size: 34px 34px;
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(255, 255, 255, .96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+
+    .topbar {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 12px 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .brand {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      border: 2px solid var(--blue);
+      background: var(--sky);
+      display: grid;
+      place-items: center;
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 28px;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      min-width: 108px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: var(--paper);
+      font-weight: 800;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .pill.orange {
+      background: var(--orange);
+    }
+
+    .pill.green {
+      background: var(--green);
+    }
+
+    .btn {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--sky);
+      color: var(--navy);
+      font-weight: 800;
+    }
+
+    .btn.primary {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: var(--paper);
+    }
+
+    .btn.blue {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: var(--paper);
+    }
+
+    .btn.ghost {
+      background: var(--paper);
+    }
+
+    main {
+      max-width: 1340px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .start-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .hero,
+    .panel,
+    .question-card,
+    .result-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .hero {
+      overflow: hidden;
+    }
+
+    .hero-head {
+      min-height: 210px;
+      padding: 24px;
+      color: var(--paper);
+      background: linear-gradient(135deg, #0a2f65, #145da8 58%, #0f8f86);
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .hero h2 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, .88);
+      max-width: 720px;
+    }
+
+    .hero svg {
+      width: 100%;
+      max-height: 230px;
+    }
+
+    .feature-band {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .feature {
+      padding: 16px;
+      background: #fbfdff;
+      min-height: 104px;
+    }
+
+    .feature strong {
+      display: block;
+      color: var(--navy);
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .feature span {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0 0 12px;
+      color: var(--navy);
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--navy);
+      font-weight: 800;
+      min-width: 0;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      padding: 0 10px;
+      color: var(--ink);
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--blue-2);
+      box-shadow: 0 0 0 3px rgba(33, 118, 207, .15);
+    }
+
+    .radio-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .mode-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfdff;
+      cursor: pointer;
+    }
+
+    .mode-card input {
+      width: auto;
+      height: auto;
+      margin-right: 6px;
+    }
+
+    .mode-card strong {
+      color: var(--navy);
+    }
+
+    .mode-card p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .bank-summary {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .summary-cell {
+      border: 1px solid var(--line);
+      background: var(--sky);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .summary-cell strong {
+      display: block;
+      font-size: 22px;
+      color: var(--navy);
+    }
+
+    .summary-cell span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .side {
+      position: sticky;
+      top: 94px;
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .student {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .student strong {
+      color: var(--navy);
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--sky);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--green);
+      transition: width .2s ease;
+    }
+
+    .navigator {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      max-height: 360px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .nav-dot {
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      color: var(--navy);
+      font-weight: 800;
+    }
+
+    .nav-dot.active {
+      background: var(--blue);
+      color: var(--paper);
+      border-color: var(--blue);
+    }
+
+    .nav-dot.answered {
+      background: var(--green);
+      color: var(--paper);
+      border-color: var(--green);
+    }
+
+    .question-card {
+      overflow: hidden;
+    }
+
+    .question-head {
+      padding: 18px 20px;
+      background: var(--navy);
+      color: var(--paper);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .question-head h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .question-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .tag {
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: rgba(255, 255, 255, .16);
+      border: 1px solid rgba(255, 255, 255, .3);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .question-body {
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .stem {
+      font-size: 20px;
+      color: var(--navy);
+      font-weight: 800;
+      line-height: 1.65;
+    }
+
+    .option-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+      width: 100%;
+      min-height: 52px;
+      text-align: left;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      color: var(--ink);
+    }
+
+    .option.selected {
+      border-color: var(--blue);
+      background: var(--sky);
+    }
+
+    .option.correct {
+      border-color: var(--green);
+      background: rgba(19, 143, 114, .09);
+    }
+
+    .option.wrong {
+      border-color: var(--red);
+      background: rgba(197, 61, 54, .08);
+    }
+
+    .opt-key {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: var(--paper);
+      font-weight: 900;
+    }
+
+    .feedback {
+      display: none;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      padding: 14px;
+      line-height: 1.7;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.good {
+      border-color: var(--green);
+      background: rgba(19, 143, 114, .08);
+    }
+
+    .feedback.bad {
+      border-color: var(--red);
+      background: rgba(197, 61, 54, .08);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .left-actions,
+    .right-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .result-card {
+      padding: 18px;
+    }
+
+    .score-number {
+      font-size: 58px;
+      line-height: 1;
+      font-weight: 900;
+      color: var(--orange);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfdff;
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--navy);
+      font-size: 20px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .review-list {
+      display: grid;
+      gap: 10px;
+      max-height: 70vh;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .review-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfdff;
+      line-height: 1.65;
+    }
+
+    .review-item.good {
+      border-color: rgba(19, 143, 114, .45);
+    }
+
+    .review-item.bad {
+      border-color: rgba(197, 61, 54, .45);
+    }
+
+    .review-item h4 {
+      margin: 0 0 6px;
+      color: var(--navy);
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .module-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .module-table th,
+    .module-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 6px;
+      text-align: left;
+    }
+
+    .module-table th {
+      color: var(--navy);
+      background: var(--sky);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1100px) {
+      .start-grid,
+      .workspace,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        padding: 10px 12px;
+      }
+
+      .brand {
+        grid-template-columns: 46px 1fr;
+      }
+
+      .logo {
+        width: 46px;
+        height: 46px;
+      }
+
+      .brand h1 {
+        font-size: 18px;
+      }
+
+      .brand p {
+        display: none;
+      }
+
+      .status > * {
+        flex: 1 1 calc(50% - 10px);
+        min-width: 0;
+      }
+
+      main {
+        padding: 12px;
+      }
+
+      .hero-head,
+      .field-grid,
+      .feature-band,
+      .bank-summary,
+      .metric-grid,
+      .radio-row {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-head {
+        padding: 18px;
+      }
+
+      .hero h2 {
+        font-size: 25px;
+      }
+
+      .question-head {
+        grid-template-columns: 1fr;
+      }
+
+      .question-meta {
+        justify-content: flex-start;
+      }
+
+      .actions {
+        display: grid;
+      }
+
+      .left-actions,
+      .right-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .btn {
+        width: 100%;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img" aria-label="题库图标">
+              <rect x="10" y="8" width="44" height="48" rx="8" fill="#fff" stroke="#145da8" stroke-width="3"></rect>
+              <path d="M20 23h24M20 33h18M20 43h24" stroke="#145da8" stroke-width="4" stroke-linecap="round"></path>
+              <circle cx="48" cy="16" r="8" fill="#e8732a"></circle>
+            </svg>
+          </div>
+          <div>
+            <h1>创新创业基础 在线习题库</h1>
+            <p>1000道模块化题目，支持练习模式、测试模式、计时交卷和答案解析。</p>
+          </div>
+        </div>
+        <div class="status">
+          <div class="pill" id="headerTotal">1000题</div>
+          <div class="pill orange" id="headerMode">未开始</div>
+          <div class="pill green" id="headerTimer">00:00</div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="screen active" id="startScreen">
+        <div class="start-grid">
+          <article class="hero">
+            <div class="hero-head">
+              <div>
+                <h2>面向《创新创业基础》的在线训练题库</h2>
+                <p>围绕机会识别、用户调研、商业模式、AI赋能、知识产权、财务测算和竞赛路演等模块，帮助学生在课前预习、课中互动和课后自测中形成稳定的项目思维。</p>
+              </div>
+              <svg viewBox="0 0 520 260" role="img" aria-label="课程模块雷达图">
+                <rect x="20" y="18" width="480" height="224" rx="8" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.35)"></rect>
+                <circle cx="260" cy="130" r="82" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"></circle>
+                <circle cx="260" cy="130" r="46" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"></circle>
+                <path d="M260 48L344 86L365 176L260 216L155 176L176 86Z" fill="rgba(232,115,42,.24)" stroke="#fff" stroke-width="3"></path>
+                <circle cx="260" cy="130" r="28" fill="#fff"></circle>
+                <text x="260" y="137" text-anchor="middle" font-size="22" font-weight="800" fill="#145da8">AI</text>
+                <text x="260" y="38" text-anchor="middle" font-size="16" fill="#fff">机会</text>
+                <text x="378" y="86" text-anchor="middle" font-size="16" fill="#fff">用户</text>
+                <text x="392" y="188" text-anchor="middle" font-size="16" fill="#fff">商业</text>
+                <text x="260" y="238" text-anchor="middle" font-size="16" fill="#fff">合规</text>
+                <text x="128" y="188" text-anchor="middle" font-size="16" fill="#fff">财务</text>
+                <text x="138" y="86" text-anchor="middle" font-size="16" fill="#fff">路演</text>
+              </svg>
+            </div>
+            <div class="feature-band">
+              <div class="feature"><strong>练习模式</strong><span>即时查看本题解析，适合课前预习与课后巩固。</span></div>
+              <div class="feature"><strong>测试模式</strong><span>倒计时自动交卷，结束后统一反馈分数与解析。</span></div>
+              <div class="feature"><strong>按模块抽题</strong><span>10个课程模块，每个模块100题，可单模块或全库训练。</span></div>
+              <div class="feature"><strong>成绩记录</strong><span>输入学号姓名后生成成绩摘要，可复制或下载留存。</span></div>
+            </div>
+          </article>
+
+          <aside class="panel">
+            <h2>开始答题</h2>
+            <div class="field-grid">
+              <label>学号
+                <input id="studentId" placeholder="请输入学号" autocomplete="off">
+              </label>
+              <label>姓名
+                <input id="studentName" placeholder="请输入姓名" autocomplete="off">
+              </label>
+            </div>
+
+            <div class="radio-row">
+              <label class="mode-card">
+                <span><input type="radio" name="mode" value="practice" checked> <strong>练习模式</strong></span>
+                <p>答题过程中可查看解析，适合课堂互动和自主学习。</p>
+              </label>
+              <label class="mode-card">
+                <span><input type="radio" name="mode" value="test"> <strong>测试模式</strong></span>
+                <p>倒计时结束自动交卷，交卷后统一显示答案解析。</p>
+              </label>
+            </div>
+
+            <div class="field-grid">
+              <label>题目模块
+                <select id="moduleSelect"></select>
+              </label>
+              <label>抽题数量
+                <select id="countSelect">
+                  <option value="20">20题</option>
+                  <option value="50" selected>50题</option>
+                  <option value="100">100题</option>
+                  <option value="200">200题</option>
+                  <option value="500">500题</option>
+                  <option value="all">全部可用题</option>
+                </select>
+              </label>
+              <label>测试计时
+                <select id="timeSelect">
+                  <option value="auto" selected>自动按题量设置</option>
+                  <option value="30">30分钟</option>
+                  <option value="60">60分钟</option>
+                  <option value="90">90分钟</option>
+                  <option value="120">120分钟</option>
+                </select>
+              </label>
+              <label>抽题方式
+                <select id="orderSelect">
+                  <option value="random" selected>随机抽题</option>
+                  <option value="sequence">顺序练习</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="bank-summary">
+              <div class="summary-cell"><strong id="singleCount">600</strong><span>单选题</span></div>
+              <div class="summary-cell"><strong id="multiCount">200</strong><span>多选题</span></div>
+              <div class="summary-cell"><strong id="judgeCount">200</strong><span>判断题</span></div>
+            </div>
+
+            <div style="margin-top:14px; display:grid; gap:10px;">
+              <button class="btn primary" id="startBtn">开始答题</button>
+              <button class="btn ghost" id="restoreBtn">查看最近一次成绩</button>
+              <p class="small">测试模式会在倒计时结束时自动提交。练习模式可随时交卷查看整体统计。</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="screen" id="quizScreen">
+        <div class="workspace">
+          <aside class="side">
+            <section class="panel">
+              <h3>答题信息</h3>
+              <div class="student" id="studentPanel"></div>
+              <div class="progress" style="margin-top:12px;"><span id="progressBar"></span></div>
+              <p class="small" id="progressText">0/0</p>
+            </section>
+            <section class="panel">
+              <h3>题号导航</h3>
+              <div class="navigator" id="navigator"></div>
+            </section>
+          </aside>
+
+          <article class="question-card">
+            <div class="question-head">
+              <div>
+                <h2 id="questionTitle">第1题</h2>
+                <div class="small" id="moduleLine" style="color:rgba(255,255,255,.78);"></div>
+              </div>
+              <div class="question-meta" id="questionMeta"></div>
+            </div>
+            <div class="question-body">
+              <div class="stem" id="questionStem"></div>
+              <div class="option-list" id="optionList"></div>
+              <div class="feedback" id="feedbackBox"></div>
+              <div class="actions">
+                <div class="left-actions">
+                  <button class="btn ghost" id="prevBtn">上一题</button>
+                  <button class="btn blue" id="checkBtn">查看本题解析</button>
+                </div>
+                <div class="right-actions">
+                  <button class="btn blue" id="nextBtn">下一题</button>
+                  <button class="btn primary" id="submitBtn">交卷</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="resultScreen">
+        <div class="result-grid">
+          <section class="result-card">
+            <h2 style="margin-top:0;color:var(--navy);">成绩报告</h2>
+            <div class="score-number" id="scoreNumber">0</div>
+            <div class="small" id="resultIdentity"></div>
+            <div class="metric-grid" id="metricGrid"></div>
+            <table class="module-table" id="moduleStats"></table>
+            <div class="actions" style="margin-top:14px;">
+              <div class="left-actions">
+                <button class="btn blue" id="copyResultBtn">复制成绩</button>
+                <button class="btn ghost" id="downloadResultBtn">下载成绩JSON</button>
+              </div>
+              <div class="right-actions">
+                <button class="btn primary" id="againBtn">重新练习</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="result-card">
+            <h2 style="margin-top:0;color:var(--navy);">答案解析</h2>
+            <div class="review-list" id="reviewList"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./questions.js"></script>
+  <script>
+    const bank = window.QUESTION_BANK || [];
+    const meta = window.QUESTION_META || { total: bank.length, typeCount: {}, modules: [] };
+    const alphabet = ["A", "B", "C", "D", "E", "F"];
+    const screens = {
+      start: document.getElementById("startScreen"),
+      quiz: document.getElementById("quizScreen"),
+      result: document.getElementById("resultScreen")
+    };
+
+    let session = null;
+    let timerHandle = null;
+
+    function byId(id) {
+      return document.getElementById(id);
+    }
+
+    function showScreen(name) {
+      Object.values(screens).forEach(screen => screen.classList.remove("active"));
+      screens[name].classList.add("active");
+    }
+
+    function formatSeconds(total) {
+      const safe = Math.max(0, Math.floor(total));
+      const minutes = Math.floor(safe / 60);
+      const seconds = safe % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function seededShuffle(items, seedText) {
+      let seed = 0;
+      for (const char of seedText) seed = (seed * 31 + char.charCodeAt(0)) >>> 0;
+      const list = [...items];
+      for (let i = list.length - 1; i > 0; i--) {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        const j = seed % (i + 1);
+        [list[i], list[j]] = [list[j], list[i]];
+      }
+      return list;
+    }
+
+    function normalizeAnswer(answer) {
+      return [...(answer || [])].map(Number).sort((a, b) => a - b);
+    }
+
+    function isCorrect(question, answer) {
+      const expected = normalizeAnswer(question.answer);
+      const actual = normalizeAnswer(answer);
+      return expected.length === actual.length && expected.every((value, idx) => value === actual[idx]);
+    }
+
+    function answerText(question, answer) {
+      const indexes = normalizeAnswer(answer);
+      if (!indexes.length) return "未作答";
+      return indexes.map(index => `${alphabet[index]}. ${question.options[index]}`).join("；");
+    }
+
+    function initStart() {
+      byId("headerTotal").textContent = `${meta.total || bank.length}题`;
+      byId("singleCount").textContent = meta.typeCount.single || 0;
+      byId("multiCount").textContent = meta.typeCount.multiple || 0;
+      byId("judgeCount").textContent = meta.typeCount.judge || 0;
+      const select = byId("moduleSelect");
+      select.innerHTML = `<option value="all">全部模块（1000题）</option>` + meta.modules.map(module => (
+        `<option value="${module.id}">${module.id} ${module.name}（${module.total}题）</option>`
+      )).join("");
+    }
+
+    function selectedMode() {
+      return document.querySelector("input[name='mode']:checked").value;
+    }
+
+    function buildQuestionSet(moduleId, countValue, orderMode, studentSeed) {
+      const pool = moduleId === "all" ? bank : bank.filter(q => q.moduleId === moduleId);
+      const ordered = orderMode === "random" ? seededShuffle(pool, `${studentSeed}-${Date.now()}`) : [...pool];
+      const count = countValue === "all" ? ordered.length : Math.min(Number(countValue), ordered.length);
+      return ordered.slice(0, count);
+    }
+
+    function startQuiz() {
+      const studentId = byId("studentId").value.trim();
+      const studentName = byId("studentName").value.trim();
+      if (!studentId || !studentName) {
+        alert("请先填写学号和姓名。");
+        return;
+      }
+      const mode = selectedMode();
+      const moduleId = byId("moduleSelect").value;
+      const countValue = byId("countSelect").value;
+      const orderMode = byId("orderSelect").value;
+      const questions = buildQuestionSet(moduleId, countValue, orderMode, `${studentId}-${studentName}`);
+      if (!questions.length) {
+        alert("当前模块没有可用题目。");
+        return;
+      }
+      const autoMinutes = Math.max(10, Math.ceil(questions.length * 0.75));
+      const timeValue = byId("timeSelect").value;
+      const limitSeconds = mode === "test" ? (timeValue === "auto" ? autoMinutes : Number(timeValue)) * 60 : 0;
+      session = {
+        studentId,
+        studentName,
+        mode,
+        moduleId,
+        moduleName: moduleId === "all" ? "全部模块" : (meta.modules.find(m => m.id === moduleId)?.name || moduleId),
+        questions,
+        answers: {},
+        current: 0,
+        startedAt: Date.now(),
+        submittedAt: null,
+        limitSeconds,
+        autoSubmitted: false
+      };
+      showScreen("quiz");
+      byId("headerMode").textContent = mode === "test" ? "测试模式" : "练习模式";
+      renderQuiz();
+      startTimer();
+    }
+
+    function startTimer() {
+      if (timerHandle) clearInterval(timerHandle);
+      timerHandle = setInterval(() => {
+        if (!session || session.submittedAt) {
+          clearInterval(timerHandle);
+          timerHandle = null;
+          return;
+        }
+        const elapsed = Math.floor((Date.now() - session.startedAt) / 1000);
+        if (session.mode === "test") {
+          const remain = session.limitSeconds - elapsed;
+          byId("headerTimer").textContent = formatSeconds(remain);
+          if (remain <= 0) {
+            session.autoSubmitted = true;
+            submitQuiz();
+          }
+        } else {
+          byId("headerTimer").textContent = formatSeconds(elapsed);
+        }
+      }, 500);
+    }
+
+    function renderQuiz() {
+      if (!session) return;
+      const question = session.questions[session.current];
+      const answeredCount = Object.keys(session.answers).length;
+      const progress = Math.round(answeredCount / session.questions.length * 100);
+      byId("progressBar").style.width = `${progress}%`;
+      byId("progressText").textContent = `已答 ${answeredCount}/${session.questions.length} 题`;
+      byId("studentPanel").innerHTML = `
+        <div><strong>${session.studentName}</strong>（${session.studentId}）</div>
+        <div>模式：${session.mode === "test" ? "测试模式" : "练习模式"}</div>
+        <div>范围：${session.moduleName}</div>
+        <div>题量：${session.questions.length}题</div>
+      `;
+      byId("questionTitle").textContent = `第 ${session.current + 1} 题 / 共 ${session.questions.length} 题`;
+      byId("moduleLine").textContent = `${question.moduleId} ${question.moduleName}`;
+      byId("questionMeta").innerHTML = [
+        question.type === "single" ? "单选题" : question.type === "multiple" ? "多选题" : "判断题",
+        question.difficulty,
+        ...(question.tags || [])
+      ].map(item => `<span class="tag">${item}</span>`).join("");
+      byId("questionStem").textContent = question.stem;
+      renderOptions(question);
+      renderNavigator();
+      byId("feedbackBox").className = "feedback";
+      byId("feedbackBox").innerHTML = "";
+      byId("checkBtn").classList.toggle("hidden", session.mode === "test");
+      byId("prevBtn").disabled = session.current === 0;
+      byId("nextBtn").textContent = session.current === session.questions.length - 1 ? "最后一题" : "下一题";
+      byId("headerMode").textContent = session.mode === "test" ? "测试模式" : "练习模式";
+    }
+
+    function renderOptions(question) {
+      const selected = normalizeAnswer(session.answers[question.id]);
+      byId("optionList").innerHTML = question.options.map((option, index) => `
+        <button type="button" class="option ${selected.includes(index) ? "selected" : ""}" data-index="${index}">
+          <span class="opt-key">${alphabet[index]}</span>
+          <span>${option}</span>
+        </button>
+      `).join("");
+      document.querySelectorAll(".option").forEach(btn => {
+        btn.addEventListener("click", () => toggleOption(Number(btn.dataset.index)));
+      });
+    }
+
+    function toggleOption(index) {
+      const question = session.questions[session.current];
+      const current = normalizeAnswer(session.answers[question.id]);
+      let next;
+      if (question.type === "multiple") {
+        next = current.includes(index) ? current.filter(item => item !== index) : [...current, index].sort((a, b) => a - b);
+      } else {
+        next = [index];
+      }
+      session.answers[question.id] = next;
+      renderOptions(question);
+      renderNavigator();
+      const answeredCount = Object.keys(session.answers).length;
+      byId("progressBar").style.width = `${Math.round(answeredCount / session.questions.length * 100)}%`;
+      byId("progressText").textContent = `已答 ${answeredCount}/${session.questions.length} 题`;
+      if (session.mode === "practice" && question.type !== "multiple") {
+        showCurrentFeedback();
+      }
+    }
+
+    function renderNavigator() {
+      byId("navigator").innerHTML = session.questions.map((question, index) => {
+        const answered = session.answers[question.id] && session.answers[question.id].length;
+        return `<button type="button" class="nav-dot ${index === session.current ? "active" : ""} ${answered ? "answered" : ""}" data-index="${index}">${index + 1}</button>`;
+      }).join("");
+      document.querySelectorAll(".nav-dot").forEach(btn => {
+        btn.addEventListener("click", () => {
+          session.current = Number(btn.dataset.index);
+          renderQuiz();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+    }
+
+    function showCurrentFeedback() {
+      const question = session.questions[session.current];
+      const answer = session.answers[question.id] || [];
+      const good = isCorrect(question, answer);
+      const feedback = byId("feedbackBox");
+      feedback.className = `feedback show ${good ? "good" : "bad"}`;
+      feedback.innerHTML = `
+        <strong>${good ? "回答正确" : "需要修正"}</strong><br>
+        你的答案：${answerText(question, answer)}<br>
+        正确答案：${answerText(question, question.answer)}<br>
+        解析：${question.explanation}
+      `;
+      document.querySelectorAll(".option").forEach(btn => {
+        const idx = Number(btn.dataset.index);
+        btn.classList.toggle("correct", question.answer.includes(idx));
+        btn.classList.toggle("wrong", answer.includes(idx) && !question.answer.includes(idx));
+      });
+    }
+
+    function nextQuestion() {
+      if (!session) return;
+      if (session.current < session.questions.length - 1) {
+        session.current += 1;
+        renderQuiz();
+      }
+    }
+
+    function prevQuestion() {
+      if (!session) return;
+      if (session.current > 0) {
+        session.current -= 1;
+        renderQuiz();
+      }
+    }
+
+    function calculateResult() {
+      const rows = session.questions.map((question, index) => {
+        const answer = session.answers[question.id] || [];
+        const correct = isCorrect(question, answer);
+        return { index, question, answer, correct };
+      });
+      const correctCount = rows.filter(row => row.correct).length;
+      const score = Math.round(correctCount / rows.length * 100);
+      const moduleStats = {};
+      rows.forEach(row => {
+        const key = row.question.moduleId;
+        if (!moduleStats[key]) moduleStats[key] = { name: row.question.moduleName, total: 0, correct: 0 };
+        moduleStats[key].total += 1;
+        if (row.correct) moduleStats[key].correct += 1;
+      });
+      return {
+        rows,
+        correctCount,
+        wrongCount: rows.length - correctCount,
+        score,
+        moduleStats,
+        answeredCount: Object.keys(session.answers).length,
+        elapsedSeconds: Math.floor(((session.submittedAt || Date.now()) - session.startedAt) / 1000)
+      };
+    }
+
+    function submitQuiz() {
+      if (!session || session.submittedAt) return;
+      if (session.mode === "test" && !session.autoSubmitted) {
+        const unanswered = session.questions.length - Object.keys(session.answers).length;
+        if (unanswered > 0 && !confirm(`还有 ${unanswered} 题未作答，确定交卷吗？`)) return;
+      }
+      session.submittedAt = Date.now();
+      const result = calculateResult();
+      const record = {
+        studentId: session.studentId,
+        studentName: session.studentName,
+        mode: session.mode,
+        moduleName: session.moduleName,
+        score: result.score,
+        correctCount: result.correctCount,
+        total: session.questions.length,
+        elapsedSeconds: result.elapsedSeconds,
+        submittedAt: new Date(session.submittedAt).toLocaleString(),
+        autoSubmitted: session.autoSubmitted
+      };
+      localStorage.setItem("innovationQuestionLastResult", JSON.stringify({ record, resultRows: result.rows.map(row => ({
+        id: row.question.id,
+        stem: row.question.stem,
+        moduleName: row.question.moduleName,
+        type: row.question.type,
+        answer: answerText(row.question, row.answer),
+        correctAnswer: answerText(row.question, row.question.answer),
+        correct: row.correct,
+        explanation: row.question.explanation
+      })) }, null, 2));
+      renderResult(result, record);
+      showScreen("result");
+      byId("headerMode").textContent = "已交卷";
+      byId("headerTimer").textContent = formatSeconds(result.elapsedSeconds);
+    }
+
+    function renderResult(result, record) {
+      byId("scoreNumber").textContent = `${result.score}分`;
+      byId("resultIdentity").innerHTML = `
+        ${record.studentName}（${record.studentId}）<br>
+        ${record.mode === "test" ? "测试模式" : "练习模式"}｜${record.moduleName}｜${record.submittedAt}
+        ${record.autoSubmitted ? "｜倒计时结束自动提交" : ""}
+      `;
+      byId("metricGrid").innerHTML = `
+        <div class="metric"><strong>${record.total}</strong><span>本次题量</span></div>
+        <div class="metric"><strong>${result.answeredCount}</strong><span>已作答</span></div>
+        <div class="metric"><strong>${result.correctCount}</strong><span>正确题数</span></div>
+        <div class="metric"><strong>${formatSeconds(result.elapsedSeconds)}</strong><span>用时</span></div>
+      `;
+      const statsRows = Object.entries(result.moduleStats).map(([id, stat]) => {
+        const rate = Math.round(stat.correct / stat.total * 100);
+        return `<tr><td>${id} ${stat.name}</td><td>${stat.correct}/${stat.total}</td><td>${rate}%</td></tr>`;
+      }).join("");
+      byId("moduleStats").innerHTML = `<thead><tr><th>模块</th><th>正确</th><th>正确率</th></tr></thead><tbody>${statsRows}</tbody>`;
+      byId("reviewList").innerHTML = result.rows.map(row => `
+        <article class="review-item ${row.correct ? "good" : "bad"}">
+          <h4>${row.index + 1}. ${row.correct ? "正确" : "错误"}｜${row.question.moduleName}</h4>
+          <div>${row.question.stem}</div>
+          <div class="small">你的答案：${answerText(row.question, row.answer)}</div>
+          <div class="small">正确答案：${answerText(row.question, row.question.answer)}</div>
+          <div>解析：${row.question.explanation}</div>
+        </article>
+      `).join("");
+    }
+
+    function copyResult() {
+      const saved = localStorage.getItem("innovationQuestionLastResult");
+      if (!saved) {
+        alert("暂无成绩。");
+        return;
+      }
+      const data = JSON.parse(saved);
+      const r = data.record;
+      const text = `创新创业基础在线习题库成绩\n姓名：${r.studentName}\n学号：${r.studentId}\n模式：${r.mode === "test" ? "测试模式" : "练习模式"}\n范围：${r.moduleName}\n成绩：${r.score}分\n正确：${r.correctCount}/${r.total}\n用时：${formatSeconds(r.elapsedSeconds)}\n提交时间：${r.submittedAt}`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => alert("成绩已复制。")).catch(() => alert(text));
+      } else {
+        alert(text);
+      }
+    }
+
+    function downloadResult() {
+      const saved = localStorage.getItem("innovationQuestionLastResult");
+      if (!saved) {
+        alert("暂无成绩。");
+        return;
+      }
+      const blob = new Blob([saved], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `创新创业基础习题库成绩_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function restoreLastResult() {
+      const saved = localStorage.getItem("innovationQuestionLastResult");
+      if (!saved) {
+        alert("当前浏览器暂无最近成绩。");
+        return;
+      }
+      const data = JSON.parse(saved);
+      const record = data.record;
+      byId("scoreNumber").textContent = `${record.score}分`;
+      byId("resultIdentity").innerHTML = `
+        ${record.studentName}（${record.studentId}）<br>
+        ${record.mode === "test" ? "测试模式" : "练习模式"}｜${record.moduleName}｜${record.submittedAt}
+      `;
+      byId("metricGrid").innerHTML = `
+        <div class="metric"><strong>${record.total}</strong><span>本次题量</span></div>
+        <div class="metric"><strong>${record.total}</strong><span>记录题数</span></div>
+        <div class="metric"><strong>${record.correctCount}</strong><span>正确题数</span></div>
+        <div class="metric"><strong>${formatSeconds(record.elapsedSeconds)}</strong><span>用时</span></div>
+      `;
+      byId("moduleStats").innerHTML = "";
+      byId("reviewList").innerHTML = data.resultRows.map((row, index) => `
+        <article class="review-item ${row.correct ? "good" : "bad"}">
+          <h4>${index + 1}. ${row.correct ? "正确" : "错误"}｜${row.moduleName}</h4>
+          <div>${row.stem}</div>
+          <div class="small">你的答案：${row.answer}</div>
+          <div class="small">正确答案：${row.correctAnswer}</div>
+          <div>解析：${row.explanation}</div>
+        </article>
+      `).join("");
+      showScreen("result");
+      byId("headerMode").textContent = "最近成绩";
+    }
+
+    function resetToStart() {
+      if (timerHandle) clearInterval(timerHandle);
+      timerHandle = null;
+      session = null;
+      byId("headerMode").textContent = "未开始";
+      byId("headerTimer").textContent = "00:00";
+      showScreen("start");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    byId("startBtn").addEventListener("click", startQuiz);
+    byId("restoreBtn").addEventListener("click", restoreLastResult);
+    byId("prevBtn").addEventListener("click", prevQuestion);
+    byId("nextBtn").addEventListener("click", nextQuestion);
+    byId("checkBtn").addEventListener("click", showCurrentFeedback);
+    byId("submitBtn").addEventListener("click", submitQuiz);
+    byId("copyResultBtn").addEventListener("click", copyResult);
+    byId("downloadResultBtn").addEventListener("click", downloadResult);
+    byId("againBtn").addEventListener("click", resetToStart);
+
+    initStart();
+  </script>
+</body>
+</html>

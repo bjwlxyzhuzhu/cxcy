@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创业知识闯关问答</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#0c1429,#14223f);color:#e0e7ff;min-height:100vh;padding:20px}
+  .wrap{max-width:680px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .topbar a{color:#93c5fd;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:23px;background:linear-gradient(90deg,#60a5fa,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#a5b4fc;font-size:14px;margin:6px 0 16px}
+  .hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px}
+  .hud .streak{color:#fbbf24;font-weight:700}
+  .timebar{height:8px;background:#1e293b;border-radius:8px;overflow:hidden;margin-bottom:16px}
+  .timebar i{display:block;height:100%;background:linear-gradient(90deg,#34d399,#fbbf24,#ef4444);width:100%;transition:width .25s linear}
+  .card{background:#172036;border:1px solid #334155;border-radius:16px;padding:22px}
+  .qn{font-size:13px;color:#60a5fa;margin-bottom:8px}
+  .q{font-size:18px;font-weight:700;line-height:1.5;margin-bottom:18px}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{background:#0f172a;border:1px solid #334155;border-radius:11px;padding:13px 16px;font-size:15px;cursor:pointer;transition:.15s;text-align:left;color:#e0e7ff}
+  .opt:hover{border-color:#60a5fa;background:#1e293b}
+  .opt.right{background:#064e3b;border-color:#22c55e}
+  .opt.wrong{background:#5b1d1d;border-color:#ef4444}
+  .opt:disabled{cursor:default}
+  .exp{margin-top:14px;padding:12px 14px;background:#0f172a;border-left:4px solid #60a5fa;border-radius:8px;font-size:14px;line-height:1.6;color:#cbd5e1;display:none}
+  .exp.show{display:block}
+  .btn{background:linear-gradient(90deg,#3b82f6,#10b981);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px}
+  .end{text-align:center;padding:24px}
+  .end .big{font-size:46px;font-weight:800;color:#fbbf24}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a href="basic.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">创新创业系列 · 07</span></div>
+  <h1>🧠 创业知识闯关问答</h1>
+  <p class="sub">10 道题，每题 15 秒。答得越快分越高，连对有额外加成。准备好了吗？</p>
+
+  <div class="hud"><span id="progress">第 1 / 10 题</span><span class="streak" id="streak">🔥 连对 0</span><span id="score">得分 0</span></div>
+  <div class="timebar"><i id="tbar"></i></div>
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+const BANK=[
+  {q:"商业模式画布(BMC)中，描述'你为客户创造什么独特价值'的模块是？",o:["价值主张","客户细分","收入来源","核心资源"],a:0,e:"价值主张(Value Proposition)是画布的心脏，回答'客户为什么选你'。"},
+  {q:"精益创业中，用最小成本验证想法的产品被称为？",o:["MVP最小可行产品","Beta版","Demo样机","旗舰产品"],a:0,e:"MVP(Minimum Viable Product)用最少资源验证核心假设，避免闭门造车。"},
+  {q:"创业公司常说的'PMF'指的是？",o:["产品与市场契合","项目管理流程","公开市场融资","付费会员功能"],a:0,e:"PMF=Product-Market Fit，找到产品满足真实市场需求的状态，是增长前提。"},
+  {q:"天使轮、A轮、B轮的先后顺序通常是？",o:["天使→A→B","A→天使→B","B→A→天使","三者同时"],a:0,e:"一般顺序为种子/天使轮在最早期，随后A轮、B轮，估值和金额逐步放大。"},
+  {q:"'烧钱率(Burn Rate)'描述的是？",o:["每月净消耗现金的速度","广告点击成本","员工流失率","利润增长率"],a:0,e:"Burn Rate指公司每月烧掉多少现金，决定了'跑道(runway)'还剩几个月。"},
+  {q:"用户增长中，AARRR模型的第一个A指？",o:["获取(Acquisition)","激活(Activation)","留存(Retention)","收入(Revenue)"],a:0,e:"AARRR:获取→激活→留存→收入→推荐，俗称'海盗指标'。"},
+  {q:"下列哪项最能体现'差异化竞争'？",o:["提供对手没有的独特价值","把价格压到最低","抄袭头部产品","加大广告投放"],a:0,e:"差异化是建立别人难以替代的独特优势，而非单纯打价格战。"},
+  {q:"SWOT分析中的'O'代表？",o:["机会Opportunity","目标Objective","运营Operation","产出Output"],a:0,e:"SWOT=优势S、劣势W、机会O、威胁T，O和T是外部环境因素。"},
+  {q:"'护城河(Moat)'在商业中通常指？",o:["难以被竞争对手复制的持续优势","公司的办公场地","创始人的学历","产品的颜色设计"],a:0,e:"护城河如网络效应、品牌、专利、规模成本等，保护企业长期利润。"},
+  {q:"对早期创业团队，下列哪点通常最关键？",o:["快速验证并迭代","一次性做到完美","先大规模招人","先注册大量商标"],a:0,e:"早期最怕方向错。小步快跑、快速验证假设，比追求完美更重要。"},
+  {q:"'现金流为正'意味着？",o:["流入的钱多于流出","利润很高","用户数很多","估值上涨"],a:0,e:"现金流为正是企业自我造血的基础，与账面利润不完全等同。"},
+  {q:"获客成本(CAC)与用户终身价值(LTV)健康的关系一般是？",o:["LTV 明显大于 CAC","CAC 大于 LTV","两者相等","与二者无关"],a:0,e:"LTV>CAC(通常>3倍)说明每获取一个用户能赚回成本，模型才可持续。"}
+];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+const quiz=shuffle(BANK.slice()).slice(0,10);
+let idx=0,score=0,streak=0,timer,timeLeft;
+const TLIMIT=15;
+function showQ(){
+  const item=quiz[idx];
+  // shuffle options but track answer
+  const opts=item.o.map((t,i)=>({t,correct:i===item.a}));shuffle(opts);
+  document.getElementById('progress').textContent=`第 ${idx+1} / 10 题`;
+  document.getElementById('streak').textContent='🔥 连对 '+streak;
+  document.getElementById('score').textContent='得分 '+score;
+  const card=document.getElementById('card');
+  card.innerHTML=`<div class="qn">Q${idx+1}</div><div class="q">${item.q}</div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${o.t}</button>`).join('')}</div>
+    <div class="exp" id="exp"></div>`;
+  card.querySelectorAll('.opt').forEach((b,i)=>b.onclick=()=>answer(b,opts[i].correct,item.e,opts));
+  startTimer();
+}
+function startTimer(){
+  timeLeft=TLIMIT;const bar=document.getElementById('tbar');bar.style.width='100%';
+  const t0=Date.now();
+  clearInterval(timer);
+  timer=setInterval(()=>{
+    timeLeft=TLIMIT-(Date.now()-t0)/1000;
+    bar.style.width=Math.max(0,timeLeft/TLIMIT*100)+'%';
+    if(timeLeft<=0){clearInterval(timer);timeout();}
+  },100);
+}
+function lockOpts(opts){
+  document.querySelectorAll('.opt').forEach((b,i)=>{
+    b.disabled=true;
+    if(opts[i].correct)b.classList.add('right');
+  });
+}
+function answer(btn,correct,exp,opts){
+  clearInterval(timer);
+  if(correct){
+    const speedBonus=Math.round(timeLeft*4); // up to ~60
+    streak++;
+    const streakBonus=(streak-1)*5;
+    const gained=50+speedBonus+streakBonus;
+    score+=gained;
+    btn.classList.add('right');
+    showExp(`✅ 正确！基础50 + 速度${speedBonus} + 连对${streakBonus} = <b>+${gained}</b>分。<br>${exp}`);
+  }else{
+    streak=0;btn.classList.add('wrong');
+    showExp(`❌ 答错了。<br>${exp}`);
+  }
+  lockOpts(opts);
+  document.getElementById('score').textContent='得分 '+score;
+  document.getElementById('streak').textContent='🔥 连对 '+streak;
+  nextBtn();
+}
+function timeout(){
+  streak=0;
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const item=quiz[idx];
+  document.querySelectorAll('.opt').forEach(b=>{if(b.textContent===item.o[item.a])b.classList.add('right')});
+  showExp(`⏰ 超时！这题没拿到分。<br>${item.e}`);
+  document.getElementById('streak').textContent='🔥 连对 0';
+  nextBtn();
+}
+function showExp(html){const e=document.getElementById('exp');e.innerHTML=html;e.classList.add('show');}
+function nextBtn(){
+  const e=document.getElementById('exp');
+  const b=document.createElement('button');b.className='btn';b.textContent=idx>=9?'查看成绩 →':'下一题 →';
+  b.onclick=()=>{idx++;idx>=quiz.length?end():showQ();};
+  e.appendChild(document.createElement('br'));e.appendChild(b);
+}
+function end(){
+  clearInterval(timer);
+  let rank,emoji;
+  if(score>=550){rank="创业理论学霸 🎓";emoji="🏆";}
+  else if(score>=400){rank="准创业者";emoji="🎉";}
+  else if(score>=250){rank="入门选手";emoji="🙂";}
+  else{rank="还需多读书";emoji="📚";}
+  document.getElementById('tbar').style.width='0';
+  document.getElementById('card').innerHTML=`<div class="end"><div style="font-size:40px">${emoji}</div>
+    <h2 style="margin:8px 0">${rank}</h2>
+    <div class="big">${score}<span style="font-size:18px;color:#a5b4fc">分</span></div>
+    <p style="color:#a5b4fc;margin-top:10px">10题挑战完成！</p>
+    <button class="btn" onclick="location.reload()">再来一轮</button></div>`;
+  document.getElementById('progress').textContent='挑战结束';
+}
+showQ();
+</script>
+</body>
+</html>

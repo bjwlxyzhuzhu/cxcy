@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>双创AI实验室 · 风格选择</title>
+<style>
+:root{--ink:#eef1fb;--mut:#9aa6c8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:var(--ink);background:#0a0e1f;min-height:100vh;line-height:1.6;background:radial-gradient(800px 500px at 20% -10%,rgba(124,92,255,.25),transparent 60%),radial-gradient(700px 500px at 100% 0,rgba(34,211,238,.18),transparent 55%),#0a0e1f}
+.wrap{max-width:1000px;margin:0 auto;padding:54px 24px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+h1 span{background:linear-gradient(120deg,#22d3ee,#7c5cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--mut);font-size:15px;margin-bottom:32px;max-width:640px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.card{display:block;text-decoration:none;color:inherit;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:24px;background:rgba(255,255,255,.05);backdrop-filter:blur(12px);transition:.3s cubic-bezier(.2,.9,.3,1.2);position:relative;overflow:hidden}
+.card:hover{transform:translateY(-6px);border-color:rgba(124,92,255,.6);box-shadow:0 20px 44px rgba(0,0,0,.4)}
+.swatch{height:80px;border-radius:14px;margin-bottom:16px;position:relative;overflow:hidden}
+.sA{background:radial-gradient(circle at 30% 30%,#bfe9ff,#7c5cff 55%,#3b2a8a)}
+.sB{background:linear-gradient(180deg,#ff2bd6,#9d5cff 60%,#16f2e3)}
+.sC{background:linear-gradient(110deg,#5eead4,#818cf8 50%,#f0abfc)}
+.sD{background:linear-gradient(135deg,#f5f7fc,#dfe4f5);border:1px solid #e7eaf3}
+.tagn{display:inline-block;font-size:12px;font-weight:700;color:#22d3ee;border:1px solid rgba(34,211,238,.4);padding:2px 10px;border-radius:999px;margin-bottom:10px}
+.card h3{font-size:19px;margin-bottom:6px}
+.card p{font-size:13.5px;color:var(--mut)}
+.feat{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}
+.feat span{font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.14);color:var(--mut)}
+.go{margin-top:16px;font-size:13px;font-weight:700;color:#22d3ee}
+.note{margin-top:30px;padding:16px 18px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.04);font-size:13px;color:var(--mut)}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+</style></head>
+<body><div class="wrap">
+  <h1>选一个 <span>前端风格</span></h1>
+  <p class="lead">4 套首页 Demo，内容相同、皮肤与动效不同，点开任意一张即可全屏体验（含学习/应用切换、搭子天团、数字人小航）。选定后，它将成为 M1 的设计系统，用 React + Framer Motion 1:1 还原。</p>
+  <div class="grid">
+    <a class="card" href="风格A_银河探索.html"><div class="swatch sA"></div><span class="tagn">A · 推荐 · 升级</span><h3>银河探索（行星卡片）</h3><p>旋臂银河背景，6 大模块化作行星；鼠标交互、点击超新星爆炸登陆功能页；学习/应用两星区不同天体运动。</p><div class="feat"><span>旋臂银河</span><span>行星卡片</span><span>爆炸进入</span></div><div class="go">打开体验 →</div></a>
+    <a class="card" href="风格A_深空全息.html" style="opacity:.7"><div class="swatch sA"></div><span class="tagn">A0 · 旧版</span><h3>深空全息玻璃</h3><p>A 的初版（玻璃拟态卡片）。留作对比，可忽略。</p><div class="feat"><span>粒子星空</span><span>全息描边</span><span>3D倾斜</span></div><div class="go">打开体验 →</div></a>
+    <a class="card" href="风格B_赛博霓虹.html"><div class="swatch sB"></div><span class="tagn">B · 吸睛</span><h3>赛博霓虹脉冲</h3><p>透视霓虹网格、故障文字、扫描线、打字机。电竞/赛博感最强，答辩现场最抓眼球。</p><div class="feat"><span>霓虹网格</span><span>故障特效</span><span>扫描线</span></div><div class="go">打开体验 →</div></a>
+    <a class="card" href="风格C_极光流体.html"><div class="swatch sC"></div><span class="tagn">C · 优雅</span><h3>极光流体柔光</h3><p>动态极光背景、强磨砂玻璃、流体数字人、鼠标光晕。高级品牌感，舒适不刺眼。</p><div class="feat"><span>极光流体</span><span>磨砂玻璃</span><span>鼠标光晕</span></div><div class="go">打开体验 →</div></a>
+    <a class="card" href="风格D_明亮Bento.html"><div class="swatch sD"></div><span class="tagn">D · 清爽</span><h3>明亮 Bento 科技</h3><p>唯一亮色：Bento 不规则栅格、干净微交互（Linear/Apple 风）。投影清晰、专业稳重。</p><div class="feat"><span>亮色</span><span>Bento栅格</span><span>微交互</span></div><div class="go">打开体验 →</div></a>
+  </div>
+  <div class="note">💡 可以混搭：比如「A 的背景 + D 的 Bento 卡片」「C 的极光 + A 的全息描边」。也可以让我再做亮色版的 A/C，或调整主色。告诉我编号与想改的点即可。</div>
+</div></body></html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创业资源匹配 · 翻牌记忆</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#2a0a18,#0f0a1e);color:#fce7f3;min-height:100vh;padding:18px}
+  .wrap{max-width:760px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .topbar a{color:#f9a8d4;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:22px;background:linear-gradient(90deg,#f472b6,#facc15);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#fbcfe8;font-size:14px;margin:6px 0 12px}
+  .hud{display:flex;gap:14px;justify-content:center;margin-bottom:14px;font-size:14px}
+  .hud b{color:#facc15}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media(max-width:560px){.grid{grid-template-columns:repeat(3,1fr);gap:7px}}
+  .card{aspect-ratio:3/4;perspective:600px;cursor:pointer}
+  .inner{position:relative;width:100%;height:100%;transition:transform .4s;transform-style:preserve-3d}
+  .card.flip .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px;font-size:13px;font-weight:700}
+  .front{background:linear-gradient(135deg,#9d174d,#581c87);border:1px solid #be185d;font-size:30px}
+  .back{transform:rotateY(180deg);border:2px solid}
+  .back.need{background:#3b0764;border-color:#c084fc;color:#f3e8ff}
+  .back.res{background:#422006;border-color:#facc15;color:#fef9c3}
+  .back .tag{font-size:10px;font-weight:600;opacity:.7;margin-bottom:4px}
+  .card.matched .inner{box-shadow:0 0 0 3px #22c55e;border-radius:12px}
+  .card.matched{animation:bounce .4s}
+  @keyframes bounce{50%{transform:scale(1.08)}}
+  .btn{background:linear-gradient(90deg,#db2777,#eab308);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:15px;font-weight:700;cursor:pointer;display:block;margin:18px auto 0}
+  .win{text-align:center;background:#1f1430;border:1px solid #6b21a8;border-radius:14px;padding:22px;margin-top:16px;display:none}
+  .win.show{display:block}
+  .win h2{font-size:24px;margin-bottom:8px}
+  .hint{font-size:12px;color:#a78bfa;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a href="basic.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">创新创业系列 · 08</span></div>
+  <h1>🃏 创业资源匹配 · 翻牌记忆</h1>
+  <p class="sub">翻开两张牌，把<b style="color:#c084fc">「创业难题」</b>和能解决它的<b style="color:#facc15">「关键资源」</b>配成一对。考验记忆，也考验你对资源的理解。</p>
+
+  <div class="hud"><span>🔄 步数 <b id="moves">0</b></span><span>✅ 已配对 <b id="pairs">0</b>/6</span><span>⏱ <b id="time">0s</b></span></div>
+  <div class="grid" id="grid"></div>
+  <div class="hint">💡 难题与资源一一对应，记住翻开过的牌的位置！</div>
+
+  <div class="win" id="winBox"></div>
+</div>
+
+<script>
+const PAIRS=[
+  {id:1,need:"缺启动资金",res:"天使投资人",ni:"💰",ri:"🪙"},
+  {id:2,need:"缺技术合伙人",res:"资深CTO",ni:"⚙️",ri:"👨‍💻"},
+  {id:3,need:"没有流量",res:"头部KOL合作",ni:"📉",ri:"📢"},
+  {id:4,need:"不懂法务财税",res:"专业顾问机构",ni:"⚖️",ri:"📋"},
+  {id:5,need:"缺早期用户",res:"种子用户社群",ni:"🌱",ri:"👥"},
+  {id:6,need:"产品没人会用",res:"用户体验设计师",ni:"😕",ri:"🎨"}
+];
+let cards=[];
+PAIRS.forEach(p=>{
+  cards.push({pid:p.id,type:'need',txt:p.need,ic:p.ni});
+  cards.push({pid:p.id,type:'res',txt:p.res,ic:p.ri});
+});
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+shuffle(cards);
+
+let first=null,lock=false,moves=0,matched=0,t=0,timer=null,started=false;
+const grid=document.getElementById('grid');
+cards.forEach((c,i)=>{
+  const d=document.createElement('div');d.className='card';d.dataset.i=i;
+  d.innerHTML=`<div class="inner">
+    <div class="face front">❓</div>
+    <div class="face back ${c.type}"><div class="tag">${c.type==='need'?'创业难题':'关键资源'}</div><div style="font-size:22px">${c.ic}</div><div>${c.txt}</div></div>
+  </div>`;
+  d.onclick=()=>flip(d,c);
+  grid.appendChild(d);
+});
+function startTimer(){if(started)return;started=true;timer=setInterval(()=>{t++;document.getElementById('time').textContent=t+'s';},1000);}
+function flip(d,c){
+  if(lock||d.classList.contains('flip')||d.classList.contains('matched'))return;
+  startTimer();
+  d.classList.add('flip');
+  if(!first){first={d,c};return;}
+  moves++;document.getElementById('moves').textContent=moves;
+  lock=true;
+  const second={d,c};
+  if(first.c.pid===second.c.pid && first.c.type!==second.c.type){
+    setTimeout(()=>{
+      first.d.classList.add('matched');second.d.classList.add('matched');
+      matched++;document.getElementById('pairs').textContent=matched;
+      first=null;lock=false;
+      if(matched===PAIRS.length)win();
+    },350);
+  }else{
+    setTimeout(()=>{
+      first.d.classList.remove('flip');second.d.classList.remove('flip');
+      first=null;lock=false;
+    },900);
+  }
+}
+function win(){
+  clearInterval(timer);
+  const best=PAIRS.length; // 6 perfect moves
+  let stars,comment;
+  if(moves<=8){stars="⭐⭐⭐";comment="记忆力惊人！而且你对'难题→资源'的对应了如指掌。";}
+  else if(moves<=12){stars="⭐⭐";comment="很棒！稍加练习就能全对路。";}
+  else{stars="⭐";comment="完成啦！多玩几次记住资源的位置和搭配。";}
+  const box=document.getElementById('winBox');box.classList.add('show');
+  box.innerHTML=`<h2>🎊 全部配对成功！</h2>
+    <div style="font-size:30px;margin:6px 0">${stars}</div>
+    <p style="color:#fbcfe8;line-height:1.7">用 <b style="color:#facc15">${moves}</b> 步、<b style="color:#facc15">${t}</b> 秒完成。${comment}</p>
+    <p style="font-size:13px;color:#a78bfa;margin-top:10px">创业的本质，就是不断为'缺什么'找到'对的资源'。</p>
+    <button class="btn" onclick="location.reload()">再玩一次</button>`;
+  box.scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

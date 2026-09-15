@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>市场争夺战</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#1a1005,#0c0a1f);color:#fef3c7;min-height:100vh;padding:18px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .topbar a{color:#fcd34d;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:22px;background:linear-gradient(90deg,#f59e0b,#ef4444);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#fde68a;font-size:14px;margin:6px 0 14px}
+  .share{display:flex;height:34px;border-radius:10px;overflow:hidden;border:1px solid #57534e;margin-bottom:6px;font-size:13px;font-weight:700}
+  .share .you{background:linear-gradient(90deg,#f59e0b,#fbbf24);color:#451a03;display:flex;align-items:center;justify-content:center;transition:width .6s}
+  .share .comp{background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;display:flex;align-items:center;justify-content:center;flex:1;transition:width .6s}
+  .small{font-size:12px;color:#a8a29e;display:flex;justify-content:space-between;margin-bottom:14px}
+  .budget{text-align:center;font-size:15px;margin-bottom:10px}
+  .budget b{color:#fbbf24;font-size:20px}
+  .chan{background:#1c1505;border:1px solid #57534e;border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+  .chan .ic{font-size:26px}
+  .chan .info{flex:1}
+  .chan .nm{font-weight:700;font-size:15px}
+  .chan .ds{font-size:12px;color:#a8a29e}
+  .step{display:flex;align-items:center;gap:8px}
+  .step button{width:32px;height:32px;border-radius:8px;border:1px solid #78716c;background:#292524;color:#fef3c7;font-size:18px;cursor:pointer;font-weight:700}
+  .step button:hover{background:#44403c}
+  .step .n{width:46px;text-align:center;font-weight:800;font-size:16px}
+  .btn{background:linear-gradient(90deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:700;cursor:pointer;width:100%}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .log{margin-top:14px;background:#1c1505;border:1px solid #57534e;border-radius:12px;padding:12px;font-size:13px;line-height:1.7;display:none}
+  .log.show{display:block}
+  .log .row{display:flex;justify-content:space-between;border-bottom:1px solid #292524;padding:3px 0}
+  .win{color:#4ade80}.lose{color:#f87171}
+  .end{text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a href="basic.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">创新创业系列 · 06</span></div>
+  <h1>⚔️ 市场争夺战</h1>
+  <p class="sub">和对手「紫鲨科技」抢同一片市场。每月把有限预算投到不同渠道，谁投得准谁抢到客户。共 6 个月，争取最高市场份额。</p>
+
+  <div class="share">
+    <div class="you" id="youBar" style="width:50%">你 50%</div>
+    <div class="comp" id="compBar">紫鲨 50%</div>
+  </div>
+  <div class="small"><span>👤 你的客户：<b id="youCust">0</b></span><span id="roundLbl">第 1 / 6 月</span><span>🦈 对手客户：<b id="compCust">0</b></span></div>
+
+  <div class="budget">本月预算：<b id="remain">10</b> 个投放点（每点=10万）</div>
+  <div id="chans"></div>
+  <button class="btn" id="go">🚀 本月投放</button>
+
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+const channels=[
+  {ic:"📱",nm:"短视频投流",ds:"覆盖广、波动大",size:0,base:1.0},
+  {ic:"🔍",nm:"搜索竞价",ds:"精准、转化高",size:0,base:1.0},
+  {ic:"🚶",nm:"地推扫街",ds:"稳健、见效慢",size:0,base:1.0},
+  {ic:"💬",nm:"私域社群",ds:"复购强、上限低",size:0,base:1.0},
+  {ic:"🌟",nm:"KOL合作",ds:"爆发力强、贵",size:0,base:1.0}
+];
+const BUDGET=10, ROUNDS=6;
+let round=1, youCust=0, compCust=0, alloc=channels.map(()=>0), lastYou=null;
+
+function rndSizes(){ // each month channels have different market potential
+  channels.forEach(c=>c.size=60+Math.random()*140|0);
+}
+function used(){return alloc.reduce((a,b)=>a+b,0);}
+function renderChans(){
+  const box=document.getElementById('chans');box.innerHTML='';
+  channels.forEach((c,i)=>{
+    const d=document.createElement('div');d.className='chan';
+    d.innerHTML=`<div class="ic">${c.ic}</div>
+      <div class="info"><div class="nm">${c.nm} <span style="color:#fbbf24;font-size:12px">本月容量 ${c.size}</span></div><div class="ds">${c.ds}</div></div>
+      <div class="step"><button data-m="${i}">−</button><div class="n" id="n${i}">${alloc[i]}</div><button data-p="${i}">＋</button></div>`;
+    box.appendChild(d);
+  });
+  box.querySelectorAll('button[data-p]').forEach(b=>b.onclick=()=>{const i=+b.dataset.p;if(used()<BUDGET){alloc[i]++;upd();}});
+  box.querySelectorAll('button[data-m]').forEach(b=>b.onclick=()=>{const i=+b.dataset.m;if(alloc[i]>0){alloc[i]--;upd();}});
+  upd();
+}
+function upd(){
+  alloc.forEach((v,i)=>document.getElementById('n'+i).textContent=v);
+  document.getElementById('remain').textContent=BUDGET-used();
+}
+function compMove(){
+  // AI: weight by channel size, plus counter where you spent last round, plus noise
+  let weights=channels.map((c,i)=>c.size/40 + (lastYou?lastYou[i]*0.6:0) + Math.random()*2);
+  let comp=channels.map(()=>0), left=BUDGET;
+  while(left>0){
+    let i=weights.indexOf(Math.max(...weights));
+    comp[i]++;left--;weights[i]*=0.7; // diminishing so it spreads
+  }
+  return comp;
+}
+document.getElementById('go').onclick=()=>{
+  const comp=compMove();
+  let log=`<div style="font-weight:700;color:#fbbf24;margin-bottom:6px">第 ${round} 月战报</div>`;
+  let myGain=0,cpGain=0;
+  channels.forEach((c,i)=>{
+    const ys=alloc[i]*10, cs=comp[i]*10; // 万元
+    const totalSpend=ys+cs;
+    let yWin=0,cWin=0;
+    if(totalSpend>0){
+      const yShare=ys/totalSpend;
+      const captured=Math.round(c.size*Math.min(1,totalSpend/120)); // 投入越多激活越多容量
+      yWin=Math.round(captured*yShare);cWin=captured-yWin;
+    }
+    myGain+=yWin;cpGain+=cWin;
+    const res=yWin>cWin?'win':yWin<cWin?'lose':'';
+    log+=`<div class="row"><span>${c.ic} ${c.nm}</span><span class="${res}">你 ${alloc[i]}点→<b>${yWin}</b>客 ｜ 对手 ${comp[i]}点→${cWin}客</span></div>`;
+  });
+  youCust+=myGain;compCust+=cpGain;lastYou=alloc.slice();
+  log+=`<div style="margin-top:6px">本月：你 +${myGain} ｜ 对手 +${cpGain}</div>`;
+  const lg=document.getElementById('log');lg.innerHTML=log;lg.classList.add('show');
+  updateShare();
+  round++;
+  if(round>ROUNDS){endGame();return;}
+  document.getElementById('roundLbl').textContent=`第 ${round} / ${ROUNDS} 月`;
+  alloc=channels.map(()=>0);rndSizes();renderChans();
+};
+function updateShare(){
+  const tot=youCust+compCust||1;
+  const yp=Math.round(youCust/tot*100);
+  document.getElementById('youBar').style.width=yp+'%';
+  document.getElementById('youBar').textContent='你 '+yp+'%';
+  document.getElementById('compBar').textContent='紫鲨 '+(100-yp)+'%';
+  document.getElementById('youCust').textContent=youCust;
+  document.getElementById('compCust').textContent=compCust;
+}
+function endGame(){
+  const tot=youCust+compCust||1;const yp=Math.round(youCust/tot*100);
+  let title,desc;
+  if(yp>=60){title="🏆 市场领导者";desc="你以压倒性份额碾压对手，渠道组合精准高效！";}
+  else if(yp>50){title="🎉 险胜对手";desc="你拿下了多数份额，但对手紧追不舍。";}
+  else if(yp>=45){title="🤝 势均力敌";desc="双雄并立，下一阶段拼的就是产品和留存了。";}
+  else{title="😟 份额落后";desc="对手抢占了先机。复盘：是否把钱投在了容量小或对手扎堆的渠道？";}
+  document.getElementById('chans').innerHTML=`<div class="end"><h2>${title}</h2>
+    <p style="color:#fde68a;line-height:1.7;margin:10px 0">${desc}</p>
+    <p>最终份额 <b style="color:#fbbf24;font-size:24px">${yp}%</b>（你 ${youCust} ｜ 对手 ${compCust}）</p>
+    <button class="btn" style="margin-top:14px" onclick="location.reload()">再战一局</button></div>`;
+  document.getElementById('go').style.display='none';
+  document.getElementById('budget')?.remove?.();
+  document.querySelector('.budget').style.display='none';
+};
+rndSizes();renderChans();
+</script>
+</body>
+</html>

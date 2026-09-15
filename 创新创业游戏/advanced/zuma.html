@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>资源链 · 祖玛</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(900px 500px at 50% 0,#2a1840,#0a0712 60%);color:#ede9fe;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:14px}
+  .topbar{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .topbar a{color:#c4b5fd;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:21px;background:linear-gradient(90deg,#c084fc,#f472b6,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
+  .sub{color:#c4b5fd;font-size:12px;text-align:center;margin:3px 0 10px}
+  .gamebox{position:relative}
+  canvas{display:block;background:#0d0a1a;border:2px solid #3b2a5f;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.5);cursor:crosshair;touch-action:none}
+  .hud{position:absolute;top:8px;left:0;right:0;display:flex;justify-content:space-between;padding:0 12px;font-size:13px;pointer-events:none;z-index:3}
+  .hud b{color:#fbbf24}
+  .overlay{position:absolute;inset:0;background:rgba(10,7,18,.93);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;z-index:6}
+  .overlay h2{font-size:24px;margin-bottom:10px;background:linear-gradient(90deg,#c084fc,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .overlay p{color:#ddd6fe;font-size:13px;line-height:1.8;margin-bottom:5px}
+  .btn{background:linear-gradient(90deg,#9333ea,#db2777);color:#fff;border:none;border-radius:9px;padding:11px 26px;font-size:15px;font-weight:800;cursor:pointer;margin-top:12px}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px;font-size:12px;color:#c4b5fd}
+  .legend span{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+  .ctrl{margin-top:8px;font-size:12px;color:#a78bfa}
+  .ctrl kbd{background:#241a3a;border:1px solid #3b2a5f;border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-size:11px}
+</style>
+</head>
+<body>
+  <div class="topbar"><a href="index.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">复杂游戏 · 祖玛</span></div>
+  <h1>🔮 资源链</h1>
+  <p class="sub">资源宝珠正滑向「破产黑洞」。瞄准发射，凑齐 3 颗以上同色「整合资源」消除。在它们抵达终点前清空整条链！</p>
+
+  <div class="gamebox">
+    <canvas id="cv" width="600" height="440"></canvas>
+    <div class="hud"><span>得分 <b id="score">0</b></span><span id="prog">进度 0%</span><span>剩余 <b id="left">0</b></span></div>
+    <div class="overlay" id="overlay">
+      <h2>🔮 准备整合</h2>
+      <p>鼠标瞄准，<b>点击 / 空格</b>发射当前宝珠<br>3 颗以上同色相连即消除，可触发连锁连击</p>
+      <button class="btn" id="startBtn">开始</button>
+    </div>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="ctrl"><kbd>点击/空格</kbd> 发射 · <kbd>P</kbd> 暂停 · 消除越多连锁，连击分越高</div>
+
+<script src="engine.js"></script>
+<script>
+"use strict";
+/* ================= 资源链 · 祖玛 =================
+   折线轨道(弧长参数) · 刚性珠链前进(锚定于前端) · 发射插入(按命中弧长定位) ·
+   3+消除 + 塌落连锁combo · 危险区 · 胜负
+   珠链模型：balls[0]=最前(最接近黑洞)，第 i 颗位于 d = headD - i*BALL_D
+================================================= */
+const W=600,H=440,STEP=1000/60,BALL_R=13,BALL_D=24;
+const COLORS=["#fbbf24","#38bdf8","#a855f7","#34d399","#f472b6"];
+const CNAME=["资金","人才","技术","流量","政策"];
+const CICON=["💰","👥","⚙️","📊","📜"];
+const WAY=[[30,40],[570,40],[570,108],[60,108],[60,176],[570,176],[570,244],[60,244],[60,312],[345,312]];
+const HOLE=WAY[WAY.length-1];
+const SHOOTER={x:300,y:402};
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const overlay=document.getElementById('overlay');
+const rand=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+// —— 轨道 ——
+let segs=[],pathLen=0;
+(function buildPath(){let cum=0;for(let i=0;i<WAY.length-1;i++){const dx=WAY[i+1][0]-WAY[i][0],dy=WAY[i+1][1]-WAY[i][1];const len=Math.hypot(dx,dy);segs.push({x0:WAY[i][0],y0:WAY[i][1],x1:WAY[i+1][0],y1:WAY[i+1][1],len,cum0:cum});cum+=len;}pathLen=cum;})();
+function posAt(d){d=clamp(d,0,pathLen);for(const s of segs){if(d<=s.cum0+s.len){const t=s.len?(d-s.cum0)/s.len:0;return{x:s.x0+(s.x1-s.x0)*t,y:s.y0+(s.y1-s.y0)*t};}}return{x:HOLE[0],y:HOLE[1]};}
+function nearestD(x,y){let best=0,bd=1e9;for(let d=0;d<=pathLen;d+=6){const p=posAt(d),dist=(p.x-x)**2+(p.y-y)**2;if(dist<bd){bd=dist;best=d;}}return best;}
+
+// —— 状态 ——
+let balls,headD,spawnRemaining,spawnTimer,speed,score,state="ready";
+let shooterCur,shooterNext,projectiles,particles,aimAng,fireCd,total,popups;
+let acc=0,lastT=0,rafId=null,dangerT=0;
+let mx=300,my=200;
+
+function randColorInChain(){
+  if(balls&&balls.length){const present=[...new Set(balls)];return present[Math.random()*present.length|0];}
+  return Math.random()*COLORS.length|0;
+}
+function startGame(){
+  const pre=10;total=46;
+  balls=[];for(let i=0;i<pre;i++)balls.push(Math.random()*COLORS.length|0);
+  headD=pre*BALL_D;            // 让整条预置链落在轨道前段
+  spawnRemaining=total-pre;spawnTimer=1.2;speed=17;score=0;
+  projectiles=[];particles=[];popups=[];fireCd=0;dangerT=0;
+  shooterCur=Math.random()*COLORS.length|0;shooterNext=randColorInChain();
+  state="play";overlay.style.display="none";updateHUD();GameKit.begin();
+  if(!rafId){lastT=performance.now();rafId=requestAnimationFrame(frame);}
+}
+
+// —— 消除：扫描所有 ≥3 同色连续段并清除，塌落连锁记combo ——
+function resolveAll(){
+  let chain=0;
+  while(true){
+    let found=null;
+    for(let i=0;i<balls.length;){
+      let j=i;while(j+1<balls.length&&balls[j+1]===balls[i])j++;
+      if(j-i+1>=3){found=[i,j];break;}i=j+1;
+    }
+    if(!found)break;
+    const[i,j]=found,count=j-i+1;chain++;
+    const pts=count*100*chain;score+=pts;
+    const mid=posAt(headD-((i+j)/2)*BALL_D);
+    popup(mid.x,mid.y,(chain>1?`连锁×${chain} `:"")+`+${pts}`);
+    for(let k=0;k<count*2;k++)burst(mid.x,mid.y,COLORS[balls[i]]);
+    Sound.sfx(chain>1?'clear':'match');
+    balls.splice(i,count);
+    if(i===0)headD-=count*BALL_D;   // 前端消除→整链后退(争取时间)
+  }
+  return chain;
+}
+function popup(x,y,t){popups.push({x,y,t,life:1,active:true});}
+function burst(x,y,col){particles.push({x,y,vx:rand(-120,120),vy:rand(-120,120),life:.5,col,active:true});}
+
+// —— 发射 ——
+function fire(){
+  if(state!=="play"||fireCd>0)return;
+  fireCd=0.22;
+  const sp=560;
+  projectiles.push({x:SHOOTER.x,y:SHOOTER.y,vx:Math.cos(aimAng)*sp,vy:Math.sin(aimAng)*sp,color:shooterCur,active:true});
+  shooterCur=shooterNext;shooterNext=randColorInChain();
+  Sound.sfx('shoot');
+}
+function tryInsert(proj){
+  // 与任意珠碰撞？
+  for(let i=0;i<balls.length;i++){
+    const d=headD-i*BALL_D;if(d<0)continue;
+    const p=posAt(d);
+    if((p.x-proj.x)**2+(p.y-proj.y)**2<(BALL_R+11)**2){
+      const projD=nearestD(proj.x,proj.y);
+      let idx=clamp(Math.round((headD-projD)/BALL_D),0,balls.length);
+      balls.splice(idx,0,proj.color);
+      proj.active=false;
+      resolveAll();
+      return true;
+    }
+  }
+  return false;
+}
+
+// —— 更新 ——
+function update(dt){
+  if(state!=="play")return;
+  const s=dt/1000;
+  speed+=0.05*s; // 随时间略加速
+  headD+=speed*s;
+  if(fireCd>0)fireCd-=s;
+  // 生成新珠(从尾部)
+  if(spawnRemaining>0){spawnTimer-=s;if(spawnTimer<=0){balls.push(randColorInChain());spawnRemaining--;spawnTimer=Math.max(.5,1.2-(total-spawnRemaining)*0.01);}}
+  // 抵达黑洞→失败
+  if(headD>=pathLen){lose();return;}
+  // 危险区
+  dangerT=(headD/pathLen>0.82)?(dangerT+s):0;
+  // 弹丸
+  for(const pr of projectiles){
+    if(!pr.active)continue;
+    pr.x+=pr.vx*s;pr.y+=pr.vy*s;
+    if(pr.x<-20||pr.x>W+20||pr.y<-20||pr.y>H+20){pr.active=false;continue;}
+    tryInsert(pr);
+  }
+  projectiles=projectiles.filter(p=>p.active);
+  // 粒子/飘字
+  for(const p of particles){if(!p.active)continue;p.x+=p.vx*s;p.y+=p.vy*s;p.vx*=.9;p.vy*=.9;p.life-=s;if(p.life<=0)p.active=false;}
+  for(const o of popups){if(!o.active)continue;o.y-=26*s;o.life-=s;if(o.life<=0)o.active=false;}
+  // 胜利
+  if(spawnRemaining<=0&&balls.length===0){win();return;}
+  updateHUD();
+}
+
+// —— 渲染 ——
+function render(){
+  ctx.clearRect(0,0,W,H);
+  // 轨道
+  ctx.strokeStyle="rgba(167,139,250,.18)";ctx.lineWidth=BALL_R*2+6;ctx.lineCap="round";ctx.lineJoin="round";
+  ctx.beginPath();WAY.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
+  ctx.strokeStyle="rgba(255,255,255,.05)";ctx.lineWidth=2;ctx.stroke();
+  // 黑洞
+  const dg=dangerT>0&&Math.floor(Date.now()/200)%2;
+  ctx.fillStyle=dg?"#ef4444":"#1a1030";ctx.beginPath();ctx.arc(HOLE[0],HOLE[1],BALL_R+9,0,6.28);ctx.fill();
+  ctx.fillStyle="#000";ctx.beginPath();ctx.arc(HOLE[0],HOLE[1],BALL_R+2,0,6.28);ctx.fill();
+  ctx.fillStyle=dg?"#fecaca":"#7c3aed";ctx.font="11px sans-serif";ctx.textAlign="center";ctx.fillText("破产",HOLE[0],HOLE[1]+4);
+  if(state==="ready"){return;}
+  // 珠链(从后往前画，前面的盖在上层)
+  for(let i=balls.length-1;i>=0;i--){
+    const d=headD-i*BALL_D;if(d<-BALL_R)continue;
+    const p=posAt(Math.max(0,d));drawBall(p.x,p.y,balls[i]);
+  }
+  // 瞄准线
+  if(state==="play"){
+    ctx.strokeStyle="rgba(255,255,255,.25)";ctx.setLineDash([4,6]);ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(SHOOTER.x,SHOOTER.y);ctx.lineTo(SHOOTER.x+Math.cos(aimAng)*70,SHOOTER.y+Math.sin(aimAng)*70);ctx.stroke();ctx.setLineDash([]);
+  }
+  // 发射器（资源整合官）
+  ctx.save();ctx.translate(SHOOTER.x,SHOOTER.y);
+  ctx.save();ctx.rotate(aimAng);
+  ctx.fillStyle="#4c1d95";ctx.fillRect(0,-7,30,14);          // 炮管
+  ctx.fillStyle="#7c3aed";ctx.fillRect(24,-9,9,18);          // 炮口
+  ctx.restore();
+  const bgr=ctx.createLinearGradient(0,-20,0,20);bgr.addColorStop(0,"#3b2a5f");bgr.addColorStop(1,"#1a1030");
+  ctx.fillStyle=bgr;ctx.beginPath();ctx.arc(0,0,21,0,6.28);ctx.fill();
+  ctx.strokeStyle="#a855f7";ctx.lineWidth=2;ctx.stroke();
+  ctx.restore();
+  drawBall(SHOOTER.x,SHOOTER.y,shooterCur);                  // 装填的宝珠
+  // 整合官头肩（底座左下露出）
+  const hx2=SHOOTER.x-30, hy2=SHOOTER.y+10;
+  ctx.fillStyle="#7c3aed";ctx.beginPath();ctx.arc(hx2,hy2+10,11,Math.PI,0);ctx.fill();
+  ctx.fillStyle="#fde68a";ctx.beginPath();ctx.arc(hx2,hy2+3,5.5,0,6.28);ctx.fill();
+  ctx.fillStyle="#1f2937";ctx.beginPath();ctx.arc(hx2,hy2+1,5.7,Math.PI,0);ctx.fill();
+  ctx.fillStyle="#c4b5fd";ctx.font="9px sans-serif";ctx.textAlign="left";ctx.fillText("整合官",hx2-16,hy2-8);
+  // 下一颗
+  ctx.fillStyle="#c4b5fd";ctx.font="10px sans-serif";ctx.fillText("下一颗",SHOOTER.x+40,SHOOTER.y-8);
+  drawBall(SHOOTER.x+40,SHOOTER.y+8,shooterNext,0.8);
+  // 弹丸
+  for(const pr of projectiles)if(pr.active)drawBall(pr.x,pr.y,pr.color);
+  // 粒子
+  for(const p of particles){if(!p.active)continue;ctx.globalAlpha=Math.max(0,p.life*2);ctx.fillStyle=p.col;ctx.fillRect(p.x-2,p.y-2,4,4);}
+  ctx.globalAlpha=1;
+  // 飘字
+  ctx.font="bold 13px sans-serif";ctx.textAlign="center";
+  for(const o of popups){if(!o.active)continue;ctx.globalAlpha=Math.min(1,o.life);ctx.fillStyle="#fde047";ctx.fillText(o.t,o.x,o.y);}
+  ctx.globalAlpha=1;
+}
+function drawBall(x,y,c,scale){
+  const r=BALL_R*(scale||1);
+  ctx.fillStyle=COLORS[c];ctx.beginPath();ctx.arc(x,y,r,0,6.28);ctx.fill();
+  ctx.fillStyle="rgba(255,255,255,.4)";ctx.beginPath();ctx.arc(x-r*0.3,y-r*0.3,r*0.35,0,6.28);ctx.fill();
+  ctx.font=(r*1.1|0)+"px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(CICON[c],x,y+1);ctx.textBaseline="alphabetic";
+}
+
+function updateHUD(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('left').textContent=balls.length+spawnRemaining;
+  document.getElementById('prog').textContent="逼近 "+Math.min(100,Math.round(headD/pathLen*100))+"%";
+}
+function win(){state="win";GameKit.stop();Sound.sfx('win');const lb=GameKit.finish(score);overlay.style.display="flex";
+  overlay.innerHTML=`<h2>🎉 资源整合成功！</h2><p>你在破产黑洞吞噬之前清空了整条资源链！</p><p>得分 <b style="color:#fbbf24">${score}</b></p>
+   ${lb.rank?`<p style="color:#f472b6;font-size:13px">🏆 排行榜第 ${lb.rank} 名！</p>`:''}
+   <div style="background:#0d0a1a;border-radius:10px;padding:6px 10px;margin:8px auto;max-width:240px">${lb.html}</div>
+   <button class="btn" id="r">再玩一局</button>`;document.getElementById('r').onclick=startGame;}
+function lose(){state="over";GameKit.stop();Sound.sfx('gameover');const lb=GameKit.finish(score);overlay.style.display="flex";
+  overlay.innerHTML=`<h2>🕳️ 资源链断裂</h2><p>宝珠被破产黑洞吞没了…</p><p>得分 <b style="color:#fbbf24">${score}</b></p>
+   ${lb.rank?`<p style="color:#f472b6;font-size:13px">🏆 排行榜第 ${lb.rank} 名！</p>`:''}
+   <div style="background:#0d0a1a;border-radius:10px;padding:6px 10px;margin:8px auto;max-width:240px">${lb.html}</div>
+   <button class="btn" id="r">再来一次</button>`;document.getElementById('r').onclick=startGame;}
+function togglePause(){if(state==="play"){state="pause";overlay.style.display="flex";overlay.innerHTML=`<h2>⏸️ 暂停</h2><button class="btn" id="rs">继续</button>`;document.getElementById('rs').onclick=togglePause;}else if(state==="pause"){state="play";overlay.style.display="none";}}
+
+function frame(now){const dt=now-lastT;lastT=now;acc+=Math.min(dt,100);while(acc>=STEP){update(STEP);acc-=STEP;}render();rafId=requestAnimationFrame(frame);}
+
+// 输入
+cv.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();mx=(e.clientX-r.left)*(W/r.width);my=(e.clientY-r.top)*(H/r.height);aimAng=Math.atan2(my-SHOOTER.y,mx-SHOOTER.x);});
+cv.addEventListener('mousedown',()=>{if(state!=="play"){if(state!=="pause")startGame();return;}fire();});
+cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0],r=cv.getBoundingClientRect();mx=(t.clientX-r.left)*(W/r.width);my=(t.clientY-r.top)*(H/r.height);aimAng=Math.atan2(my-SHOOTER.y,mx-SHOOTER.x);if(state!=="play"){if(state!=="pause")startGame();}else fire();},{passive:false});
+window.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Spacebar'){e.preventDefault();if(state==="play")fire();else if(state!=="pause")startGame();}else if(e.key==='p'||e.key==='P')togglePause();});
+document.getElementById('startBtn').onclick=startGame;
+document.getElementById('legend').innerHTML=COLORS.map((c,i)=>`<span style="background:${c}"></span>${CICON[i]}${CNAME[i]}`).join('  ');
+aimAng=-Math.PI/2;render();
+GameKit.mount({key:'zuma',title:'🔮 资源链',bgm:'zuma',help:`
+  <h3>🎯 目标</h3><p>作为<b>资源整合官</b>，资源宝珠正沿轨道滑向「破产黑洞」。瞄准发射，凑齐 <b>3 颗以上同色</b>即「整合资源」消除。在它们抵达终点前清空整条珠链即胜！</p>
+  <h3>🎮 操作</h3><ul><li><b>鼠标瞄准</b>，<b>点击 / 空格</b>发射当前宝珠</li><li>当前珠在炮口，<b>下一颗</b>在右侧预览 · <b>P</b> 暂停</li></ul>
+  <h3>💡 高分攻略</h3>
+  <div class="tip">① <b>制造连锁</b>：消除中段会让两侧珠子塌落相撞，若同色就连续消除——<b>连锁×N</b> 分数成倍暴涨。</div>
+  <div class="tip">② <b>消最前端的珠</b>能让整条链后退、争取时间，危急时优先打头部同色。</div>
+  <div class="tip">③ 先消"夹心"：两颗同色之间只差一颗时，把对应色塞进去立即三连。</div>
+  <div class="tip">④ 留意右侧<b>下一颗</b>预先规划落点，黑洞变红心跳=危险，集中清前段。</div>`});
+</script>
+</body>
+</html>

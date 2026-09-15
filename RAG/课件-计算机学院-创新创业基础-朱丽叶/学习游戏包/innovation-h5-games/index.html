@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>创新创业基础 H5闯关训练营</title>
+  <style>
+    :root {
+      --blue-900: #0a2f66;
+      --blue-700: #1159a6;
+      --blue-500: #2176cf;
+      --blue-100: #e8f3ff;
+      --teal-600: #0f8f86;
+      --teal-100: #e6f8f5;
+      --orange-600: #e46f28;
+      --orange-100: #fff0e5;
+      --green-600: #2d8b57;
+      --green-100: #eaf7ef;
+      --ink: #17304f;
+      --muted: #65758b;
+      --line: #c9ddf2;
+      --paper: #ffffff;
+      --bg: #f5f9fd;
+      --danger: #ba2d2d;
+      --shadow: 0 8px 20px rgba(20, 61, 110, 0.12);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(33, 118, 207, 0.08) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(33, 118, 207, 0.06) 1px, transparent 1px),
+        var(--bg);
+      background-size: 32px 32px;
+      letter-spacing: 0;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header {
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 14px 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 54px;
+      height: 54px;
+      border: 2px solid var(--blue-700);
+      background: var(--blue-100);
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(18px, 2.2vw, 28px);
+      line-height: 1.18;
+      color: var(--blue-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .scorebar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .score-pill {
+      min-width: 132px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: var(--paper);
+      background: var(--blue-700);
+      text-align: center;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+    }
+
+    .ghost-btn {
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 8px;
+      background: var(--blue-100);
+      color: var(--blue-900);
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    main {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .side {
+      position: sticky;
+      top: 94px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .visual-panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .visual-panel svg {
+      width: 100%;
+      display: block;
+    }
+
+    .game-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .game-tab {
+      width: 100%;
+      min-height: 48px;
+      padding: 8px 10px;
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+    }
+
+    .game-tab.active {
+      background: var(--blue-700);
+      color: var(--paper);
+      border-color: var(--blue-700);
+    }
+
+    .game-tab .num {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--orange-100);
+      color: var(--orange-600);
+      font-weight: 800;
+    }
+
+    .game-tab.active .num {
+      background: var(--paper);
+      color: var(--blue-700);
+    }
+
+    .game-tab .name {
+      font-weight: 800;
+      font-size: 14px;
+      min-width: 0;
+    }
+
+    .game-tab .badge {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .stage {
+      display: grid;
+      gap: 16px;
+    }
+
+    .game {
+      display: none;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .game.active {
+      display: block;
+    }
+
+    .game-head {
+      padding: 18px 20px;
+      background: var(--blue-900);
+      color: var(--paper);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .game-head h2 {
+      margin: 0;
+      font-size: clamp(19px, 2vw, 27px);
+      line-height: 1.2;
+    }
+
+    .game-head p {
+      margin: 6px 0 0;
+      color: #d7eaff;
+      font-size: 14px;
+    }
+
+    .mini-score {
+      min-width: 120px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .game-body {
+      padding: 18px 20px 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .concept {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .concept-card {
+      border: 1px solid var(--line);
+      background: var(--blue-100);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .concept-card strong {
+      display: block;
+      color: var(--blue-900);
+      margin-bottom: 6px;
+    }
+
+    .concept-card p {
+      margin: 0;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .svg-card {
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      border-radius: 8px;
+      min-height: 148px;
+      display: grid;
+      place-items: center;
+      padding: 10px;
+    }
+
+    .svg-card svg {
+      width: min(100%, 360px);
+      max-height: 180px;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .choice, .drop, .chip, .map-node, .quadrant {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      padding: 11px 12px;
+      min-height: 48px;
+      text-align: left;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+
+    .choice:hover, .chip:hover, .map-node:hover, .quadrant:hover, .drop:hover {
+      transform: translateY(-1px);
+      border-color: var(--blue-500);
+      background: #f8fcff;
+    }
+
+    .choice.correct, .drop.correct, .chip.correct, .quadrant.correct, .map-node.correct {
+      border-color: var(--green-600);
+      background: var(--green-100);
+    }
+
+    .choice.wrong, .drop.wrong, .chip.wrong, .quadrant.wrong, .map-node.wrong {
+      border-color: var(--danger);
+      background: #fff0f0;
+    }
+
+    .feedback {
+      min-height: 44px;
+      padding: 11px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .feedback.good {
+      border-color: var(--green-600);
+      color: #1d6a41;
+      background: var(--green-100);
+    }
+
+    .feedback.warn {
+      border-color: var(--orange-600);
+      color: #91430d;
+      background: var(--orange-100);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .primary {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      background: var(--orange-600);
+      color: var(--paper);
+      font-weight: 800;
+    }
+
+    .secondary {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      background: var(--blue-100);
+      color: var(--blue-900);
+      border: 1px solid var(--line);
+      font-weight: 800;
+    }
+
+    .match-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .stack-title {
+      font-weight: 800;
+      color: var(--blue-900);
+    }
+
+    .chip {
+      cursor: pointer;
+    }
+
+    .chip.selected {
+      border-color: var(--orange-600);
+      background: var(--orange-100);
+    }
+
+    .canvas-board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .drop {
+      min-height: 118px;
+      display: grid;
+      align-content: start;
+      gap: 6px;
+    }
+
+    .drop strong {
+      color: var(--blue-900);
+    }
+
+    .drop .placed {
+      display: inline-block;
+      padding: 5px 7px;
+      border-radius: 6px;
+      background: var(--teal-100);
+      color: var(--teal-600);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .card-pool {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .quadrant {
+      min-height: 132px;
+      display: grid;
+      align-content: start;
+      gap: 6px;
+    }
+
+    .quadrant strong {
+      color: var(--blue-900);
+    }
+
+    .simulator {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) 1fr;
+      gap: 16px;
+    }
+
+    .sliders {
+      display: grid;
+      gap: 12px;
+    }
+
+    .slider-line {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfdff;
+    }
+
+    .slider-line label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 800;
+      color: var(--blue-900);
+      margin-bottom: 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue-700);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      padding: 12px;
+    }
+
+    .metric .value {
+      display: block;
+      margin-top: 6px;
+      color: var(--orange-600);
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .question-card {
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--orange-600);
+      border-radius: 8px;
+      padding: 13px;
+      background: #fbfdff;
+      line-height: 1.55;
+      font-weight: 800;
+    }
+
+    .map {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .map-visual {
+      min-height: 320px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdff;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+    }
+
+    .map-visual svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .map-options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .progress-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .progress-item {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--blue-100);
+      border: 1px solid var(--line);
+    }
+
+    .progress-item.done {
+      background: var(--green-600);
+      border-color: var(--green-600);
+    }
+
+    .summary {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 10px;
+    }
+
+    .summary h3 {
+      margin: 0;
+      color: var(--blue-900);
+      font-size: 18px;
+    }
+
+    .summary p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .learning-note {
+      border-left: 4px solid var(--teal-600);
+      padding: 10px 12px;
+      background: var(--teal-100);
+      border-radius: 0 8px 8px 0;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 980px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .scorebar {
+        justify-content: flex-start;
+      }
+
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        position: static;
+      }
+
+      .game-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .concept, .simulator, .map {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .topbar {
+        padding: 12px;
+      }
+
+      main {
+        padding: 12px;
+      }
+
+      .brand {
+        grid-template-columns: 44px 1fr;
+      }
+
+      .brand-mark {
+        width: 44px;
+        height: 44px;
+      }
+
+      .brand p {
+        display: none;
+      }
+
+      .game-list, .choices, .match-grid, .canvas-board, .card-pool, .matrix, .metrics, .progress-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .game-head {
+        grid-template-columns: 1fr;
+      }
+
+      .mini-score {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img" aria-label="课程游戏图标">
+              <rect x="9" y="10" width="46" height="34" rx="6" fill="#fff" stroke="#1159a6" stroke-width="3"></rect>
+              <path d="M16 50h32" stroke="#e46f28" stroke-width="5" stroke-linecap="round"></path>
+              <circle cx="24" cy="27" r="5" fill="#0f8f86"></circle>
+              <circle cx="40" cy="27" r="5" fill="#2176cf"></circle>
+              <path d="M22 38c8 5 14 5 22 0" fill="none" stroke="#1159a6" stroke-width="3" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <h1>创新创业基础 H5闯关训练营</h1>
+            <p>10个小游戏，对应机会识别、用户画像、商业模式、AI伦理、竞赛路演等课程核心能力。</p>
+          </div>
+        </div>
+        <div class="scorebar">
+          <div class="score-pill" id="totalScore">总分 0</div>
+          <button class="ghost-btn" id="resetBtn" type="button">重置进度</button>
+          <button class="ghost-btn" id="exportBtn" type="button">复制成绩</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <aside class="side">
+        <section class="visual-panel" aria-label="课程能力图">
+          <svg viewBox="0 0 300 210" role="img" aria-label="从问题到路演的学习流程图">
+            <rect x="8" y="8" width="284" height="194" rx="8" fill="#f8fcff" stroke="#c9ddf2"></rect>
+            <path d="M46 78h208" stroke="#1159a6" stroke-width="4" stroke-linecap="round"></path>
+            <path d="M238 66l20 12-20 12z" fill="#e46f28"></path>
+            <g fill="#fff" stroke="#1159a6" stroke-width="3">
+              <circle cx="54" cy="78" r="27"></circle>
+              <circle cx="122" cy="78" r="27"></circle>
+              <circle cx="190" cy="78" r="27"></circle>
+            </g>
+            <circle cx="254" cy="78" r="27" fill="#fff0e5" stroke="#e46f28" stroke-width="3"></circle>
+            <text x="54" y="83" text-anchor="middle" font-size="18" fill="#1159a6" font-weight="700">问</text>
+            <text x="122" y="83" text-anchor="middle" font-size="18" fill="#1159a6" font-weight="700">证</text>
+            <text x="190" y="83" text-anchor="middle" font-size="18" fill="#1159a6" font-weight="700">创</text>
+            <text x="254" y="83" text-anchor="middle" font-size="18" fill="#e46f28" font-weight="700">演</text>
+            <text x="150" y="142" text-anchor="middle" font-size="17" fill="#17304f" font-weight="700">课程项目从真实问题出发</text>
+            <text x="150" y="168" text-anchor="middle" font-size="13" fill="#65758b">区域产业 · AI工具 · 竞赛表达</text>
+          </svg>
+        </section>
+        <nav class="game-list" id="gameTabs" aria-label="小游戏列表"></nav>
+        <section class="summary">
+          <h3>课堂使用建议</h3>
+          <p>每个小游戏建议用时5到8分钟。可作为课前预习、课堂小组PK或课后自测。</p>
+          <div class="progress-grid" id="progressGrid"></div>
+        </section>
+      </aside>
+
+      <section class="stage" id="games"></section>
+    </main>
+  </div>
+
+  <script>
+    const gamesMeta = [
+      { id: "radar", title: "机会雷达", subtitle: "从区域产业情境中识别高质量创业机会", max: 30 },
+      { id: "persona", title: "用户画像配对", subtitle: "把用户类型和真实痛点精准匹配", max: 30 },
+      { id: "canvas", title: "商业画布拼图", subtitle: "把项目要素放进正确的商业模式画布模块", max: 40 },
+      { id: "matrix", title: "竞品定位矩阵", subtitle: "判断方案的创新度和落地可行性", max: 30 },
+      { id: "ethics", title: "AI伦理守门员", subtitle: "识别AI使用、数据隐私和学术诚信边界", max: 30 },
+      { id: "sim", title: "成本收益模拟器", subtitle: "用价格、成本、用户数理解商业闭环", max: 40 },
+      { id: "survey", title: "问卷修正工坊", subtitle: "把诱导性问题改成可分析的调研题", max: 30 },
+      { id: "ip", title: "知识产权快判", subtitle: "判断软著、专利和版权保护的适用场景", max: 30 },
+      { id: "map", title: "陕西产业地图", subtitle: "把宝鸡和陕西产业资源转化为选题方向", max: 30 },
+      { id: "pitch", title: "路演答辩急救", subtitle: "用评委追问训练答辩表达结构", max: 40 }
+    ];
+
+    const state = JSON.parse(localStorage.getItem("courseGameState") || "{}");
+    const scores = state.scores || {};
+    let activeGame = state.activeGame || gamesMeta[0].id;
+    let selected = {};
+
+    const data = {
+      radar: {
+        scenario: "宝鸡钛谷企业希望开发面向年轻用户的钛文创礼品，已有材料优势，但缺少清晰用户场景。",
+        answer: 2,
+        options: [
+          "直接做一个覆盖所有人的综合电商平台。",
+          "把钛产品定价做低，先和普通不锈钢杯竞争。",
+          "面向户外、通勤和国潮礼品用户，验证轻量耐用与文化表达的组合价值。",
+          "先做复杂工业设备，再考虑消费者产品。"
+        ],
+        feedback: "高质量机会通常同时具备真实用户、明确场景、可验证痛点和差异化价值。钛文创适合从细分用户和具体使用场景切入。"
+      },
+      persona: {
+        users: [
+          { id: "u1", text: "眉县猕猴桃合作社负责人" },
+          { id: "u2", text: "长乐塬研学课程教师" },
+          { id: "u3", text: "县域农产品直播店主" }
+        ],
+        pains: [
+          { id: "p1", match: "u3", text: "商品卖点讲不清，直播脚本和售后话术不稳定" },
+          { id: "p2", match: "u1", text: "冷链和分级标准影响复购，消费者评价难管理" },
+          { id: "p3", match: "u2", text: "工业遗址故事好，但学生沉浸任务设计不足" }
+        ]
+      },
+      canvas: {
+        blocks: [
+          { id: "customer", title: "客户细分" },
+          { id: "value", title: "价值主张" },
+          { id: "channel", title: "渠道" },
+          { id: "revenue", title: "收入来源" }
+        ],
+        cards: [
+          { id: "c1", text: "县域合作社和电商店主", target: "customer" },
+          { id: "c2", text: "用AI生成直播脚本并保留事实核验", target: "value" },
+          { id: "c3", text: "短视频平台、社群、供销合作渠道", target: "channel" },
+          { id: "c4", text: "内容服务费、培训费、代运营月费", target: "revenue" },
+          { id: "c5", text: "宝鸡文旅研学机构", target: "customer" },
+          { id: "c6", text: "让青铜器故事变成可体验任务", target: "value" }
+        ]
+      },
+      matrix: {
+        item: "给宝鸡钛企业做一套视觉质检智能体，先识别表面划痕，再输出检测报告。",
+        answer: "q1",
+        quadrants: [
+          { id: "q1", title: "高创新 · 高可行", hint: "适合优先进入MVP" },
+          { id: "q2", title: "高创新 · 低可行", hint: "先降复杂度" },
+          { id: "q3", title: "低创新 · 高可行", hint: "可作为服务补充" },
+          { id: "q4", title: "低创新 · 低可行", hint: "不建议优先做" }
+        ]
+      },
+      ethics: {
+        questions: [
+          {
+            text: "学生用AI生成商业计划书整段内容，未标注也未核验数据，是否可以直接提交？",
+            answer: 1,
+            options: ["可以，只要语言通顺。", "不可以，需要标注AI参与、核验事实并保留修改记录。", "可以，但把AI名称删掉。"]
+          },
+          {
+            text: "问卷收集了手机号和家庭住址，但项目只需要分析消费偏好，怎么处理更合适？",
+            answer: 2,
+            options: ["继续收集，数据越多越好。", "公开展示原始问卷，让评委看到真实。", "删去非必要敏感信息，只保留分析所需字段。"]
+          },
+          {
+            text: "团队想用网上图片做路演PPT，最稳妥的做法是什么？",
+            answer: 0,
+            options: ["使用自摄、授权、可商用或自制素材，并注明来源。", "随便搜索，比赛不算商业用途。", "把水印裁掉即可。"]
+          }
+        ],
+        idx: 0
+      },
+      survey: {
+        bad: ["您是不是非常支持我们的优秀项目？", "您为什么觉得现有冷链特别差？", "您愿意马上为本服务付999元吗？"],
+        good: ["您是否愿意试用该服务？请说明原因。", "过去三个月，您遇到冷链延迟的次数是多少？", "在可追溯包装服务中，您可接受的单次加价区间是多少？"]
+      },
+      ip: {
+        cases: [
+          { text: "团队开发了一个可运行的农技AI问答小程序，有源代码和操作说明。", answer: "软件著作权" },
+          { text: "团队设计了一个新型植保无人机折叠喷洒结构。", answer: "实用新型专利" },
+          { text: "团队提出一种新的图像识别与灌溉决策联合方法。", answer: "发明专利" },
+          { text: "团队设计了一套钛文创杯外观造型和图案。", answer: "外观设计专利" }
+        ],
+        options: ["软件著作权", "发明专利", "实用新型专利", "外观设计专利"]
+      },
+      map: {
+        answer: "宝鸡 · 钛及钛合金 · 钛文创与AI质检",
+        options: [
+          "宝鸡 · 钛及钛合金 · 钛文创与AI质检",
+          "榆林 · 周秦青铜器 · 青铜器研学盒",
+          "眉县 · 集成电路 · 芯片测试平台",
+          "西安 · 猕猴桃冷链 · 鲜果分级服务"
+        ]
+      },
+      pitch: {
+        questions: [
+          {
+            text: "评委问：你们怎么证明用户真的需要这个项目？",
+            answer: 0,
+            options: [
+              "先回答证据来源：我们访谈了谁、问卷多少份、试用反馈是什么，再说下一步如何扩大样本。",
+              "强调项目很有意义，政策也支持，所以肯定需要。",
+              "直接说老师和同学都觉得不错。"
+            ]
+          },
+          {
+            text: "评委问：你们和已有竞品相比有什么差异？",
+            answer: 2,
+            options: [
+              "说竞品都不行，我们一定能超过。",
+              "说暂时没有竞品，因为我们很创新。",
+              "先承认替代方案存在，再用用户场景、成本、效率或服务闭环说明差异。"
+            ]
+          },
+          {
+            text: "评委问：如果AI生成结果错误怎么办？",
+            answer: 1,
+            options: [
+              "AI现在很强，一般不会错。",
+              "说明人工复核、来源标注、关键结论回到原始数据验证，并设置风险提示。",
+              "把错误归因于用户不会提问。"
+            ]
+          }
+        ],
+        idx: 0
+      }
+    };
+
+    function saveState() {
+      localStorage.setItem("courseGameState", JSON.stringify({ scores, activeGame }));
+    }
+
+    function totalScore() {
+      return Object.values(scores).reduce((sum, score) => sum + score, 0);
+    }
+
+    function setScore(gameId, value) {
+      const max = gamesMeta.find(g => g.id === gameId).max;
+      scores[gameId] = Math.max(scores[gameId] || 0, Math.min(max, value));
+      saveState();
+      renderScore();
+      renderTabs();
+    }
+
+    function addScore(gameId, value) {
+      setScore(gameId, (scores[gameId] || 0) + value);
+    }
+
+    function renderScore() {
+      document.getElementById("totalScore").textContent = `总分 ${totalScore()}`;
+      const grid = document.getElementById("progressGrid");
+      grid.innerHTML = "";
+      gamesMeta.forEach(game => {
+        const item = document.createElement("div");
+        item.className = "progress-item" + ((scores[game.id] || 0) >= Math.ceil(game.max * 0.6) ? " done" : "");
+        item.title = `${game.title}: ${scores[game.id] || 0}/${game.max}`;
+        grid.appendChild(item);
+      });
+    }
+
+    function renderTabs() {
+      const tabs = document.getElementById("gameTabs");
+      tabs.innerHTML = "";
+      gamesMeta.forEach((game, index) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "game-tab" + (game.id === activeGame ? " active" : "");
+        btn.innerHTML = `<span class="num">${String(index + 1).padStart(2, "0")}</span><span class="name">${game.title}</span><span class="badge">${scores[game.id] || 0}/${game.max}</span>`;
+        btn.addEventListener("click", () => switchGame(game.id));
+        tabs.appendChild(btn);
+      });
+    }
+
+    function switchGame(gameId) {
+      activeGame = gameId;
+      saveState();
+      document.querySelectorAll(".game").forEach(game => game.classList.toggle("active", game.dataset.game === gameId));
+      renderTabs();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function header(meta) {
+      return `
+        <div class="game-head">
+          <div>
+            <h2>${meta.title}</h2>
+            <p>${meta.subtitle}</p>
+          </div>
+          <div class="mini-score">${scores[meta.id] || 0}/${meta.max}</div>
+        </div>
+      `;
+    }
+
+    function courseSvg(type) {
+      const palette = {
+        radar: ["#1159a6", "#e46f28"],
+        persona: ["#0f8f86", "#2176cf"],
+        canvas: ["#1159a6", "#0f8f86"],
+        matrix: ["#e46f28", "#1159a6"],
+        ethics: ["#0f8f86", "#e46f28"],
+        sim: ["#2176cf", "#2d8b57"],
+        survey: ["#1159a6", "#e46f28"],
+        ip: ["#0f8f86", "#1159a6"],
+        map: ["#2d8b57", "#e46f28"],
+        pitch: ["#1159a6", "#e46f28"]
+      }[type] || ["#1159a6", "#e46f28"];
+      return `
+        <svg viewBox="0 0 360 180" aria-hidden="true">
+          <rect x="8" y="8" width="344" height="164" rx="8" fill="#f8fcff" stroke="#c9ddf2"></rect>
+          <circle cx="92" cy="92" r="48" fill="${palette[0]}" opacity=".14"></circle>
+          <circle cx="248" cy="92" r="48" fill="${palette[1]}" opacity=".14"></circle>
+          <path d="M92 42v100M42 92h100" stroke="${palette[0]}" stroke-width="7" stroke-linecap="round" opacity=".72"></path>
+          <rect x="199" y="52" width="98" height="82" rx="8" fill="#fff" stroke="${palette[1]}" stroke-width="5"></rect>
+          <path d="M215 75h66M215 94h66M215 113h42" stroke="${palette[1]}" stroke-width="6" stroke-linecap="round"></path>
+          <path d="M146 92h42" stroke="#65758b" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M184 78l22 14-22 14z" fill="#65758b"></path>
+        </svg>
+      `;
+    }
+
+    function gameShell(id, inner) {
+      const meta = gamesMeta.find(g => g.id === id);
+      return `<article class="game ${id === activeGame ? "active" : ""}" data-game="${id}">${header(meta)}<div class="game-body">${inner}</div></article>`;
+    }
+
+    function renderGames() {
+      const games = document.getElementById("games");
+      games.innerHTML = [
+        renderRadar(),
+        renderPersona(),
+        renderCanvas(),
+        renderMatrix(),
+        renderEthics(),
+        renderSimulator(),
+        renderSurvey(),
+        renderIp(),
+        renderMap(),
+        renderPitch()
+      ].join("");
+      bindRadar();
+      bindPersona();
+      bindCanvas();
+      bindMatrix();
+      bindEthics();
+      bindSimulator();
+      bindSurvey();
+      bindIp();
+      bindMap();
+      bindPitch();
+    }
+
+    function concept(gameId, text, note) {
+      return `
+        <div class="concept">
+          <div class="concept-card">
+            <strong>学习任务</strong>
+            <p>${text}</p>
+            <div class="learning-note">${note}</div>
+          </div>
+          <div class="svg-card">${courseSvg(gameId)}</div>
+        </div>
+      `;
+    }
+
+    function renderRadar() {
+      return gameShell("radar", `
+        ${concept("radar", data.radar.scenario, "判断创业机会时，先看用户、场景、痛点和可验证性。")}
+        <div class="choices" id="radarChoices">
+          ${data.radar.options.map((option, i) => `<button type="button" class="choice" data-index="${i}">${option}</button>`).join("")}
+        </div>
+        <div class="feedback" id="radarFeedback">请选择最值得优先验证的机会。</div>
+      `);
+    }
+
+    function bindRadar() {
+      document.querySelectorAll("#radarChoices .choice").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const ok = Number(btn.dataset.index) === data.radar.answer;
+          btn.classList.add(ok ? "correct" : "wrong");
+          document.getElementById("radarFeedback").className = "feedback " + (ok ? "good" : "warn");
+          document.getElementById("radarFeedback").textContent = ok ? data.radar.feedback : "这个选项还不够聚焦。再想想：谁是第一批用户，痛点能不能快速验证？";
+          if (ok) addScore("radar", 10);
+        });
+      });
+    }
+
+    function renderPersona() {
+      return gameShell("persona", `
+        ${concept("persona", "先点击一个用户，再点击匹配的痛点。完成三组配对。", "用户画像不是人口统计表，而是场景、任务和痛点的组合。")}
+        <div class="match-grid">
+          <div class="stack">
+            <div class="stack-title">用户类型</div>
+            ${data.persona.users.map(u => `<button type="button" class="chip user-chip" data-id="${u.id}">${u.text}</button>`).join("")}
+          </div>
+          <div class="stack">
+            <div class="stack-title">真实痛点</div>
+            ${data.persona.pains.map(p => `<button type="button" class="chip pain-chip" data-match="${p.match}">${p.text}</button>`).join("")}
+          </div>
+        </div>
+        <div class="feedback" id="personaFeedback">选择用户和痛点，完成精准匹配。</div>
+      `);
+    }
+
+    function bindPersona() {
+      let selectedUser = null;
+      document.querySelectorAll(".user-chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedUser = btn.dataset.id;
+          document.querySelectorAll(".user-chip").forEach(b => b.classList.remove("selected"));
+          btn.classList.add("selected");
+        });
+      });
+      document.querySelectorAll(".pain-chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (!selectedUser) {
+            document.getElementById("personaFeedback").textContent = "请先选择一个用户类型。";
+            return;
+          }
+          const ok = selectedUser === btn.dataset.match;
+          btn.classList.add(ok ? "correct" : "wrong");
+          document.getElementById("personaFeedback").className = "feedback " + (ok ? "good" : "warn");
+          document.getElementById("personaFeedback").textContent = ok ? "匹配正确。好的用户画像能直接导出访谈问题和产品功能。" : "这个痛点和用户场景不够贴合，重新选择一组。";
+          if (ok) addScore("persona", 10);
+          selectedUser = null;
+          document.querySelectorAll(".user-chip").forEach(b => b.classList.remove("selected"));
+        });
+      });
+    }
+
+    function renderCanvas() {
+      return gameShell("canvas", `
+        ${concept("canvas", "先点击下方项目要素，再点击上方画布模块完成归类。", "商业模式画布帮助团队从想法走向交易闭环。")}
+        <div class="canvas-board" id="canvasDrops">
+          ${data.canvas.blocks.map(b => `<button type="button" class="drop" data-block="${b.id}"><strong>${b.title}</strong><span>点击放入要素</span></button>`).join("")}
+        </div>
+        <div class="card-pool" id="canvasPool">
+          ${data.canvas.cards.map(c => `<button type="button" class="chip canvas-card" data-target="${c.target}" data-text="${c.text}">${c.text}</button>`).join("")}
+        </div>
+        <div class="feedback" id="canvasFeedback">每放对一个要素加分。注意客户、价值、渠道、收入不要混淆。</div>
+      `);
+    }
+
+    function bindCanvas() {
+      let current = null;
+      document.querySelectorAll(".canvas-card").forEach(card => {
+        card.addEventListener("click", () => {
+          current = card;
+          document.querySelectorAll(".canvas-card").forEach(c => c.classList.remove("selected"));
+          card.classList.add("selected");
+        });
+      });
+      document.querySelectorAll("#canvasDrops .drop").forEach(drop => {
+        drop.addEventListener("click", () => {
+          if (!current) {
+            document.getElementById("canvasFeedback").textContent = "请先选择一个项目要素。";
+            return;
+          }
+          const ok = current.dataset.target === drop.dataset.block;
+          drop.classList.add(ok ? "correct" : "wrong");
+          document.getElementById("canvasFeedback").className = "feedback " + (ok ? "good" : "warn");
+          if (ok) {
+            const span = document.createElement("span");
+            span.className = "placed";
+            span.textContent = current.dataset.text;
+            drop.appendChild(span);
+            current.disabled = true;
+            current.style.opacity = "0.45";
+            current.classList.remove("selected");
+            current = null;
+            addScore("canvas", 7);
+            document.getElementById("canvasFeedback").textContent = "归类正确。画布要素越清晰，路演越容易说服评委。";
+          } else {
+            document.getElementById("canvasFeedback").textContent = "放错了。想想这个要素是在回答谁、给什么价值、怎么触达，还是怎么赚钱。";
+          }
+        });
+      });
+    }
+
+    function renderMatrix() {
+      return gameShell("matrix", `
+        ${concept("matrix", data.matrix.item, "竞赛项目要同时看创新性和可落地性，高创新但无法验证也难得高分。")}
+        <div class="matrix" id="matrixChoices">
+          ${data.matrix.quadrants.map(q => `<button type="button" class="quadrant" data-id="${q.id}"><strong>${q.title}</strong><span>${q.hint}</span></button>`).join("")}
+        </div>
+        <div class="feedback" id="matrixFeedback">请选择这个项目最适合放入的象限。</div>
+      `);
+    }
+
+    function bindMatrix() {
+      document.querySelectorAll("#matrixChoices .quadrant").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const ok = btn.dataset.id === data.matrix.answer;
+          btn.classList.add(ok ? "correct" : "wrong");
+          document.getElementById("matrixFeedback").className = "feedback " + (ok ? "good" : "warn");
+          document.getElementById("matrixFeedback").textContent = ok ? "判断正确。AI质检有明确工业场景，可先从划痕识别MVP切入。" : "再评估一下：它是否有明确场景，能不能做出第一版验证？";
+          if (ok) addScore("matrix", 10);
+        });
+      });
+    }
+
+    function renderEthics() {
+      const q = data.ethics.questions[data.ethics.idx];
+      return gameShell("ethics", `
+        ${concept("ethics", "阅读情境，选择更符合AI伦理、数据安全和学术诚信的做法。", "AI可以辅助学习和项目迭代，但人要负责判断、核验和披露。")}
+        <div class="question-card" id="ethicsQuestion">${q.text}</div>
+        <div class="choices" id="ethicsChoices">
+          ${q.options.map((option, i) => `<button type="button" class="choice" data-index="${i}">${option}</button>`).join("")}
+        </div>
+        <div class="toolbar"><button type="button" class="secondary" id="nextEthics">下一题</button></div>
+        <div class="feedback" id="ethicsFeedback">请选择最稳妥的处理方式。</div>
+      `);
+    }
+
+    function bindEthics() {
+      document.querySelectorAll("#ethicsChoices .choice").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const q = data.ethics.questions[data.ethics.idx];
+          const ok = Number(btn.dataset.index) === q.answer;
+          btn.classList.add(ok ? "correct" : "wrong");
+          document.getElementById("ethicsFeedback").className = "feedback " + (ok ? "good" : "warn");
+          document.getElementById("ethicsFeedback").textContent = ok ? "选择正确。竞赛材料要真实、可追溯、可解释。" : "这个做法存在诚信、隐私或版权风险。";
+          if (ok) addScore("ethics", 10);
+        });
+      });
+      document.getElementById("nextEthics").addEventListener("click", () => {
+        data.ethics.idx = (data.ethics.idx + 1) % data.ethics.questions.length;
+        renderGames();
+        switchGame("ethics");
+      });
+    }
+
+    function renderSimulator() {
+      return gameShell("sim", `
+        ${concept("sim", "调节价格、单位成本、月用户数和固定成本，让项目达到健康经营状态。", "商业计划书中的财务模型不用复杂，但必须讲清关键假设。")}
+        <div class="simulator">
+          <div class="sliders">
+            <div class="slider-line"><label>单价 <span id="priceVal"></span></label><input id="price" type="range" min="10" max="120" value="48"></div>
+            <div class="slider-line"><label>单位成本 <span id="costVal"></span></label><input id="cost" type="range" min="5" max="80" value="22"></div>
+            <div class="slider-line"><label>月付费用户 <span id="usersVal"></span></label><input id="users" type="range" min="20" max="600" value="160"></div>
+            <div class="slider-line"><label>固定成本 <span id="fixedVal"></span></label><input id="fixed" type="range" min="1000" max="18000" step="500" value="6000"></div>
+          </div>
+          <div class="metrics">
+            <div class="metric">月收入<span class="value" id="revenueVal"></span></div>
+            <div class="metric">月利润<span class="value" id="profitVal"></span></div>
+            <div class="metric">毛利率<span class="value" id="marginVal"></span></div>
+            <div class="metric">健康度<span class="value" id="healthVal"></span></div>
+          </div>
+        </div>
+        <div class="toolbar"><button type="button" class="primary" id="checkSim">提交模型</button></div>
+        <div class="feedback" id="simFeedback">目标：月利润大于5000，毛利率大于35%，并且价格不超过90。</div>
+      `);
+    }
+
+    function bindSimulator() {
+      const ids = ["price", "cost", "users", "fixed"];
+      const update = () => {
+        const price = Number(document.getElementById("price").value);
+        const cost = Number(document.getElementById("cost").value);
+        const users = Number(document.getElementById("users").value);
+        const fixed = Number(document.getElementById("fixed").value);
+        const revenue = price * users;
+        const profit = (price - cost) * users - fixed;
+        const margin = price > 0 ? Math.round(((price - cost) / price) * 100) : 0;
+        document.getElementById("priceVal").textContent = `${price}元`;
+        document.getElementById("costVal").textContent = `${cost}元`;
+        document.getElementById("usersVal").textContent = `${users}人`;
+        document.getElementById("fixedVal").textContent = `${fixed}元`;
+        document.getElementById("revenueVal").textContent = `${revenue}元`;
+        document.getElementById("profitVal").textContent = `${profit}元`;
+        document.getElementById("marginVal").textContent = `${margin}%`;
+        document.getElementById("healthVal").textContent = profit > 5000 && margin > 35 && price <= 90 ? "达标" : "待优化";
+      };
+      ids.forEach(id => document.getElementById(id).addEventListener("input", update));
+      document.getElementById("checkSim").addEventListener("click", () => {
+        const price = Number(document.getElementById("price").value);
+        const cost = Number(document.getElementById("cost").value);
+        const users = Number(document.getElementById("users").value);
+        const fixed = Number(document.getElementById("fixed").value);
+        const profit = (price - cost) * users - fixed;
+        const margin = Math.round(((price - cost) / price) * 100);
+        const ok = profit > 5000 && margin > 35 && price <= 90;
+        document.getElementById("simFeedback").className = "feedback " + (ok ? "good" : "warn");
+        document.getElementById("simFeedback").textContent = ok ? "模型达标。记得在商业计划书中说明每个假设的证据来源。" : "还不健康。可以尝试提高用户数、降低单位成本或重新设计服务包。";
+        if (ok) addScore("sim", 20);
+      });
+      update();
+    }
+
+    function renderSurvey() {
+      return gameShell("survey", `
+        ${concept("survey", "选择诱导性或不可分析的问题，并学习如何改写。", "好问卷关注真实行为，不诱导、不暗示、不收集无关隐私。")}
+        <div class="choices" id="surveyChoices">
+          ${data.survey.bad.concat(data.survey.good).map((q, i) => `<button type="button" class="choice" data-bad="${i < data.survey.bad.length}">${q}</button>`).join("")}
+        </div>
+        <div class="feedback" id="surveyFeedback">找出需要修改的问题。</div>
+      `);
+    }
+
+    function bindSurvey() {
+      document.querySelectorAll("#surveyChoices .choice").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const ok = btn.dataset.bad === "true";
+          btn.classList.add(ok ? "correct" : "wrong");
+          document.getElementById("surveyFeedback").className = "feedback " + (ok ? "good" : "warn");
+          document.getElementById("surveyFeedback").textContent = ok ? "判断正确。这类题会诱导回答或难以分析，应改成行为事实、量表或区间题。" : "这道题相对可分析，注意保留样本来源和选项口径。";
+          if (ok) addScore("survey", 10);
+        });
+      });
+    }
+
+    function renderIp() {
+      return gameShell("ip", `
+        ${concept("ip", "阅读成果描述，选择最适合优先准备的知识产权材料。", "软著、发明、实用新型、外观设计的保护对象不同。")}
+        <div class="stack" id="ipCases">
+          ${data.ip.cases.map((item, i) => `
+            <div class="question-card">${i + 1}. ${item.text}</div>
+            <div class="choices">
+              ${data.ip.options.map(opt => `<button type="button" class="choice ip-choice" data-answer="${item.answer}" data-option="${opt}">${opt}</button>`).join("")}
+            </div>
+          `).join("")}
+        </div>
+        <div class="feedback" id="ipFeedback">选择保护类型。正式申请前还要确认权属和公开时间。</div>
+      `);
+    }
+
+    function bindIp() {
+      document.querySelectorAll(".ip-choice").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const ok = btn.dataset.answer === btn.dataset.option;
+          btn.classList.add(ok ? "correct" : "wrong");
+          document.getElementById("ipFeedback").className = "feedback " + (ok ? "good" : "warn");
+          document.getElementById("ipFeedback").textContent = ok ? "判断正确。竞赛附件中要说明成果名称、权属、申请状态和对应项目模块。" : "再想想保护对象：代码文档、技术方法、硬件结构、外观设计分别对应不同材料。";
+          if (ok) addScore("ip", 8);
+        });
+      });
+    }
+
+    function renderMap() {
+      return gameShell("map", `
+        ${concept("map", "选择区域、产业和项目方向匹配最准确的一项。", "区域产业不是背景装饰，而是项目真实场景和资源入口。")}
+        <div class="map">
+          <div class="map-visual">
+            <svg viewBox="0 0 420 300" role="img" aria-label="陕西产业地图示意">
+              <rect x="20" y="20" width="380" height="260" rx="8" fill="#f8fcff" stroke="#c9ddf2"></rect>
+              <path d="M128 50l92 22 70 54-18 72-76 44-86-24-34-86z" fill="#e6f8f5" stroke="#0f8f86" stroke-width="4"></path>
+              <circle cx="125" cy="132" r="16" fill="#e46f28"></circle>
+              <text x="151" y="138" font-size="16" fill="#17304f" font-weight="700">宝鸡 钛谷</text>
+              <circle cx="230" cy="120" r="16" fill="#2176cf"></circle>
+              <text x="254" y="126" font-size="16" fill="#17304f" font-weight="700">西安 硬科技</text>
+              <circle cx="176" cy="210" r="16" fill="#2d8b57"></circle>
+              <text x="202" y="216" font-size="16" fill="#17304f" font-weight="700">眉县 果业</text>
+              <circle cx="265" cy="192" r="16" fill="#f5a623"></circle>
+              <text x="291" y="198" font-size="16" fill="#17304f" font-weight="700">杨凌 农科</text>
+            </svg>
+          </div>
+          <div class="map-options" id="mapChoices">
+            ${data.map.options.map(opt => `<button type="button" class="map-node" data-value="${opt}">${opt}</button>`).join("")}
+          </div>
+        </div>
+        <div class="feedback" id="mapFeedback">请选择最适合做课程项目和竞赛选题的一组。</div>
+      `);
+    }
+
+    function bindMap() {
+      document.querySelectorAll("#mapChoices .map-node").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const ok = btn.dataset.value === data.map.answer;
+          btn.classList.add(ok ? "correct" : "wrong");
+          document.getElementById("mapFeedback").className = "feedback " + (ok ? "good" : "warn");
+          document.getElementById("mapFeedback").textContent = ok ? "匹配正确。宝鸡钛产业适合连接钛文创、AI质检、设备运维和材料应用。" : "区域和产业不匹配会让项目显得牵强。重新看地图和产业基础。";
+          if (ok) addScore("map", 15);
+        });
+      });
+    }
+
+    function renderPitch() {
+      const q = data.pitch.questions[data.pitch.idx];
+      return gameShell("pitch", `
+        ${concept("pitch", "面对评委追问，选择最稳妥的答辩结构。", "高分答辩不是背稿，而是承认边界、拿出证据、说明下一步。")}
+        <div class="question-card" id="pitchQuestion">${q.text}</div>
+        <div class="choices" id="pitchChoices">
+          ${q.options.map((option, i) => `<button type="button" class="choice" data-index="${i}">${option}</button>`).join("")}
+        </div>
+        <div class="toolbar"><button type="button" class="secondary" id="nextPitch">换一道追问</button></div>
+        <div class="feedback" id="pitchFeedback">请选择更容易让评委信服的回答。</div>
+      `);
+    }
+
+    function bindPitch() {
+      document.querySelectorAll("#pitchChoices .choice").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const q = data.pitch.questions[data.pitch.idx];
+          const ok = Number(btn.dataset.index) === q.answer;
+          btn.classList.add(ok ? "correct" : "wrong");
+          document.getElementById("pitchFeedback").className = "feedback " + (ok ? "good" : "warn");
+          document.getElementById("pitchFeedback").textContent = ok ? "回答结构正确。先证据，再解释，再下一步，是答辩中的稳妥节奏。" : "这个回答偏口号或偏回避。评委更想听事实、证据和边界。";
+          if (ok) addScore("pitch", 14);
+        });
+      });
+      document.getElementById("nextPitch").addEventListener("click", () => {
+        data.pitch.idx = (data.pitch.idx + 1) % data.pitch.questions.length;
+        renderGames();
+        switchGame("pitch");
+      });
+    }
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      Object.keys(scores).forEach(key => delete scores[key]);
+      selected = {};
+      saveState();
+      renderScore();
+      renderTabs();
+      renderGames();
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", async () => {
+      const lines = gamesMeta.map(game => `${game.title}: ${scores[game.id] || 0}/${game.max}`);
+      const text = `创新创业基础H5闯关成绩\n总分: ${totalScore()}\n${lines.join("\n")}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("成绩已复制，可粘贴到课程群或学习通。");
+      } catch (e) {
+        alert(text);
+      }
+    });
+
+    renderTabs();
+    renderScore();
+    renderGames();
+  </script>
+</body>
+</html>

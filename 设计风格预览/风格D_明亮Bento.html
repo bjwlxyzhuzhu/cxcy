@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>双创AI实验室 · 风格D 明亮Bento科技</title>
+<style>
+:root{--bg:#f5f7fc;--ink:#171c33;--mut:#6b7493;--cyan:#06b6d4;--violet:#7c5cff;--pink:#ec4899;--amber:#f59e0b;--green:#10b981;--card:#ffffff;--line:#e7eaf3;--shadow:0 10px 30px rgba(23,28,51,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:var(--bg);overflow-x:hidden;line-height:1.6}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 400px at 8% -5%,rgba(124,92,255,.10),transparent 60%),radial-gradient(600px 400px at 100% 0,rgba(6,182,212,.10),transparent 55%),var(--bg)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+nav{display:flex;align-items:center;gap:14px;padding:20px 0}
+.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--cyan),var(--violet));display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;box-shadow:0 8px 20px rgba(124,92,255,.3)}
+.brand b{font-weight:800;font-size:18px}.brand small{display:block;font-size:10px;color:var(--mut);letter-spacing:1px}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--card);box-shadow:var(--shadow)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber)}
+.av{width:37px;height:37px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--cyan));display:grid;place-items:center;font-weight:600;color:#fff}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:center;padding:30px 0 20px}
+.tag{display:inline-block;font-size:13px;font-weight:600;color:var(--violet);border:1px solid rgba(124,92,255,.25);padding:6px 13px;border-radius:999px;background:rgba(124,92,255,.07);margin-bottom:18px}
+h1{font-size:46px;line-height:1.1;font-weight:800;letter-spacing:-1px}
+.g{background:linear-gradient(120deg,var(--cyan),var(--violet) 55%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mut);font-size:15.5px;margin:16px 0 22px;max-width:500px}
+.team{display:flex;gap:9px;flex-wrap:wrap}
+.buddy{font-size:13px;font-weight:600;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);box-shadow:var(--shadow);transition:.25s cubic-bezier(.2,.9,.3,1.3);cursor:default}
+.buddy:hover{transform:translateY(-4px);border-color:var(--violet);color:var(--violet)}
+.herofig{position:relative;border-radius:26px;aspect-ratio:1/1;display:grid;place-items:center;background:linear-gradient(135deg,#eef0fb,#fff);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+.core{width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fff,var(--cyan) 45%,var(--violet));box-shadow:0 20px 50px rgba(124,92,255,.4);animation:bob 3.6s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-12px) scale(1.04)}}
+.cap{position:absolute;bottom:18px;font-size:12px;color:var(--mut)}
+.switchwrap{display:flex;justify-content:center;margin:30px 0 8px}
+.switch{position:relative;display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px;width:380px;box-shadow:var(--shadow)}
+.switch button{flex:1;z-index:2;background:none;border:none;color:var(--mut);font-size:15px;font-weight:700;padding:12px 0;cursor:pointer;font-family:inherit;transition:.3s}
+.switch button.on{color:#fff}
+.slider{position:absolute;top:6px;left:6px;width:calc(50% - 6px);height:calc(100% - 12px);border-radius:999px;background:linear-gradient(120deg,var(--cyan),var(--violet));transition:transform .4s cubic-bezier(.2,.9,.3,1.3);box-shadow:0 6px 18px rgba(124,92,255,.4)}
+.slider.r{transform:translateX(100%)}
+.zonecap{text-align:center;color:var(--mut);font-size:13px;margin:10px 0 20px}
+/* Bento 不规则栅格 */
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:128px;gap:16px}
+.mod{position:relative;border:1px solid var(--line);border-radius:22px;padding:20px;cursor:pointer;background:var(--card);box-shadow:var(--shadow);transition:.3s cubic-bezier(.2,.9,.3,1.2);opacity:0;transform:translateY(18px);animation:up .55s forwards;overflow:hidden}
+@keyframes up{to{opacity:1;transform:none}}
+.mod:hover{transform:translateY(-6px);box-shadow:0 22px 44px rgba(23,28,51,.13)}
+.mod.big{grid-column:span 2;grid-row:span 2}
+.mod.wide{grid-column:span 2}
+.mi{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;font-size:24px;margin-bottom:12px}
+.mod h3{font-size:16px;margin-bottom:5px}.mod p{font-size:13px;color:var(--mut)}
+.mod.big h3{font-size:21px}.mod.big p{font-size:14px}
+.bar{position:absolute;left:0;bottom:0;height:4px;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet));transition:width .4s}
+.mod:hover .bar{width:100%}
+.badge{display:inline-block;font-size:11px;font-weight:600;margin-top:9px;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--mut)}
+.fab{position:fixed;right:24px;bottom:24px;display:flex;align-items:center;gap:9px;padding:13px 19px;border-radius:999px;background:linear-gradient(120deg,var(--cyan),var(--violet));color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 14px 34px rgba(124,92,255,.4)}
+footer{color:var(--mut);font-size:12px;text-align:center;padding:32px 0;border-top:1px solid var(--line);margin-top:32px}
+@media(max-width:820px){.hero{grid-template-columns:1fr}h1{font-size:33px}.bento{grid-template-columns:repeat(2,1fr)}.mod.big{grid-column:span 2;grid-row:span 1}}
+</style></head>
+<body>
+<div class="bg"></div>
+<div class="wrap">
+  <nav><div class="logo">双创</div><div class="brand"><b>双创AI实验室</b><small>DOUBLE INNOVATION AI LAB</small></div><div class="spacer"></div><span class="chip"><span class="dot"></span>积分 120</span><div class="av">朱</div></nav>
+  <section class="hero">
+    <div>
+      <span class="tag">创新创业教育 · 比赛 · AI 工具应用</span>
+      <h1>不是一个 AI，<br>是一群<span class="g">懂创赛的智能搭子</span></h1>
+      <p class="sub">选题、写作、做 PPT、磨路演、上战场——双创AI实验室的智能体集群，一路陪你从想法到夺奖。</p>
+      <div class="team"><span class="buddy">🎯 选题搭子</span><span class="buddy">✍️ 写作搭子</span><span class="buddy">🖼️ PPT搭子</span><span class="buddy">🎤 路演搭子</span><span class="buddy">⚖️ 答辩搭子</span><span class="buddy">📊 数据搭子</span><span class="buddy">🤝 组队搭子</span></div>
+    </div>
+    <div class="herofig"><div class="core"></div><div class="cap">数字人「小航」· 亲和形态</div></div>
+  </section>
+  <div class="switchwrap"><div class="switch"><div class="slider" id="sld"></div><button class="on" onclick="setZone(0)">📚 学习中心</button><button onclick="setZone(1)">🚀 应用中心</button></div></div>
+  <div class="zonecap" id="zc"></div>
+  <div class="bento" id="grid"></div>
+  <footer>风格D · 明亮 Bento 科技　|　亮色 + Bento 不规则栅格 + 干净微交互（Linear/Apple 风）　|　双创AI实验室</footer>
+</div>
+<div class="fab">💬 AI 客服 · 百问百答</div>
+<script>
+const tint={cyan:'rgba(6,182,212,.14)',violet:'rgba(124,92,255,.14)',pink:'rgba(236,72,153,.14)',amber:'rgba(245,158,11,.16)',green:'rgba(16,185,129,.14)'};
+const Z=[{cap:'打基础、拿资源：学理论 · 读政策 · 看案例 · 拿模板 · 直达平台',m:[['📘','理论知识','五模块创新创业基础课件，AI 老师讲给你听，随问随答','cyan','5 模块','big'],['📜','政策解读','政策一键看懂，自动划重点','violet','实时',''],['💡','案例库','50 个区域产业案例拆解','pink','50+',''],['🧰','模板库','BP、路演PPT、专利、合同模板随取随用','amber','20+','wide'],['🎮','题库闯关','1000 题＋卡牌闯关','green','1000 题',''],['🔗','平台直达','合规导流拿证书','cyan','导流','']]},{cap:'上战场、出成果：生成资料 · 模拟路演 · 协作组队',m:[['🎯','选题与赛道匹配','主动多轮帮你定方向，研/本/专怎么组队、补哪类队友都给建议','violet','主动式','big'],['✍️','文本生成','BP、专利、合同、文案一键起草','cyan','一键',''],['🖼️','PPT 生成','大纲＋逐字稿＋配图','pink','配图',''],['⚖️','模拟路演答辩','评委连环追问、雷达图打分','amber','评委级','wide'],['📊','数据分析','调研数据出结论与图表','green','可视化',''],['🤝','组队协作','跨校组队，共编 PPT','violet','协作','']]}];
+let zone=0;
+function render(){const g=document.getElementById('grid');g.innerHTML='';Z[zone].m.forEach((m,k)=>{const d=document.createElement('div');d.className='mod '+(m[5]||'');d.style.animationDelay=(k*.06)+'s';d.innerHTML=`<div class="mi" style="background:${tint[m[3]]}">${m[0]}</div><h3>${m[1]}</h3><p>${m[2]}</p><span class="badge">${m[4]}</span><div class="bar"></div>`;g.appendChild(d)});document.getElementById('zc').textContent=Z[zone].cap}
+function setZone(z){zone=z;document.getElementById('sld').classList.toggle('r',z===1);document.querySelectorAll('.switch button').forEach((b,k)=>b.classList.toggle('on',k===z));render()}
+render();
+</script></body></html>

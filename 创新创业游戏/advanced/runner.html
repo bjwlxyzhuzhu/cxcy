@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创业马拉松 · 跑酷闯关</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(900px 500px at 50% 0,#1a2e3a,#070b10 60%);color:#e0f2fe;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:14px}
+  .topbar{width:100%;max-width:780px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .topbar a{color:#7dd3fc;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:21px;background:linear-gradient(90deg,#34d399,#fbbf24,#38bdf8);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
+  .sub{color:#93c5fd;font-size:12px;text-align:center;margin:3px 0 10px}
+  .gamebox{position:relative;width:100%;max-width:780px}
+  canvas{display:block;width:100%;background:#0a1018;border:2px solid #1e3a5f;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.5);touch-action:none}
+  .hud{position:absolute;top:8px;left:0;right:0;display:flex;justify-content:space-between;padding:0 12px;font-size:13px;pointer-events:none;z-index:3}
+  .hud .lives{color:#fb7185;letter-spacing:2px}
+  .hud b{color:#fbbf24}
+  .overlay{position:absolute;inset:0;background:rgba(7,11,16,.92);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;z-index:6}
+  .overlay h2{font-size:24px;margin-bottom:10px;background:linear-gradient(90deg,#34d399,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .overlay p{color:#bfdbfe;font-size:13px;line-height:1.8;margin-bottom:5px}
+  .btn{background:linear-gradient(90deg,#10b981,#f59e0b);color:#06281b;border:none;border-radius:9px;padding:11px 26px;font-size:15px;font-weight:800;cursor:pointer;margin-top:12px}
+  .btn:hover{opacity:.92}
+  .controls{margin-top:10px;font-size:12px;color:#7dd3fc;text-align:center}
+  .controls kbd{background:#13233f;border:1px solid #1e3a5f;border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:inherit;font-size:11px;color:#cbd5e1}
+</style>
+</head>
+<body>
+  <div class="topbar"><a href="index.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">复杂游戏 · 跑酷闯关</span></div>
+  <h1>🏃 创业马拉松</h1>
+  <p class="sub">创始人一路狂奔冲向上市！跳过资金缺口、躲开竞品陷阱、下滑钻过行业壁垒，别被身后的「资金链断裂」追上。</p>
+
+  <div class="gamebox">
+    <canvas id="cv" width="780" height="400"></canvas>
+    <div class="hud">
+      <span class="lives" id="lives">♥♥♥</span>
+      <span>📏 <b id="dist">0</b> m / 2000m</span>
+      <span>💰 <b id="coins">0</b></span>
+    </div>
+    <div class="overlay" id="overlay">
+      <h2>🏃 准备出发</h2>
+      <p><kbd>空格</kbd>/<kbd>↑</kbd> 跳（空中再按=二段跳）<br><kbd>↓</kbd> 下滑钻过障碍 · 长按跳跃跳更高</p>
+      <p style="color:#7dd3fc;font-size:12px">收集 💰融资 · 冲过 2000m 终点敲钟上市！</p>
+      <button class="btn" id="startBtn">开跑</button>
+    </div>
+  </div>
+  <div class="controls"><kbd>空格</kbd>/<kbd>↑</kbd> 跳 · <kbd>↓</kbd> 滑 · <kbd>P</kbd> 暂停 · 手机点屏幕跳、下半屏下滑</div>
+
+<script src="engine.js"></script>
+<script>
+"use strict";
+/* ============ 创业马拉松 · 横版跑酷 ============
+   可变跳/二段跳/土狼时间/跳跃缓冲/下滑 · 程序化坑+障碍+金币 ·
+   追逐墙(资金链断裂) · 视差背景 · 生命 · 终点(IPO)
+================================================ */
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const W=780,H=400,STEP=1000/60,GROUND=300,PX=150; // 玩家固定屏幕x
+const FINISH=20000; // 世界终点(=2000m)
+const GRAV=2200,JUMP=730,JUMP2=650;
+const overlay=document.getElementById('overlay');
+
+let state="ready";
+let player,cameraX,spawnX,distance,coinsGot,lives,runSpeed,wallX;
+let pits,obstacles,coins,bgFar,bgNear,particles;
+let acc=0,lastT=0,rafId=null,lastTier=0,shakeT=0;
+let jumpHeld=false,jumpBuffer=0,coyote=0;
+const rand=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const AABB=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+
+function reset(){
+  player={worldX:0,y:GROUND-40,vy:0,w:26,h:40,grounded:true,doubleUsed:false,sliding:false,invuln:0};
+  cameraX=player.worldX-PX;spawnX=200;distance=0;coinsGot=0;lives=3;runSpeed=270;wallX=-260;
+  pits=[];obstacles=[];coins=[];particles=[];lastTier=0;
+  bgFar=[];bgNear=[];
+  for(let i=0;i<14;i++)bgFar.push({x:i*90,h:rand(40,120),w:rand(40,70)});
+  for(let i=0;i<12;i++)bgNear.push({x:i*120,h:rand(70,180),w:rand(50,90)});
+  generateAhead();
+}
+function ph(){return player.sliding?22:40;}
+
+function generateAhead(){
+  const diff=clamp(distance/15000,0,1);
+  while(spawnX<cameraX+W+360){
+    spawnX+=rand(150,250)-diff*50;
+    const roll=Math.random();
+    if(roll<0.16+diff*0.12){ // 坑
+      const w=rand(55,80)+diff*70;
+      pits.push({x:spawnX,w});
+      coins.push({x:spawnX+w/2-7,y:GROUND-95,got:false});
+      spawnX+=w+20;
+    }else if(roll<0.46){ // 地面障碍(刺/高墙)
+      const tall=Math.random()<0.4;
+      obstacles.push({x:spawnX,type:tall?'block':'spike',w:tall?28:26,h:tall?56:26,hit:false});
+    }else if(roll<0.66){ // 头顶横杆(需下滑)
+      obstacles.push({x:spawnX,type:'bar',w:46,h:26,y:GROUND-52,hit:false});
+    }else{ // 金币
+      const n=3,baseY=GROUND-50-rand(0,46);
+      for(let i=0;i<n;i++)coins.push({x:spawnX+i*32,y:baseY,got:false});
+    }
+  }
+  pits=pits.filter(p=>p.x+p.w>cameraX-60);
+  obstacles=obstacles.filter(o=>o.x+o.w>cameraX-60);
+  coins=coins.filter(c=>!c.got&&c.x>cameraX-60);
+}
+function overPit(x){return pits.some(p=>x>p.x&&x<p.x+p.w);}
+function obstacleBox(o){
+  if(o.type==='spike')return{x:o.x,y:GROUND-o.h,w:o.w,h:o.h};
+  if(o.type==='block')return{x:o.x,y:GROUND-o.h,w:o.w,h:o.h};
+  return{x:o.x,y:o.y,w:o.w,h:o.h}; // bar
+}
+function doJump(){
+  if(player.grounded||coyote>0){player.vy=-JUMP;player.grounded=false;player.doubleUsed=false;coyote=0;burst(player.worldX+13,GROUND,'#94a3b8',5);Sound.sfx('jump');}
+  else if(!player.doubleUsed){player.vy=-JUMP2;player.doubleUsed=true;burst(player.worldX+13,player.y+ph(),'#38bdf8',8);Sound.sfx('jump2');}
+}
+function burst(wx,wy,col,n){for(let i=0;i<n;i++)particles.push({x:wx,y:wy,vx:rand(-80,80),vy:rand(-120,20),life:.5,col,active:true});}
+function hitObstacle(){
+  if(player.invuln>0)return;
+  lives--;player.invuln=1400;shakeT=.25;player.worldX-=34;burst(player.worldX+13,player.y+10,'#fb7185',14);Sound.sfx('hit');
+  updateHUD();
+  if(lives<=0)gameOver("被障碍击倒");
+}
+
+function update(dt){
+  if(state!=="play")return;
+  const s=dt/1000;
+  runSpeed=270+Math.min(180,distance/120); // 越跑越快
+  player.worldX+=runSpeed*s;
+  distance=Math.floor(player.worldX/10);
+  // 追逐墙：随速度推进，撞障碍被击退时会逼近
+  wallX+=runSpeed*0.9*s;
+  // 计时器
+  if(jumpBuffer>0)jumpBuffer-=dt;
+  if(coyote>0)coyote-=dt;
+  if(player.invuln>0)player.invuln-=dt;
+  // 重力
+  player.vy+=GRAV*s;player.y+=player.vy*s;
+  // 落地判定
+  const feetX=player.worldX+player.w/2, curH=ph();
+  if(!overPit(feetX)&&player.y+curH>=GROUND&&player.vy>=0){
+    player.y=GROUND-curH;player.vy=0;
+    if(!player.grounded){player.grounded=true;player.doubleUsed=false;Sound.sfx('land');}
+    coyote=90;
+    if(jumpBuffer>0){doJump();jumpBuffer=0;}
+  }else{
+    if(player.grounded)coyote=90; // 刚离地
+    player.grounded=false;
+  }
+  // 坠坑/坠落
+  if(player.y>H+80){gameOver("掉进资金缺口");return;}
+  // 追逐墙抓到
+  if(player.worldX< wallX+24){gameOver("被资金链断裂追上");return;}
+  cameraX=player.worldX-PX;
+  generateAhead();
+  // 障碍碰撞
+  const pbox={x:player.worldX,y:player.y,w:player.w,h:curH};
+  for(const o of obstacles){
+    if(o.hit)continue;
+    const ob=obstacleBox(o);
+    if(AABB(pbox,ob)){o.hit=true;hitObstacle();}
+  }
+  // 金币
+  for(const c of coins){if(c.got)continue;const cb={x:c.x,y:c.y,w:16,h:16};if(AABB(pbox,cb)){c.got=true;coinsGot++;burst(c.x+8,c.y+8,'#fbbf24',6);Sound.sfx('coin');updateHUD();}}
+  // 里程碑(融资轮)
+  const tier=Math.floor(distance/400);
+  if(tier>lastTier&&tier>=1){lastTier=tier;const names=["天使轮 ✅","A轮 ✅","B轮 ✅","C轮 ✅"];if(names[tier-1]){toast(names[tier-1]);Sound.sfx('levelup');}}
+  // 终点
+  if(player.worldX>=FINISH){winGame();return;}
+  // 粒子
+  for(const p of particles){if(!p.active)continue;p.vy+=1400*s;p.x+=p.vx*s;p.y+=p.vy*s;p.life-=s;if(p.life<=0)p.active=false;}
+  if(shakeT>0)shakeT-=s;
+}
+
+let toastMsg="",toastT=0;
+function toast(m){toastMsg=m;toastT=1.6;}
+
+function render(){
+  let ox=0;if(shakeT>0)ox=rand(-5,5);
+  ctx.setTransform(1,0,0,1,ox,0);
+  // 天空渐变
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0e1f33');g.addColorStop(1,'#1a2e1f');ctx.fillStyle=g;ctx.fillRect(-10,0,W+20,H);
+  if(state==="ready"){ctx.setTransform(1,0,0,1,0,0);return;}
+  // 视差远景
+  for(const b of bgFar){let x=((b.x-cameraX*0.3)%(W+200));if(x<-100)x+=W+200;ctx.fillStyle='rgba(56,189,248,.10)';ctx.fillRect(x,GROUND-b.h,b.w,b.h);}
+  for(const b of bgNear){let x=((b.x-cameraX*0.55)%(W+240));if(x<-120)x+=W+240;ctx.fillStyle='rgba(99,102,241,.16)';ctx.fillRect(x,GROUND-b.h,b.w,b.h);ctx.fillStyle='rgba(0,0,0,.2)';for(let wy=GROUND-b.h+8;wy<GROUND-8;wy+=16)for(let wx=x+6;wx<x+b.w-6;wx+=14)ctx.fillRect(wx,wy,6,8);}
+  // 地面(含坑)
+  ctx.fillStyle='#16314a';
+  let gx=-10;const segEnd=W+20;
+  // 画地面：整条减去坑
+  ctx.fillRect(-10,GROUND,W+20,H-GROUND);
+  ctx.fillStyle='#0a1018';
+  for(const p of pits){const sx=p.x-cameraX;if(sx<W&&sx+p.w>0)ctx.fillRect(sx,GROUND,p.w,H-GROUND);}
+  ctx.fillStyle='#22d3ee';ctx.fillRect(-10,GROUND,W+20,3);
+  for(const p of pits){const sx=p.x-cameraX;if(sx<W&&sx+p.w>0)ctx.clearRect(sx,GROUND,p.w,3);}
+  // 终点线
+  const fx=FINISH-cameraX;if(fx<W+40){for(let y=GROUND-120;y<GROUND;y+=16){ctx.fillStyle=(Math.floor(y/16)%2)?'#fff':'#111';ctx.fillRect(fx,y,10,16);}ctx.fillStyle='#fbbf24';ctx.font='20px sans-serif';ctx.fillText('🔔 IPO',fx-6,GROUND-128);}
+  // 金币
+  for(const c of coins){if(c.got)continue;const sx=c.x-cameraX;if(sx<-20||sx>W+20)continue;ctx.font='16px sans-serif';ctx.fillText('💰',sx,c.y+14);}
+  // 障碍
+  for(const o of obstacles){const ob=obstacleBox(o),sx=ob.x-cameraX;if(sx<-50||sx>W+50)continue;
+    if(o.type==='bar'){ctx.fillStyle='#a855f7';ctx.fillRect(sx,ob.y,ob.w,ob.h);ctx.fillStyle='#e9d5ff';ctx.font='11px sans-serif';ctx.fillText('壁垒',sx+4,ob.y+17);}
+    else if(o.type==='block'){ctx.fillStyle='#ef4444';ctx.fillRect(sx,ob.y,ob.w,ob.h);ctx.fillStyle='#fecaca';ctx.font='14px sans-serif';ctx.fillText('🏢',sx+5,ob.y+30);}
+    else{ctx.fillStyle='#f97316';ctx.beginPath();ctx.moveTo(sx,GROUND);ctx.lineTo(sx+ob.w/2,GROUND-ob.h);ctx.lineTo(sx+ob.w,GROUND);ctx.closePath();ctx.fill();}
+  }
+  // 追逐墙
+  const wsx=wallX-cameraX;if(wsx>-40){const wg=ctx.createLinearGradient(0,0,wsx,0);wg.addColorStop(0,'#7f1d1d');wg.addColorStop(1,'rgba(239,68,68,.7)');ctx.fillStyle=wg;ctx.fillRect(-10,0,wsx+10,H);
+    ctx.fillStyle='#fff';ctx.font='13px sans-serif';ctx.save();ctx.translate(wsx-8,H/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.fillText('资金链断裂',0,0);ctx.restore();
+    for(let y=20;y<H;y+=40){ctx.fillStyle='rgba(255,200,200,.5)';ctx.beginPath();ctx.moveTo(wsx,y);ctx.lineTo(wsx+14,y+10);ctx.lineTo(wsx,y+20);ctx.closePath();ctx.fill();}}
+  // 玩家（创始人角色）
+  const psx=PX, curH=ph();
+  if(!(player.invuln>0&&Math.floor(Date.now()/80)%2))drawFounder(psx,player.y,curH);
+  // 粒子
+  for(const p of particles){if(!p.active)continue;ctx.globalAlpha=Math.max(0,p.life*2);ctx.fillStyle=p.col;ctx.fillRect(p.x-cameraX,p.y,3,3);}
+  ctx.globalAlpha=1;
+  // toast
+  if(toastT>0){ctx.globalAlpha=Math.min(1,toastT);ctx.fillStyle='#fbbf24';ctx.font='bold 20px sans-serif';ctx.textAlign='center';ctx.fillText(toastMsg,W/2,90);ctx.textAlign='left';ctx.globalAlpha=1;toastT-=1/60;}
+  ctx.setTransform(1,0,0,1,0,0);
+}
+
+function updateHUD(){
+  document.getElementById('lives').textContent="♥".repeat(Math.max(0,lives))||'·';
+  document.getElementById('dist').textContent=distance;
+  document.getElementById('coins').textContent=coinsGot;
+}
+function startGame(){reset();state="play";overlay.style.display="none";updateHUD();GameKit.begin();if(!rafId){lastT=performance.now();rafId=requestAnimationFrame(frame);}}
+function gameOver(reason){
+  state="over";GameKit.stop();Sound.sfx('gameover');
+  const lb=GameKit.finish(distance);
+  overlay.style.display="flex";
+  overlay.innerHTML=`<h2>💥 创业中止</h2><p>${reason}。</p>
+    <p>跑了 <b style="color:#fbbf24">${distance}</b> 米 · 融资 <b style="color:#fbbf24">${coinsGot}</b> 💰</p>
+    ${lb.rank?`<p style="color:#34d399;font-size:13px">🏆 冲上排行榜第 ${lb.rank} 名！（按米数）</p>`:''}
+    <div style="background:#0a1018;border-radius:10px;padding:6px 10px;margin:8px 0;width:100%;max-width:240px">${lb.html}</div>
+    <button class="btn" id="r">再跑一次</button>`;
+  document.getElementById('r').onclick=startGame;
+}
+function winGame(){
+  state="win";GameKit.stop();Sound.sfx('win');
+  const lb=GameKit.finish(distance);
+  overlay.style.display="flex";
+  overlay.innerHTML=`<h2>🔔 冲线上市！</h2><p>你跑完了 2000 米创业马拉松，成功敲钟 IPO！</p>
+    <p>沿途融资 <b style="color:#fbbf24">${coinsGot}</b> 💰</p>
+    <div style="background:#0a1018;border-radius:10px;padding:6px 10px;margin:8px 0;width:100%;max-width:240px">${lb.html}</div>
+    <button class="btn" id="r">再跑一次</button>`;
+  document.getElementById('r').onclick=startGame;
+}
+function togglePause(){if(state==="play"){state="pause";overlay.style.display="flex";overlay.innerHTML=`<h2>⏸️ 暂停</h2><button class="btn" id="rs">继续</button>`;document.getElementById('rs').onclick=togglePause;}else if(state==="pause"){state="play";overlay.style.display="none";}}
+
+// 创始人角色：西装+领带，跑/跳/滑三种姿态
+function drawFounder(x,y,h){
+  const sw=Math.sin(player.worldX*0.06)*6, air=!player.grounded;
+  ctx.save();ctx.translate(x+13,y);ctx.lineCap='round';
+  if(player.sliding){
+    ctx.strokeStyle='#1e3a5f';ctx.lineWidth=5;
+    ctx.beginPath();ctx.moveTo(-6,h-3);ctx.lineTo(10,h-2);ctx.stroke();              // 腿前伸
+    ctx.fillStyle='#2563eb';ctx.beginPath();ctx.ellipse(0,h-9,11,6,-0.15,0,6.28);ctx.fill(); // 身体
+    ctx.fillStyle='#fde68a';ctx.beginPath();ctx.arc(-9,h-12,5,0,6.28);ctx.fill();    // 头
+    ctx.fillStyle='#1f2937';ctx.beginPath();ctx.arc(-9,h-14,5,Math.PI,0);ctx.fill(); // 头发
+    ctx.restore();return;
+  }
+  // 腿
+  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=5;
+  if(air){ctx.beginPath();ctx.moveTo(-3,h-12);ctx.lineTo(-7,h-2);ctx.stroke();ctx.beginPath();ctx.moveTo(3,h-12);ctx.lineTo(8,h-7);ctx.stroke();}
+  else{ctx.beginPath();ctx.moveTo(0,h-13);ctx.lineTo(-sw,h);ctx.stroke();ctx.beginPath();ctx.moveTo(0,h-13);ctx.lineTo(sw,h);ctx.stroke();}
+  // 西装身体
+  ctx.fillStyle='#2563eb';ctx.fillRect(-7,h-25,14,13);
+  ctx.fillStyle='#1d4ed8';ctx.fillRect(-7,h-25,14,4);
+  // 领带
+  ctx.fillStyle='#ef4444';ctx.beginPath();ctx.moveTo(0,h-25);ctx.lineTo(-2,h-18);ctx.lineTo(0,h-14);ctx.lineTo(2,h-18);ctx.closePath();ctx.fill();
+  // 手臂
+  ctx.strokeStyle='#1d4ed8';ctx.lineWidth=4;
+  if(air){ctx.beginPath();ctx.moveTo(-6,h-23);ctx.lineTo(-11,h-29);ctx.stroke();ctx.beginPath();ctx.moveTo(6,h-23);ctx.lineTo(11,h-29);ctx.stroke();}
+  else{ctx.beginPath();ctx.moveTo(-6,h-23);ctx.lineTo(-8+sw*0.4,h-15);ctx.stroke();ctx.beginPath();ctx.moveTo(6,h-23);ctx.lineTo(8-sw*0.4,h-15);ctx.stroke();}
+  // 头
+  ctx.fillStyle='#fde68a';ctx.beginPath();ctx.arc(0,h-31,6,0,6.28);ctx.fill();
+  ctx.fillStyle='#1f2937';ctx.beginPath();ctx.arc(0,h-33,6.2,Math.PI,0);ctx.fill();
+  ctx.fillStyle='#1f2937';ctx.fillRect(2.5,h-32,2,2);
+  ctx.restore();
+}
+
+function frame(now){const dt=now-lastT;lastT=now;acc+=Math.min(dt,100);while(acc>=STEP){update(STEP);acc-=STEP;}render();rafId=requestAnimationFrame(frame);}
+
+// 输入
+function pressJump(){
+  if(state!=="play"){if(state==="ready"||state==="over"||state==="win")startGame();return;}
+  jumpHeld=true;
+  if(player.grounded||coyote>0)doJump();        // 地面跳
+  else if(!player.doubleUsed)doJump();           // 二段跳
+  else jumpBuffer=120;                            // 都用完了→存缓冲，落地即跳
+}
+function releaseJump(){jumpHeld=false;if(player&&player.vy<0)player.vy*=0.45;}
+function setSlide(v){if(player&&state==="play")player.sliding=v;}
+window.addEventListener('keydown',e=>{
+  if([" ","Spacebar","ArrowUp","ArrowDown"].includes(e.key))e.preventDefault();
+  if(e.repeat)return;
+  if(e.key===' '||e.key==='Spacebar'||e.key==='ArrowUp'||e.key==='w'||e.key==='W')pressJump();
+  else if(e.key==='ArrowDown'||e.key==='s'||e.key==='S')setSlide(true);
+  else if(e.key==='p'||e.key==='P')togglePause();
+});
+window.addEventListener('keyup',e=>{
+  if(e.key===' '||e.key==='Spacebar'||e.key==='ArrowUp'||e.key==='w'||e.key==='W')releaseJump();
+  else if(e.key==='ArrowDown'||e.key==='s'||e.key==='S')setSlide(false);
+});
+// 触屏：上半屏跳，下半屏滑
+cv.addEventListener('touchstart',e=>{e.preventDefault();const r=cv.getBoundingClientRect(),ty=(e.touches[0].clientY-r.top)/r.height;if(ty>0.6)setSlide(true);else pressJump();},{passive:false});
+cv.addEventListener('touchend',e=>{e.preventDefault();releaseJump();setSlide(false);},{passive:false});
+cv.addEventListener('mousedown',()=>{if(state!=="play")startGame();else pressJump();});
+cv.addEventListener('mouseup',releaseJump);
+
+document.getElementById('startBtn').onclick=startGame;
+render();
+GameKit.mount({key:'runner',title:'🏃 创业马拉松',bgm:'runner',help:`
+  <h3>🎯 目标</h3><p>扮演<b>创始人</b>一路狂奔冲向上市，跑满 <b>2000 米</b>即敲钟 IPO。跳过资金缺口、躲开竞品陷阱、下滑钻过行业壁垒，别被身后的「资金链断裂」追上。</p>
+  <h3>🎮 操作</h3><ul><li><b>空格 / ↑</b> 跳跃（空中再按一次 = 二段跳）</li><li><b>↓</b> 下滑钻过头顶横杆「行业壁垒」</li><li><b>长按跳跃键</b>跳得更高 · <b>P</b> 暂停 · 手机：点上半屏跳、下半屏滑</li></ul>
+  <h3>💡 通关攻略</h3>
+  <div class="tip">① <b>长按跳过宽坑</b>、轻点跳小障碍——松手越早跳得越低，按需控制高度。</div>
+  <div class="tip">② <b>二段跳</b>是保命技：第一跳没踩稳，空中补一跳救回来。</div>
+  <div class="tip">③ <b>红墙(高障碍)要跳、紫杆(壁垒)要滑</b>，看清类型再动作。</div>
+  <div class="tip">④ 撞障碍会被击退、让追逐墙逼近——<b>宁可稳一点也别连撞</b>，3 次出局。</div>`});
+</script>
+</body>
+</html>

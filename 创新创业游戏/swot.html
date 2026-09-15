@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWOT 分析挑战</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#06141f,#0a1f1a);color:#e6fffb;min-height:100vh;padding:18px}
+  .wrap{max-width:840px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .topbar a{color:#5eead4;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:22px;background:linear-gradient(90deg,#2dd4bf,#a3e635);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#99f6e4;font-size:14px;margin:6px 0 12px;line-height:1.5}
+  .sub b{color:#a3e635}
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .q{border-radius:12px;padding:12px;min-height:130px;border:2px solid}
+  .q.S{background:#062c22;border-color:#10b981}
+  .q.W{background:#2c1206;border-color:#f59e0b}
+  .q.O{background:#06222c;border-color:#0ea5e9}
+  .q.T{background:#2c0612;border-color:#ef4444}
+  .q .h{font-size:14px;font-weight:800;margin-bottom:4px}
+  .q .meta{font-size:11px;opacity:.75;margin-bottom:8px}
+  .q.hl{box-shadow:0 0 0 3px rgba(255,255,255,.35)}
+  .slot{display:flex;flex-wrap:wrap;gap:6px}
+  .pool{margin-top:14px;background:#0c1c2a;border:1px solid #1e3a4a;border-radius:12px;padding:12px}
+  .pool h3{font-size:13px;color:#99f6e4;margin-bottom:8px}
+  .cards{display:flex;flex-wrap:wrap;gap:8px}
+  .card{background:#13293a;border:1px solid #2c5364;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;transition:.15s;user-select:none;line-height:1.4}
+  .card:hover{border-color:#5eead4}
+  .card.sel{background:#0f766e;border-color:#5eead4;transform:scale(1.04)}
+  .card.placed{font-size:12px;padding:5px 9px}
+  .card.ok{border-color:#22c55e;background:#064e3b}
+  .card.no{border-color:#ef4444;background:#5b1d1d}
+  .bar{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .btn{background:linear-gradient(90deg,#14b8a6,#84cc16);color:#04221c;border:none;border-radius:9px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer}
+  .btn.ghost{background:#13293a;color:#e6fffb;border:1px solid #2c5364}
+  .msg{font-size:14px;color:#ccfbf1}
+  .axis{font-size:11px;color:#5eead4;text-align:center;margin:8px 0 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a href="basic.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">创新创业系列 · 10</span></div>
+  <h1>📊 SWOT 分析挑战</h1>
+  <p class="sub">案例：<b>「绿叶」校园共享充电宝创业项目</b>。把每张卡片放进正确象限。<br>记住两条轴：<b>优势S/劣势W=内部</b>，<b>机会O/威胁T=外部</b>；<b>S、O为有利</b>，<b>W、T为不利</b>。</p>
+
+  <div class="axis">↑ 内部因素　　　　　　　　　　　外部因素 ↓</div>
+  <div class="quad">
+    <div class="q S" data-k="S"><div class="h">💪 优势 Strengths</div><div class="meta">内部 · 有利</div><div class="slot"></div></div>
+    <div class="q W" data-k="W"><div class="h">⚠️ 劣势 Weaknesses</div><div class="meta">内部 · 不利</div><div class="slot"></div></div>
+    <div class="q O" data-k="O"><div class="h">🌈 机会 Opportunities</div><div class="meta">外部 · 有利</div><div class="slot"></div></div>
+    <div class="q T" data-k="T"><div class="h">🌩️ 威胁 Threats</div><div class="meta">外部 · 不利</div><div class="slot"></div></div>
+  </div>
+
+  <div class="pool"><h3>📦 待分类条目</h3><div class="cards" id="pool"></div></div>
+
+  <div class="bar">
+    <button class="btn" id="check">✓ 检查答案</button>
+    <button class="btn ghost" id="reset">↺ 重置</button>
+    <span class="msg" id="msg"></span>
+  </div>
+</div>
+
+<script>
+const items=[
+  {t:"团队有3名核心成员懂硬件与运营",k:"S"},
+  {t:"首批设备成本比同行低15%",k:"S"},
+  {t:"已和2所高校签独家合作",k:"S"},
+  {t:"品牌知名度低，学生没听过",k:"W"},
+  {t:"资金紧张，铺设网点速度慢",k:"W"},
+  {t:"缺乏成熟的售后维护体系",k:"W"},
+  {t:"校园人流密集，租借需求高频",k:"O"},
+  {t:"学校推动‘绿色低碳’校园政策",k:"O"},
+  {t:"毕业季手机使用激增带来旺季",k:"O"},
+  {t:"美团、怪兽等巨头加速进校园",k:"T"},
+  {t:"共享充电宝行业普遍涨价遭吐槽",k:"T"},
+  {t:"电池安全监管政策可能收紧",k:"T"}
+];
+const NAMES={S:"优势",W:"劣势",O:"机会",T:"威胁"};
+let selected=null,checked=false;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function build(){
+  const pool=document.getElementById('pool');pool.innerHTML='';
+  document.querySelectorAll('.slot').forEach(s=>s.innerHTML='');
+  shuffle(items.slice()).forEach(it=>{
+    const c=document.createElement('div');c.className='card';c.textContent=it.t;c.dataset.k=it.k;
+    c.onclick=()=>pick(c);pool.appendChild(c);
+  });
+  selected=null;checked=false;document.getElementById('msg').textContent='';
+}
+function pick(card){
+  if(checked)return;
+  if(selected===card){card.classList.remove('sel');selected=null;clearHL();return;}
+  if(selected)selected.classList.remove('sel');
+  selected=card;card.classList.add('sel');
+  clearHL();document.querySelectorAll('.q').forEach(b=>b.classList.add('hl'));
+}
+function clearHL(){document.querySelectorAll('.q').forEach(b=>b.classList.remove('hl'))}
+document.querySelectorAll('.q').forEach(b=>{
+  b.onclick=()=>{
+    if(!selected||checked)return;
+    selected.classList.remove('sel');selected.classList.add('placed');
+    b.querySelector('.slot').appendChild(selected);selected=null;clearHL();
+  };
+});
+document.getElementById('check').onclick=()=>{
+  let right=0;const total=items.length;
+  document.querySelectorAll('.q').forEach(b=>{
+    b.querySelectorAll('.card').forEach(c=>{
+      if(c.dataset.k===b.dataset.k){c.classList.add('ok');right++;}
+      else c.classList.add('no');
+    });
+  });
+  checked=true;
+  const remain=document.querySelectorAll('#pool .card').length;
+  const m=document.getElementById('msg');
+  let tip=right===total?'🏆 满分！你已真正理解 SWOT 的内外/利弊两条轴。':
+          right>=9?'👍 很不错！看看红色卡片，想想它是内部还是外部、有利还是不利。':
+          '💪 再想想：是公司‘自身’的(内部S/W)，还是‘环境’带来的(外部O/T)？';
+  m.innerHTML=`得分 <b style="color:#a3e635">${right}/${total}</b>${remain?`（还有${remain}张没放）`:''} · ${tip}`;
+};
+document.getElementById('reset').onclick=build;
+build();
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>融资路演 · 抉择之夜</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(800px 500px at 50% -5%,#1e1b4b,#0a0a14 60%);color:#e2e8f0;min-height:100vh;padding:20px}
+  .wrap{max-width:640px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .topbar a{color:#a5b4fc;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:22px;background:linear-gradient(90deg,#818cf8,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .meter{margin:14px 0}
+  .meter .lbl{font-size:12px;color:#a5b4fc;display:flex;justify-content:space-between;margin-bottom:5px}
+  .meter .track{height:12px;background:#1e293b;border-radius:8px;overflow:hidden}
+  .meter .fill{height:100%;background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e);width:50%;transition:width .6s}
+  .scene{background:#16162e;border:1px solid #312e6b;border-radius:16px;padding:22px;margin-top:6px}
+  .who{font-size:12px;color:#c084fc;letter-spacing:1px;margin-bottom:8px}
+  .text{font-size:16px;line-height:1.8;color:#e9d5ff;min-height:84px}
+  .text .react{display:block;margin-top:10px;color:#94a3b8;font-size:14px;font-style:italic}
+  .choices{margin-top:18px;display:flex;flex-direction:column;gap:11px}
+  .choice{background:#0f0f24;border:1px solid #312e6b;border-radius:11px;padding:13px 16px;font-size:15px;cursor:pointer;transition:.15s;text-align:left;color:#e2e8f0;line-height:1.5}
+  .choice:hover{border-color:#818cf8;background:#1e1b4b;transform:translateX(4px)}
+  .step{font-size:12px;color:#64748b;text-align:right;margin-top:10px}
+  .btn{background:linear-gradient(90deg,#6366f1,#a855f7);color:#fff;border:none;border-radius:10px;padding:12px 26px;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px}
+  .end h2{font-size:25px;margin-bottom:10px;text-align:center}
+  .end p{line-height:1.8;color:#cbd5e1}
+  .end .verdict{text-align:center;padding:10px;border-radius:10px;margin:14px 0;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a href="basic.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">创新创业系列 · 09</span></div>
+  <h1>🎭 融资路演 · 抉择之夜</h1>
+  <p style="color:#a5b4fc;font-size:14px;margin-top:6px">你是创始人，对面坐着挑剔的投资人「周维」。你的每句话都在改变他的兴趣。带着你的项目，拿下 Term Sheet！</p>
+
+  <div class="meter">
+    <div class="lbl"><span>📉 冷淡</span><span>投资人兴趣度</span><span>狂热 📈</span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+
+  <div class="scene" id="scene"></div>
+</div>
+
+<script>
+let interest=50, step=0;
+const TOTAL=5;
+const fill=document.getElementById('fill');
+function setMeter(){fill.style.width=Math.max(0,Math.min(100,interest))+'%';}
+
+const scenes={
+  start:{who:"📍 路演开始",text:"会议室的灯有点刺眼。周维放下咖啡，靠在椅背上：「时间宝贵，3分钟，让我记住你。」",
+    choices:[
+      {t:"目光坚定，开门见山讲一个真实用户的痛点故事",d:12,n:"start2"},
+      {t:"礼貌寒暄，先夸对方过往的成功投资案例",d:-4,n:"start2"},
+      {t:"紧张地打开40页PPT，准备逐页念",d:-10,n:"start2"}
+    ]},
+  start2:{who:"💬 周维",text:"「故事讲得不错。」他身体微微前倾，「但市场到底多大？别跟我说‘千亿蓝海’这种废话。」",
+    choices:[
+      {t:"给出自下而上的测算：目标用户数×付费率×客单价",d:14,n:"s3"},
+      {t:"抛出行业报告里的‘万亿市场’大数字",d:-8,n:"s3"},
+      {t:"坦诚：我们还在早期，已验证了第一个细分场景",d:6,n:"s3"}
+    ]},
+  s3:{who:"💬 周维",text:"「大厂要是看上这块,明天就能抄你。你的护城河在哪？」他眼神锐利。",
+    choices:[
+      {t:"我们的数据飞轮+社区壁垒，越用越难被替代",d:13,n:"s4"},
+      {t:"大厂太笨重了，根本做不好这种小事",d:-9,n:"s4"},
+      {t:"我们团队在这个领域深耕8年，比谁都懂用户",d:5,n:"s4"}
+    ]},
+  s4:{who:"💬 周维",text:"「聊点实的——现在收入和增长怎么样？」他翻开你的财务页。",
+    choices:[
+      {t:"月营收50万，环比增长20%，复购率行业领先（真实）",d:15,n:"s5"},
+      {t:"含糊其辞，把数字说得比实际翻一倍",d:-14,n:"s5"},
+      {t:"我们还没开始变现，先把规模做起来",d:-3,n:"s5"}
+    ]},
+  s5:{who:"💬 周维",text:"他合上本子，沉默了几秒：「我有点兴趣。说吧，你想要多少钱，多少估值？」",
+    choices:[
+      {t:"500万天使，估值5000万——并拿出清晰的资金使用计划",d:10,n:"end"},
+      {t:"我要1个亿估值，少了不谈！",d:-12,n:"end"},
+      {t:"您是专业的，您觉得值多少就多少",d:-6,n:"end"}
+    ]}
+};
+
+function render(id){
+  const s=scenes[id];
+  if(id==='end'){return ending();}
+  step++;
+  const el=document.getElementById('scene');
+  el.innerHTML=`<div class="who">${s.who}</div>
+    <div class="text">${s.text}</div>
+    <div class="choices"></div>
+    <div class="step">第 ${step} / ${TOTAL} 回合</div>`;
+  const box=el.querySelector('.choices');
+  s.choices.forEach(c=>{
+    const b=document.createElement('button');b.className='choice';b.textContent=c.t;
+    b.onclick=()=>{
+      interest+=c.d;setMeter();
+      // brief reaction flash
+      const r=c.d>=10?'周维眼睛一亮，飞快地记了一笔。':c.d>0?'周维微微点头。':c.d<=-10?'周维皱起眉头，明显不悦。':'周维不置可否地“嗯”了一声。';
+      box.querySelectorAll('.choice').forEach(x=>{x.style.pointerEvents='none';x.style.opacity=.45});
+      b.style.opacity=1;b.style.borderColor=c.d>0?'#22c55e':'#ef4444';
+      const note=document.createElement('div');note.className='text';note.innerHTML=`<span class="react">${r}</span>`;
+      box.after(note);
+      const nx=document.createElement('button');nx.className='btn';nx.textContent=c.n==='end'?'听取最终结果 →':'继续 →';
+      nx.onclick=()=>render(c.n);note.appendChild(nx);
+    };
+    box.appendChild(b);
+  });
+}
+function ending(){
+  const el=document.getElementById('scene');
+  let title,verdict,vcolor,desc;
+  if(interest>=85){title="🏆 当场签下 Term Sheet！";verdict="周维伸出手：「就冲你这份清醒和真诚，我投了。」";vcolor="#14532d";
+    desc="你用真实数据、清晰壁垒和合理估值赢得了信任。记住：投资人投的不是PPT，是一个值得托付的创始人。";}
+  else if(interest>=65){title="🎉 进入下一轮尽调";verdict="「我让团队约你做尽职调查。」——一只脚已经踏进门了。";vcolor="#1e3a5f";
+    desc="表现可圈可点。融资是场马拉松，保持你的真诚和数据敏感度，下一关稳住。";}
+  else if(interest>=45){title="🤔 礼貌性的‘再联系’";verdict="「不错，保持联系，有进展告诉我。」——典型的婉拒信号。";vcolor="#4a3a0a";
+    desc="你没犯大错，但也没让他心动。复盘：哪一句话本可以更有说服力、更有数据支撑？";}
+  else{title="❌ 路演失败";verdict="周维看了看表：「今天就到这吧。」";vcolor="#4a1010";
+    desc="夸大、贬低对手或没有底气的估值，都是融资大忌。投资人阅人无数，真诚和准备永远是最优解。";}
+  el.innerHTML=`<div class="end"><h2>${title}</h2>
+    <div class="verdict" style="background:${vcolor}">${verdict}</div>
+    <p>${desc}</p>
+    <p style="text-align:center;margin-top:14px">最终兴趣度 <b style="color:#f0abfc;font-size:22px">${Math.max(0,Math.min(100,interest))}</b></p>
+    <div style="text-align:center"><button class="btn" onclick="location.reload()">重新路演</button></div></div>`;
+}
+setMeter();render('start');
+</script>
+</body>
+</html>

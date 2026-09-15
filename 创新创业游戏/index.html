@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创新创业游戏 · 选择模式</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(1100px 700px at 50% -8%,#1e1b4b,#06060f 60%);color:#e2e8f0;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 18px;overflow-x:hidden}
+  /* 背景流动光斑 */
+  .blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.5;z-index:0;animation:drift 14s ease-in-out infinite}
+  .blob.a{width:380px;height:380px;background:#0ea5e9;top:-80px;left:-60px}
+  .blob.b{width:420px;height:420px;background:#a855f7;bottom:-120px;right:-80px;animation-delay:-6s}
+  @keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,30px) scale(1.1)}}
+  .wrap{position:relative;z-index:1;width:100%;max-width:920px;text-align:center}
+  .logo{font-size:13px;letter-spacing:3px;color:#818cf8;margin-bottom:10px}
+  h1{font-size:40px;font-weight:800;background:linear-gradient(90deg,#a78bfa,#22d3ee,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent;animation:hue 8s linear infinite}
+  @keyframes hue{to{filter:hue-rotate(360deg)}}
+  .sub{color:#94a3b8;font-size:15px;margin:12px 0 6px}
+  .pick{color:#64748b;font-size:13px;margin-bottom:30px}
+  .modes{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+  .mode{position:relative;width:380px;max-width:100%;border-radius:24px;padding:30px 26px;cursor:pointer;
+    border:1.5px solid;background:#11132a;overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s;
+    text-align:left;display:block;text-decoration:none;color:inherit}
+  .mode::before{content:"";position:absolute;inset:0;opacity:.16;transition:.25s}
+  .mode:hover{transform:translateY(-8px)}
+  .mode:hover::before{opacity:.3}
+  .mode.basic{border-color:#22d3ee}
+  .mode.basic::before{background:radial-gradient(circle at 30% 20%,#0e7490,transparent 70%)}
+  .mode.basic:hover{box-shadow:0 20px 50px rgba(34,211,238,.25)}
+  .mode.adv{border-color:#c084fc}
+  .mode.adv::before{background:radial-gradient(circle at 30% 20%,#7c3aed,transparent 70%)}
+  .mode.adv:hover{box-shadow:0 20px 50px rgba(168,85,247,.3)}
+  .mode .ribbon{position:absolute;top:16px;right:-34px;transform:rotate(40deg);font-size:11px;font-weight:700;padding:3px 40px;color:#06060f}
+  .mode.basic .ribbon{background:#22d3ee}
+  .mode.adv .ribbon{background:#c084fc}
+  .mode .ic{font-size:52px;margin-bottom:8px;position:relative}
+  .mode .name{font-size:26px;font-weight:800;margin-bottom:2px;position:relative}
+  .mode.basic .name{color:#67e8f9}
+  .mode.adv .name{color:#d8b4fe}
+  .mode .cnt{font-size:13px;color:#94a3b8;margin-bottom:14px;position:relative}
+  .mode .ds{font-size:13px;color:#cbd5e1;line-height:1.7;position:relative;min-height:42px}
+  .pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;position:relative}
+  .pills span{font-size:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:3px 10px;color:#cbd5e1}
+  .enter{margin-top:18px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;position:relative}
+  .mode.basic .enter{color:#22d3ee}
+  .mode.adv .enter{color:#c084fc}
+  .mode .arrow{transition:transform .25s}
+  .mode:hover .arrow{transform:translateX(6px)}
+  footer{position:relative;z-index:1;color:#475569;font-size:12px;margin-top:30px;text-align:center;line-height:1.8}
+
+  /* —— 过渡动效 —— */
+  #trans{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    clip-path:circle(0% at 50% 50%);transition:clip-path .32s cubic-bezier(.6,.2,.2,1);pointer-events:none}
+  #trans.show{clip-path:circle(150% at var(--ox) var(--oy));pointer-events:auto}
+  #trans.basic{background:radial-gradient(circle at 50% 42%,#0e7490,#04222b 72%)}
+  #trans.adv{background:radial-gradient(circle at 50% 42%,#7c3aed,#1a0b2e 72%)}
+  #trans .tIc{font-size:74px;animation:pulse .6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+  #trans .tName{font-size:30px;font-weight:800;color:#fff;margin-top:10px;letter-spacing:2px}
+  #trans .tHint{color:rgba(255,255,255,.8);font-size:14px;margin-top:6px}
+  #trans .bar{width:240px;height:8px;background:rgba(255,255,255,.18);border-radius:6px;overflow:hidden;margin-top:20px}
+  #trans .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#fff,#fde047);border-radius:6px}
+  #trans.show .bar > i{animation:fill .5s .08s ease-out forwards}
+  @keyframes fill{to{width:100%}}
+  #trans .tEnter{margin-top:24px;display:none;background:#fff;color:#1a0b2e;font-weight:800;text-decoration:none;
+    border-radius:12px;padding:13px 30px;font-size:16px;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer}
+  #trans.late .tEnter{display:inline-block;animation:pop .3s ease-out}
+  @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+  .pt{position:absolute;font-size:26px;pointer-events:none;will-change:transform,opacity}
+  @keyframes rise{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
+</style>
+</head>
+<body>
+  <div class="blob a"></div><div class="blob b"></div>
+  <div class="wrap">
+    <div class="logo">宝鸡 · 双创 AI 实验室智能体大赛</div>
+    <h1>🎮 创新创业游戏</h1>
+    <p class="sub">15 款创业主题游戏，在玩中读懂创业</p>
+    <p class="pick">请选择你的游戏模式 ▾</p>
+
+    <div class="modes">
+      <a class="mode basic" href="basic.html" data-key="basic" data-ic="🎲" data-name="基础版">
+        <div class="ribbon">轻松上手</div>
+        <div class="ic">🎲</div>
+        <div class="name">基础版</div>
+        <div class="cnt">10 款轻量教学小游戏</div>
+        <div class="ds">经营决策、拖拽拼图、限时问答、记忆翻牌、逻辑分类……规则简单、上手即玩，适合课堂教学与双创入门。</div>
+        <div class="pills"><span>🚀经营</span><span>🧩拼图</span><span>🧠问答</span><span>🎭剧情</span><span>📊分析</span></div>
+        <div class="enter">进入基础版 <span class="arrow">→</span></div>
+      </a>
+
+      <a class="mode adv" href="advanced/index.html" data-key="adv" data-ic="🕹️" data-name="进阶版">
+        <div class="ribbon">街机硬核</div>
+        <div class="ic">🕹️</div>
+        <div class="name">进阶版</div>
+        <div class="cnt">5 款引擎级复杂游戏</div>
+        <div class="ds">俄罗斯方块、弹幕射击、跑酷闯关、连连看、祖玛。Canvas 实时引擎 + 物理 / 碰撞 / AI / 弹幕 / 粒子，配音乐音效与排行榜。</div>
+        <div class="pills"><span>🏢方块</span><span>🚀射击</span><span>🏃跑酷</span><span>🔗连看</span><span>🔮祖玛</span></div>
+        <div class="enter">进入进阶版 <span class="arrow">→</span></div>
+      </a>
+    </div>
+
+    <footer>每个游戏均可独立运行，无需联网 · 建议使用 Chrome / Edge 浏览器</footer>
+  </div>
+
+  <div id="trans">
+    <div class="tIc" id="tIc">🎲</div>
+    <div class="tName" id="tName">基础版</div>
+    <div class="tHint" id="tHint">正在进入游戏大厅…</div>
+    <div class="bar"><i></i></div>
+    <a class="tEnter" id="tEnter" href="#">👉 点击进入游戏大厅</a>
+  </div>
+
+<script>
+const trans=document.getElementById('trans');
+const BASIC_EMO=["🚀","🧩","🎤","🎰","💸","⚔️","🧠","🃏","🎭","📊"];
+const ADV_EMO=["🏢","🚀","🏃","🔗","🔮","💥","⭐","🎯","🕹️","👾"];
+let chosen=false;
+function go(target,card){
+  try{ window.location.assign(target); }
+  catch(e){ window.location.href=card.getAttribute('href'); }
+}
+function choose(card,x,y){
+  if(chosen)return;chosen=true;
+  const key=card.dataset.key, target=card.href;   // 锚点解析后的绝对地址，file:// 下最稳
+  // 点击的卡片高亮放大一下
+  card.style.transform='scale(1.06)';card.style.boxShadow='0 0 0 3px #fff8';
+  // 配置过渡层主题
+  trans.classList.add(key==='basic'?'basic':'adv');
+  document.getElementById('tIc').textContent=card.dataset.ic;
+  document.getElementById('tName').textContent=card.dataset.name;
+  trans.style.setProperty('--ox',x+'px');
+  trans.style.setProperty('--oy',y+'px');
+  // 粒子（该版本的游戏图标）从中心迸射上升
+  const emo=key==='basic'?BASIC_EMO:ADV_EMO;
+  const cx=window.innerWidth/2, cy=window.innerHeight*0.45;
+  for(let i=0;i<26;i++){
+    const s=document.createElement('div');s.className='pt';
+    s.textContent=emo[i%emo.length];
+    s.style.left=cx+'px';s.style.top=cy+'px';
+    const ang=Math.random()*Math.PI*2, dist=120+Math.random()*260;
+    s.style.setProperty('--dx',Math.cos(ang)*dist+'px');
+    s.style.setProperty('--dy',(Math.sin(ang)*dist-160)+'px');
+    s.style.setProperty('--rot',(Math.random()*120-60)+'deg');
+    s.style.animation=`rise ${0.45+Math.random()*0.35}s ${0.03+Math.random()*0.12}s ease-out forwards`;
+    s.style.fontSize=(20+Math.random()*22)+'px';
+    trans.appendChild(s);
+  }
+  // 兜底按钮指向真实相对链接（原生跳转，最兼容）
+  const enter=document.getElementById('tEnter');
+  enter.setAttribute('href',card.getAttribute('href'));
+  // 整个过渡层也可点击进入（以防自动跳转被环境拦截）
+  trans.style.cursor='pointer';
+  trans.addEventListener('click',e=>{ if(e.target!==enter) go(target,card); });
+  requestAnimationFrame(()=>trans.classList.add('show'));
+  setTimeout(()=>go(target,card),650);                       // 尝试自动进入
+  setTimeout(()=>{                                            // 仍在本页 → 亮出手动按钮
+    trans.classList.add('late');
+    document.getElementById('tHint').textContent='若没有自动进入，请点下面的按钮 👇';
+  },1200);
+}
+document.querySelectorAll('.mode').forEach(card=>{
+  card.addEventListener('click',e=>{e.preventDefault();choose(card,e.clientX||innerWidth/2,e.clientY||innerHeight/2);});
+});
+</script>
+</body>
+</html>

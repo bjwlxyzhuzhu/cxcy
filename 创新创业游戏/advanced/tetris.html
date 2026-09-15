@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>独角兽大厦 · 创业版俄罗斯方块</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  :root{--bg:#0a0e1a;--panel:#141a2e;--line:#27304d;--txt:#e2e8f0;--accent:#a78bfa}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:radial-gradient(900px 600px at 50% -10%,#1e1b4b,#070910 60%);color:var(--txt);
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;overflow-x:hidden}
+  .topbar{width:100%;max-width:720px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .topbar a{color:#94a3b8;text-decoration:none;font-size:14px}.topbar a:hover{color:#fff}
+  h1{font-size:22px;background:linear-gradient(90deg,#a78bfa,#22d3ee,#facc15);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
+  .sub{color:#94a3b8;font-size:13px;text-align:center;margin:4px 0 12px}
+  .game{display:flex;gap:14px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+  .side{display:flex;flex-direction:column;gap:10px;width:150px}
+  .board-wrap{position:relative}
+  canvas{display:block;background:#070b16;border:2px solid var(--line);border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .box h3{font-size:12px;color:#94a3b8;letter-spacing:1px;margin-bottom:6px;text-transform:uppercase}
+  .mini{display:flex;flex-direction:column;gap:6px;align-items:center}
+  .stat{display:flex;justify-content:space-between;font-size:13px;margin:3px 0}
+  .stat b{color:#facc15;font-variant-numeric:tabular-nums}
+  .floor-track{height:8px;background:#0a0e1a;border-radius:6px;overflow:hidden;margin-top:6px}
+  .floor-track i{display:block;height:100%;background:linear-gradient(90deg,#22d3ee,#a78bfa);width:0;transition:width .3s}
+  .legend{font-size:11px;color:#94a3b8;line-height:1.7}
+  .legend span{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  .controls{font-size:11px;color:#94a3b8;line-height:1.8}
+  .controls kbd{background:#1e2742;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;font-family:inherit;color:#cbd5e1;font-size:10px}
+  .overlay{position:absolute;inset:0;background:rgba(7,11,22,.93);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;z-index:5}
+  .overlay h2{font-size:24px;margin-bottom:8px}
+  .overlay p{color:#cbd5e1;font-size:13px;line-height:1.7;margin-bottom:5px}
+  .btn{background:linear-gradient(90deg,#7c3aed,#22d3ee);color:#fff;border:none;border-radius:9px;padding:11px 24px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px}
+  .btn:hover{opacity:.92}
+  .toast{position:absolute;left:50%;top:30%;transform:translateX(-50%);background:rgba(124,58,237,.92);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;pointer-events:none;opacity:0;white-space:nowrap;z-index:6;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .toast.show{animation:toast 1.8s ease-out}
+  @keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}15%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-14px)}}
+  .touch{display:none;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center;max-width:330px}
+  .touch button{flex:1;min-width:60px;background:#1e2742;border:1px solid var(--line);color:#e2e8f0;border-radius:8px;padding:12px 0;font-size:13px;font-weight:600}
+  @media(hover:none){.touch{display:flex}}
+  @media(max-width:560px){.side{width:46%}.game{gap:8px}}
+</style>
+</head>
+<body>
+  <div class="topbar"><a href="index.html">← 返回游戏大厅</a><span style="font-size:13px;color:#64748b">复杂游戏 · 俄罗斯方块</span></div>
+  <h1>🏢 独角兽大厦</h1>
+  <p class="sub">把「部门方块」一层层垒成大厦 · 填满整行=盖好一层楼 · 冲击 IPO 敲钟层！</p>
+
+  <div class="game">
+    <div class="side">
+      <div class="box"><h3>暂存 HOLD</h3><div class="mini"><canvas id="hold" width="120" height="80"></canvas></div></div>
+      <div class="box">
+        <div class="stat"><span>得分</span><b id="score">0</b></div>
+        <div class="stat"><span>楼层</span><b id="floor">0</b></div>
+        <div class="stat"><span>消行</span><b id="lines">0</b></div>
+        <div class="stat"><span>等级</span><b id="level">1</b></div>
+        <div class="stat"><span>最高</span><b id="best">0</b></div>
+      </div>
+      <div class="box"><h3>距 IPO</h3>
+        <div style="font-size:12px;color:#cbd5e1">还需 <b id="togo" style="color:#22d3ee">40</b> 层</div>
+        <div class="floor-track"><i id="floorbar"></i></div>
+      </div>
+    </div>
+
+    <div class="board-wrap">
+      <canvas id="board" width="300" height="600"></canvas>
+      <div class="toast" id="toast"></div>
+      <div class="overlay" id="overlay">
+        <h2>🏗️ 准备开工</h2>
+        <p>方向键移动，↑旋转，空格硬降<br>C暂存，P暂停。<br>每盖满一行楼，公司就长高一层。</p>
+        <button class="btn" id="startBtn">开始建造</button>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="box"><h3>下一个 NEXT</h3><div class="mini" id="nextMini">
+        <canvas id="next0" width="120" height="60"></canvas>
+        <canvas id="next1" width="120" height="48"></canvas>
+        <canvas id="next2" width="120" height="48"></canvas>
+      </div></div>
+      <div class="box"><h3>部门图例</h3><div class="legend" id="legend"></div></div>
+      <div class="box"><h3>操作</h3><div class="controls">
+        <kbd>←</kbd><kbd>→</kbd> 移动 · <kbd>↓</kbd> 软降<br>
+        <kbd>↑</kbd>/<kbd>X</kbd> 顺旋 · <kbd>Z</kbd> 逆旋<br>
+        <kbd>空格</kbd> 硬降 · <kbd>C</kbd> 暂存<br>
+        <kbd>P</kbd> 暂停
+      </div></div>
+    </div>
+  </div>
+
+  <div class="touch">
+    <button data-k="left">◀</button>
+    <button data-k="rotate">⟳</button>
+    <button data-k="right">▶</button>
+    <button data-k="soft">▼</button>
+    <button data-k="hard">⤓ 硬降</button>
+    <button data-k="hold">暂存</button>
+  </div>
+
+<script src="engine.js"></script>
+<script>
+"use strict";
+/* ====================== 创新创业 · 独角兽大厦 (现代标准 Tetris) ======================
+   实现：SRS旋转+踢墙表+T-Spin / 7-bag / Hold / Ghost / Next / 软硬降 /
+        锁定延迟 / DAS-ARR / 连击+Back-to-Back+消行计分 / 重力曲线 /
+        楼层(IPO)目标 + 事件彩蛋 + 双创知识点 toast + 最高分(localStorage)
+======================================================================================= */
+
+const COLS=10, ROWS=20, CELL=30;
+const GOAL_FLOORS=40;                 // 盖到40层 = 上市敲钟
+const LOCK_DELAY=500, MAX_LOCK_RESETS=15;
+const DAS=150, ARR=40, SOFT_MS=28;    // 自动位移延迟/间隔，软降速度
+const STEP=1000/60;
+
+// —— 7 种方块（部门）定义：颜色 + 初始矩阵（1=实心）——
+const PIECES={
+  I:{dept:"研发",color:"#22d3ee",m:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]]},
+  O:{dept:"财务",color:"#facc15",m:[[1,1],[1,1]]},
+  T:{dept:"产品",color:"#a855f7",m:[[0,1,0],[1,1,1],[0,0,0]]},
+  S:{dept:"市场",color:"#22c55e",m:[[0,1,1],[1,1,0],[0,0,0]]},
+  Z:{dept:"运营",color:"#ef4444",m:[[1,1,0],[0,1,1],[0,0,0]]},
+  J:{dept:"人力",color:"#3b82f6",m:[[1,0,0],[1,1,1],[0,0,0]]},
+  L:{dept:"销售",color:"#f97316",m:[[0,0,1],[1,1,1],[0,0,0]]}
+};
+const TYPES=Object.keys(PIECES);
+
+// —— SRS 踢墙表（已转换为屏幕坐标 [dCol, dRow]，dRow 向下为正）——
+const KICK_JLSTZ={
+ "0>1":[[0,0],[-1,0],[-1,-1],[0,2],[-1,2]],
+ "1>0":[[0,0],[1,0],[1,1],[0,-2],[1,-2]],
+ "1>2":[[0,0],[1,0],[1,1],[0,-2],[1,-2]],
+ "2>1":[[0,0],[-1,0],[-1,-1],[0,2],[-1,2]],
+ "2>3":[[0,0],[1,0],[1,-1],[0,2],[1,2]],
+ "3>2":[[0,0],[-1,0],[-1,1],[0,-2],[-1,-2]],
+ "3>0":[[0,0],[-1,0],[-1,1],[0,-2],[-1,-2]],
+ "0>3":[[0,0],[1,0],[1,-1],[0,2],[1,2]]
+};
+const KICK_I={
+ "0>1":[[0,0],[-2,0],[1,0],[-2,1],[1,-2]],
+ "1>0":[[0,0],[2,0],[-1,0],[2,-1],[-1,2]],
+ "1>2":[[0,0],[-1,0],[2,0],[-1,-2],[2,1]],
+ "2>1":[[0,0],[1,0],[-2,0],[1,2],[-2,-1]],
+ "2>3":[[0,0],[2,0],[-1,0],[2,-1],[-1,2]],
+ "3>2":[[0,0],[-2,0],[1,0],[-2,1],[1,-2]],
+ "3>0":[[0,0],[1,0],[-2,0],[1,2],[-2,-1]],
+ "0>3":[[0,0],[-1,0],[2,0],[-1,-2],[2,1]]
+};
+
+const KNOWLEDGE=[
+ "🏢 第10层：现金流是企业的血液，别让它断。",
+ "🏢 第20层：找到 PMF（产品与市场契合）再谈规模化。",
+ "🏢 第30层：护城河决定你能守住多少利润。",
+ "🏢 第40层：上市不是终点，是新责任的起点。"
+];
+
+// ===================== 状态 =====================
+let board, cur, hold, canHold, bag, nextQ, rng;
+let score, lines, floors, level, best=0;
+let gravAccum, lockTimer, lockResets, grounded, lastWasRotate, lastKick, b2b, combo;
+let softDrop, dasDir, dasTimer;
+let state="ready"; // ready / play / pause / over
+let acc=0, lastT=0, rafId=null;
+const keys={};
+
+// ===================== Canvas =====================
+const boardC=document.getElementById('board'), bx=boardC.getContext('2d');
+const holdC=document.getElementById('hold'), hx=holdC.getContext('2d');
+const nextCs=[0,1,2].map(i=>document.getElementById('next'+i));
+const nextXs=nextCs.map(c=>c.getContext('2d'));
+const overlay=document.getElementById('overlay');
+const toastEl=document.getElementById('toast');
+
+// ===================== 工具 =====================
+function loadBest(){try{best=+(localStorage.getItem('uni_tower_best')||0)||0;}catch(e){best=0;}document.getElementById('best').textContent=best;}
+function saveBest(){try{if(score>best){best=score;localStorage.setItem('uni_tower_best',String(best));}}catch(e){}}
+function emptyBoard(){return Array.from({length:ROWS},()=>Array(COLS).fill(null));}
+function rotateCW(m){const n=m.length,r=Array.from({length:n},()=>Array(n).fill(0));for(let i=0;i<n;i++)for(let j=0;j<n;j++)r[i][j]=m[n-1-j][i];return r;}
+function rotateCCW(m){const n=m.length,r=Array.from({length:n},()=>Array(n).fill(0));for(let i=0;i<n;i++)for(let j=0;j<n;j++)r[i][j]=m[j][n-1-i];return r;}
+function cellsOf(piece){const out=[];const m=piece.m;for(let r=0;r<m.length;r++)for(let c=0;c<m[r].length;c++)if(m[r][c])out.push([piece.y+r,piece.x+c]);return out;}
+function collides(piece){for(const [r,c] of cellsOf(piece)){if(c<0||c>=COLS||r>=ROWS)return true;if(r>=0&&board[r][c])return true;}return false;}
+
+// ===================== 7-bag 随机器 =====================
+function refillBag(){bag=TYPES.slice();for(let i=bag.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[bag[i],bag[j]]=[bag[j],bag[i]];}}
+function nextType(){if(!bag||!bag.length)refillBag();return bag.pop();}
+function spawn(){
+  const type=nextQ.shift();nextQ.push(nextType());
+  const def=PIECES[type];
+  const m=def.m.map(r=>r.slice());
+  const p={type,color:def.color,dept:def.dept,m,rot:0,x:(type==='O')?4:3,y:0};
+  if(type==='I')p.y=0;
+  cur=p;canHold=true;grounded=false;lockTimer=null;lockResets=0;lastWasRotate=false;gravAccum=0;
+  if(collides(cur)){gameOver();return;}
+  drawNext();
+}
+
+// ===================== 旋转 + 踢墙 =====================
+function tryRotate(dir){ // dir:+1 顺时针, -1 逆时针
+  if(cur.type==='O')return;
+  const from=cur.rot, to=(from+dir+4)%4;
+  const newM=dir>0?rotateCW(cur.m):rotateCCW(cur.m);
+  const table=cur.type==='I'?KICK_I:KICK_JLSTZ;
+  const kicks=table[from+">"+to]||[[0,0]];
+  for(const [dx,dy] of kicks){
+    const test={...cur,m:newM,x:cur.x+dx,y:cur.y+dy};
+    if(!collides(test)){
+      cur=test;cur.rot=to;lastWasRotate=true;lastKick=[dx,dy];
+      onMoved();Sound.sfx('rotate');return true;
+    }
+  }
+  return false;
+}
+
+// ===================== 平移 / 下落 =====================
+function move(dx,dy){
+  const test={...cur,x:cur.x+dx,y:cur.y+dy};
+  if(collides(test))return false;
+  cur=test;if(dx!==0)lastWasRotate=false;onMoved();
+  return true;
+}
+function onMoved(){ // 触地时重置锁定延迟（有上限）
+  const below={...cur,y:cur.y+1};
+  if(collides(below)){
+    if(lockTimer!==null&&lockResets<MAX_LOCK_RESETS){lockTimer=LOCK_DELAY;lockResets++;}
+  }
+}
+function hardDrop(){
+  let d=0;while(!collides({...cur,y:cur.y+1})){cur.y++;d++;}
+  score+=d*2;lastWasRotate=false;lockPiece();
+}
+function ghostY(){let gy=cur.y;while(!collides({...cur,y:gy+1}))gy++;return gy;}
+
+// ===================== 锁定 + 消行 + 计分 =====================
+function isTSpin(){
+  if(cur.type!=='T'||!lastWasRotate)return 0;
+  // T 的 3x3 四角
+  const corners=[[0,0],[0,2],[2,0],[2,2]];
+  let occ=0, front=0;
+  corners.forEach(([r,c],idx)=>{
+    const ar=cur.y+r, ac=cur.x+c;
+    const filled=(ac<0||ac>=COLS||ar>=ROWS)||(ar>=0&&board[ar][ac]);
+    if(filled)occ++;
+  });
+  if(occ<3)return 0;
+  // 简化 mini/full：用踢墙幅度判断，大幅踢入算 full
+  return (Math.abs(lastKick[0])+Math.abs(lastKick[1])>=2)?2:1; // 2=full,1=mini
+}
+function lockPiece(){
+  const cells=cellsOf(cur);
+  if(cells.every(([r])=>r<0)){gameOver();return;} // 顶出
+  const tspin=isTSpin();
+  for(const [r,c] of cells){if(r<0){gameOver();return;}board[r][c]=cur.color;}
+  Sound.sfx('lock');
+  flashAndClear(tspin);
+}
+function flashAndClear(tspin){
+  // 找满行
+  const full=[];
+  for(let r=0;r<ROWS;r++)if(board[r].every(c=>c))full.push(r);
+  const n=full.length;
+  scoreClear(n,tspin);
+  if(state==="over")return;
+  if(n>0){
+    state="clearing";
+    clearFlash=full.slice();flashT=0;
+    pendingClear=full.slice();
+  }else{
+    spawn();
+  }
+}
+let clearFlash=[],flashT=0,pendingClear=[];
+function finishClear(){
+  // 移除满行（此时棋盘稳定，安全做事件）
+  pendingClear.sort((a,b)=>a-b);
+  for(const r of pendingClear){board.splice(r,1);board.unshift(Array(COLS).fill(null));}
+  clearFlash=[];pendingClear=[];
+  state="play";
+  postClearEvents();
+  if(state==="over")return;
+  spawn();
+}
+function scoreClear(n,tspin){
+  let pts=0,label="";
+  if(tspin){
+    if(n===0){pts=tspin===2?400:100;label=tspin===2?"🌀 T-Spin 空转!":"🌀 T-Spin Mini";}
+    else{
+      const full=[0,800,1200,1600], mini=[0,200,400,400];
+      pts=(tspin===2?full:mini)[n];
+      label=(tspin===2?"🌀 T-Spin ":"🌀 T-Spin Mini ")+["","单消","双消","三消"][n];
+    }
+  }else{
+    pts=[0,100,300,500,800][n]||0;
+    label=["","🏢 盖好1层","🏢 双连楼!","🏢 三连楼!!","🏢 摩天四连!!!"][n]||"";
+  }
+  if(n>0){
+    const hard=(n===4)||(tspin>0);
+    if(hard&&b2b){pts=Math.floor(pts*1.5);label+=" B2B×1.5";}
+    b2b=hard;
+    combo++;
+    if(combo>1)pts+=50*(combo-1);
+    score+=pts*level;
+    lines+=n;floors+=n;
+    if(label)toast(label+(combo>1?`  连击×${combo}`:""));
+    Sound.sfx(n>=4?'bigclear':'clear');
+  }else{
+    combo=0;
+    if(tspin){score+=pts*level;toast(label);}
+  }
+  const oldLevel=level;
+  level=Math.min(20,Math.floor(lines/10)+1);
+  if(level>oldLevel)Sound.sfx('levelup');
+  updateHUD();saveBest();
+}
+let lastTier=0;
+function postClearEvents(){ // 在棋盘稳定后执行，避免打乱消行索引
+  // 「政策利好」：低概率白送清掉最底一行
+  if(Math.random()<0.06){
+    for(let r=ROWS-1;r>=0;r--){
+      if(board[r].some(c=>c)){
+        board.splice(r,1);board.unshift(Array(COLS).fill(null));
+        floors++;lines++;score+=120*level;updateHUD();
+        setTimeout(()=>toast("📜 政策利好！白送一层楼"),600);
+        break;
+      }
+    }
+  }
+  // 楼层知识点里程碑（每跨10层提示一次）
+  const tier=Math.floor(floors/10);
+  if(tier>0&&tier<=KNOWLEDGE.length&&tier!==lastTier){
+    lastTier=tier;const k=KNOWLEDGE[tier-1];setTimeout(()=>toast(k),500);
+  }
+  // 通关
+  if(floors>=GOAL_FLOORS)winGame();
+}
+
+// ===================== Hold =====================
+function doHold(){
+  if(!canHold)return;
+  lastWasRotate=false;
+  const curType=cur.type;
+  if(hold===null){hold=curType;spawn();}
+  else{const h=hold;hold=curType;
+    const def=PIECES[h];
+    cur={type:h,color:def.color,dept:def.dept,m:def.m.map(r=>r.slice()),rot:0,x:(h==='O')?4:3,y:0};
+    grounded=false;lockTimer=null;lockResets=0;gravAccum=0;
+    if(collides(cur)){gameOver();return;}
+  }
+  canHold=false;drawHold();
+}
+
+// ===================== 重力 =====================
+function gravityInterval(){
+  const t=Math.pow(0.8-((level-1)*0.007),level-1)*1000;
+  return Math.max(16,Math.min(1000,t));
+}
+
+// ===================== 更新 =====================
+function update(dt){
+  if(state==="clearing"){
+    flashT+=dt;
+    if(flashT>=180)finishClear();
+    return;
+  }
+  if(state!=="play")return;
+
+  // DAS / ARR 水平移动
+  let dir=0;
+  if(keys.left&&!keys.right)dir=-1;else if(keys.right&&!keys.left)dir=1;
+  if(dir!==dasDir){dasDir=dir;if(dir){move(dir,0);dasTimer=DAS;}}
+  else if(dir){dasTimer-=dt;if(dasTimer<=0){if(move(dir,0))dasTimer=ARR;else dasTimer=ARR;}}
+
+  // 触地判定
+  grounded=collides({...cur,y:cur.y+1});
+
+  if(grounded){
+    if(lockTimer===null)lockTimer=LOCK_DELAY;
+    lockTimer-=dt;
+    if(lockTimer<=0){lockPiece();return;}
+  }else{
+    lockTimer=null;lockResets=0;
+    const interval=softDrop?Math.min(gravityInterval(),SOFT_MS):gravityInterval();
+    gravAccum+=dt;
+    while(gravAccum>=interval){
+      gravAccum-=interval;
+      if(move(0,1)){if(softDrop)score+=1;}
+      else break;
+    }
+  }
+}
+
+// ===================== 渲染 =====================
+function drawCell(ctx,x,y,size,color,alpha){
+  ctx.globalAlpha=alpha==null?1:alpha;
+  ctx.fillStyle=color;
+  ctx.fillRect(x+1,y+1,size-2,size-2);
+  // 高光
+  ctx.globalAlpha=(alpha==null?1:alpha)*0.35;
+  ctx.fillStyle="#ffffff";
+  ctx.fillRect(x+1,y+1,size-2,4);
+  ctx.fillRect(x+1,y+1,4,size-2);
+  ctx.globalAlpha=(alpha==null?1:alpha)*0.25;
+  ctx.fillStyle="#000000";
+  ctx.fillRect(x+1,y+size-4,size-2,3);
+  ctx.globalAlpha=1;
+}
+function render(){
+  bx.clearRect(0,0,boardC.width,boardC.height);
+  // 网格
+  bx.strokeStyle="rgba(255,255,255,.04)";bx.lineWidth=1;
+  for(let c=0;c<=COLS;c++){bx.beginPath();bx.moveTo(c*CELL,0);bx.lineTo(c*CELL,ROWS*CELL);bx.stroke();}
+  for(let r=0;r<=ROWS;r++){bx.beginPath();bx.moveTo(0,r*CELL);bx.lineTo(COLS*CELL,r*CELL);bx.stroke();}
+  // 已落定
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    if(board[r][c]){
+      const flashing=clearFlash.includes(r);
+      drawCell(bx,c*CELL,r*CELL,CELL,flashing?"#ffffff":board[r][c]);
+    }
+  }
+  if(state==="play"||state==="pause"){
+    // Ghost
+    const gy=ghostY();
+    for(const [r,c] of cellsOf({...cur,y:gy})){if(r>=0)drawCell(bx,c*CELL,r*CELL,CELL,cur.color,0.22);}
+    // 当前块
+    for(const [r,c] of cellsOf(cur)){if(r>=0)drawCell(bx,c*CELL,r*CELL,CELL,cur.color);}
+  }
+}
+function drawPieceMini(ctx,canvas,type){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!type)return;
+  const def=PIECES[type];const m=def.m;
+  // 计算包围盒
+  let minR=9,maxR=-1,minC=9,maxC=-1;
+  for(let r=0;r<m.length;r++)for(let c=0;c<m[r].length;c++)if(m[r][c]){minR=Math.min(minR,r);maxR=Math.max(maxR,r);minC=Math.min(minC,c);maxC=Math.max(maxC,c);}
+  const w=maxC-minC+1,h=maxR-minR+1,s=18;
+  const ox=(canvas.width-w*s)/2, oy=(canvas.height-h*s)/2;
+  for(let r=minR;r<=maxR;r++)for(let c=minC;c<=maxC;c++)if(m[r][c])drawCell(ctx,ox+(c-minC)*s,oy+(r-minR)*s,s,def.color);
+}
+function drawHold(){drawPieceMini(hx,holdC,hold);}
+function drawNext(){nextCs.forEach((cv,i)=>drawPieceMini(nextXs[i],cv,nextQ[i]));}
+
+// ===================== HUD / Toast =====================
+function updateHUD(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('floor').textContent=floors;
+  document.getElementById('lines').textContent=lines;
+  document.getElementById('level').textContent=level;
+  document.getElementById('best').textContent=Math.max(best,score);
+  const togo=Math.max(0,GOAL_FLOORS-floors);
+  document.getElementById('togo').textContent=togo;
+  document.getElementById('floorbar').style.width=Math.min(100,floors/GOAL_FLOORS*100)+'%';
+}
+let toastTimer=null;
+function toast(msg){
+  toastEl.textContent=msg;toastEl.classList.remove('show');void toastEl.offsetWidth;toastEl.classList.add('show');
+}
+
+// ===================== 游戏流程 =====================
+function startGame(){
+  board=emptyBoard();hold=null;canHold=true;score=0;lines=0;floors=0;level=1;
+  b2b=false;combo=0;softDrop=false;dasDir=0;dasTimer=0;lastTier=0;clearFlash=[];pendingClear=[];
+  refillBag();nextQ=[nextType(),nextType(),nextType(),nextType(),nextType()];
+  state="play";overlay.style.display="none";
+  drawHold();drawNext();updateHUD();
+  spawn();
+  buildLegend();
+  GameKit.begin();
+  if(!rafId){lastT=performance.now();rafId=requestAnimationFrame(frame);}
+}
+function gameOver(){
+  state="over";saveBest();loadBest();GameKit.stop();Sound.sfx('gameover');
+  const lb=GameKit.finish(score);
+  overlay.style.display="flex";
+  overlay.innerHTML=`<h2>🏚️ 大厦封顶失败</h2>
+    <p>方块堆到了顶端，建造中止。</p>
+    <p>盖到 <b style="color:#facc15">${floors}</b> 层 · 得分 <b style="color:#facc15">${score}</b></p>
+    ${lb.rank?`<p style="color:#a78bfa;font-size:13px">🏆 冲上排行榜第 ${lb.rank} 名！</p>`:''}
+    <div style="background:#0d1322;border-radius:10px;padding:6px 10px;margin:8px 0;width:100%;max-width:240px">${lb.html}</div>
+    <button class="btn" id="restart">重新建造</button>`;
+  document.getElementById('restart').onclick=startGame;
+}
+function winGame(){
+  state="over";saveBest();loadBest();GameKit.stop();Sound.sfx('win');
+  const lb=GameKit.finish(score);
+  overlay.style.display="flex";
+  overlay.innerHTML=`<h2>🔔 敲钟上市！</h2>
+    <p>你把公司盖到了第 ${GOAL_FLOORS} 层，成为<b style="color:#a78bfa">独角兽</b>！</p>
+    <p>最终得分 <b style="color:#facc15;font-size:20px">${score}</b></p>
+    ${lb.rank?`<p style="color:#a78bfa;font-size:13px">🏆 排行榜第 ${lb.rank} 名！</p>`:''}
+    <div style="background:#0d1322;border-radius:10px;padding:6px 10px;margin:8px 0;width:100%;max-width:240px">${lb.html}</div>
+    <button class="btn" id="restart">再建一座</button>`;
+  document.getElementById('restart').onclick=startGame;
+}
+function togglePause(){
+  if(state==="play"){state="pause";overlay.style.display="flex";
+    overlay.innerHTML=`<h2>⏸️ 暂停</h2><p>休息一下，喝口水。</p><button class="btn" id="resume">继续建造</button>`;
+    document.getElementById('resume').onclick=togglePause;
+  }else if(state==="pause"){state="play";overlay.style.display="none";}
+}
+function buildLegend(){
+  document.getElementById('legend').innerHTML=TYPES.map(t=>`<div><span style="background:${PIECES[t].color}"></span>${PIECES[t].dept}</div>`).join('');
+}
+
+// ===================== 主循环 =====================
+function frame(now){
+  const dt=now-lastT;lastT=now;
+  acc+=Math.min(dt,100);
+  while(acc>=STEP){update(STEP);acc-=STEP;}
+  render();
+  rafId=requestAnimationFrame(frame);
+}
+
+// ===================== 输入 =====================
+window.addEventListener('keydown',e=>{
+  if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"," ","Spacebar"].includes(e.key))e.preventDefault();
+  if(state!=="play"){
+    if((e.key==='Enter'||e.key===' ')&&(state==="ready"||state==="over")){startGame();}
+    if((e.key==='p'||e.key==='P')&&state==="pause")togglePause();
+    return;
+  }
+  if(e.repeat&&!(e.key==='ArrowLeft'||e.key==='ArrowRight'||e.key==='ArrowDown'))return;
+  switch(e.key){
+    case 'ArrowLeft':keys.left=true;break;
+    case 'ArrowRight':keys.right=true;break;
+    case 'ArrowDown':softDrop=true;keys.down=true;break;
+    case 'ArrowUp':case 'x':case 'X':tryRotate(1);break;
+    case 'z':case 'Z':tryRotate(-1);break;
+    case ' ':case 'Spacebar':hardDrop();break;
+    case 'c':case 'C':doHold();break;
+    case 'p':case 'P':togglePause();break;
+  }
+});
+window.addEventListener('keyup',e=>{
+  switch(e.key){
+    case 'ArrowLeft':keys.left=false;break;
+    case 'ArrowRight':keys.right=false;break;
+    case 'ArrowDown':softDrop=false;keys.down=false;break;
+  }
+});
+// 触屏按钮
+document.querySelectorAll('.touch button').forEach(b=>{
+  const k=b.dataset.k;
+  const press=ev=>{ev.preventDefault();if(state!=="play"){if(k==='hard')startGame();return;}
+    if(k==='left'){keys.left=true;}
+    else if(k==='right'){keys.right=true;}
+    else if(k==='soft'){softDrop=true;}
+    else if(k==='rotate'){tryRotate(1);}
+    else if(k==='hard'){hardDrop();}
+    else if(k==='hold'){doHold();}
+  };
+  const release=()=>{if(k==='left')keys.left=false;if(k==='right')keys.right=false;if(k==='soft')softDrop=false;};
+  b.addEventListener('touchstart',press,{passive:false});
+  b.addEventListener('touchend',release);
+  b.addEventListener('mousedown',press);
+  b.addEventListener('mouseup',release);
+  b.addEventListener('mouseleave',release);
+});
+
+document.getElementById('startBtn').onclick=startGame;
+board=emptyBoard();loadBest();buildLegend();render();
+GameKit.mount({key:'tetris',title:'🏢 独角兽大厦',bgm:'tetris',help:`
+  <h3>🎯 目标</h3><p>把「部门方块」一层层垒成大厦，填满一整行即<b>盖好一层楼</b>并消除。盖到第 40 层即<b>敲钟上市</b>，成为独角兽！</p>
+  <h3>🎮 操作</h3><ul><li><b>← →</b> 移动 · <b>↓</b> 软降 · <b>空格</b> 硬降</li><li><b>↑ / X</b> 顺时针旋转 · <b>Z</b> 逆时针</li><li><b>C</b> 暂存方块 · <b>P</b> 暂停</li></ul>
+  <h3>💡 高分攻略</h3>
+  <div class="tip">① <b>专攻四连(Tetris)</b>：留一列空着，用长条 I 块一次消 4 行，得分是单行的 8 倍。</div>
+  <div class="tip">② 连续 Tetris 或 T-Spin 会触发 <b>Back-to-Back ×1.5</b> 加成，连击越多额外分越高。</div>
+  <div class="tip">③ 善用 <b>Ghost 落点预测</b> 与 <b>Hold 暂存</b>，不顺手的块先存起来等时机。</div>
+  <div class="tip">④ 保持地形平整、别堆太高，给旋转和插入留出空间。</div>`});
+</script>
+</body>
+</html>
