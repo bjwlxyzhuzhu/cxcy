@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/api-client";
 import AccountPanel from "./AccountPanel";
 import LoginModal from "./LoginModal";
 
@@ -16,13 +16,12 @@ export default function AccountButton({ accent = "#22d3ee" }: { accent?: string 
   const [loginOpen, setLoginOpen] = useState(false);
 
   function loadAuth() {
-    const supabase = createClient();
-    // getSession 读本地会话（不联网校验），避免国内访问 Supabase 美国节点超时被误判为未登录
-    supabase.auth.getSession().then(({ data }) => {
-      const u = data.session?.user;
+    const api = createClient();
+    api.auth.getSession().then(({ data }) => {
+      const u = data.user;
       if (!u) { setAuthed(false); return; }
       setAuthed(true);
-      supabase.from("profiles").select("name,student_no,role,credits").eq("id", u.id).single()
+      api.from<Prof & { student_no?: string | null }>("profiles").select("name,student_no,role,credits").eq("id", u.id).single()
         .then(({ data: p }) => setProf({ name: p?.name ?? null, studentNo: p?.student_no ?? null, role: p?.role ?? null, credits: p?.credits ?? null }));
     });
   }

@@ -18,9 +18,12 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
-# 服务端密钥（SUPABASE_SERVICE_ROLE_KEY / APIMART_*）运行期由 env_file 注入，不打进镜像
+# 服务端密钥（DATABASE_URL / SESSION_SECRET / AI keys）运行期由 Stack 注入，不打进镜像
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts/start-container.sh ./scripts/start-container.sh
+COPY --from=builder /app/scripts/migrate.mjs ./scripts/migrate.mjs
+COPY --from=builder /app/scripts/seed.mjs ./scripts/seed.mjs
+COPY --from=builder /app/db/migrations ./db/migrations
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 EXPOSE 3000

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/db-client";
 
 export const runtime = "nodejs";
 
@@ -54,7 +54,7 @@ export async function GET() {
   };
 
   const [visits, students, chats, docs, events] = await Promise.all([
-    (async () => { try { const { data } = await admin.from("site_visits").select("count"); return (data || []).reduce((s, r) => s + (r.count || 0), 0); } catch { return 0; } })(),
+    (async () => { try { const { data } = await admin.from("site_visits").select("count"); return (data || []).reduce((s: number, r: { count?: number }) => s + (r.count || 0), 0); } catch { return 0; } })(),
     safeCount(admin.from("profiles").select("id", { count: "exact", head: true }).eq("role", "student")),
     safeCount(admin.from("usage_logs").select("id", { count: "exact", head: true })),
     safeCount(admin.from("evidence_events").select("id", { count: "exact", head: true }).in("kind", ["export_doc", "bp_draft", "crew_final"])),
@@ -71,15 +71,15 @@ export async function GET() {
   // 姓名脱敏拼动态
   let feed: { text: string; time: string }[] = [];
   if (events.length) {
-    const ids = [...new Set(events.map((e) => e.user_id))];
+    const ids = [...new Set(events.map((e: { user_id: string }) => e.user_id))];
     let names: Record<string, string | null> = {};
     try {
       const { data: profs } = await admin.from("profiles").select("id, name").in("id", ids);
-      names = Object.fromEntries((profs || []).map((p) => [p.id, p.name]));
+      names = Object.fromEntries((profs || []).map((p: { id: string; name: string | null }) => [p.id, p.name]));
     } catch { /* 名字取不到就全用"某同学" */ }
     feed = events
-      .filter((e) => KIND_TEXT[e.kind])
-      .map((e) => ({
+      .filter((e: { kind: string }) => KIND_TEXT[e.kind])
+      .map((e: { user_id: string; kind: string; dims: unknown; created_at: string }) => ({
         text: `${mask(names[e.user_id])} ${KIND_TEXT[e.kind](e.kind, (e.dims as { total?: number } | null)?.total)}`,
         time: ago(e.created_at),
       }));

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/api-client";
 
 const ACTION_LABEL: Record<string, string> = { chat: "对话", topic: "选题", text: "文本生成", ppt: "PPT", image: "配图", defense: "答辩", data: "数据分析", tts: "语音" };
 type Log = { user_id: string; action: string; cost: number; created_at: string };
@@ -12,10 +12,10 @@ export default function UsageStats() {
 
   useEffect(() => {
     (async () => {
-      const supabase = createClient();
+      const api = createClient();
       const [{ data: l }, { data: p }] = await Promise.all([
-        supabase.from("usage_logs").select("user_id,action,cost,created_at").order("created_at", { ascending: false }).limit(5000),
-        supabase.from("profiles").select("id,name,student_no").limit(2000),
+        api.from("usage_logs").select("user_id,action,cost,created_at").order("created_at", { ascending: false }).limit(5000),
+        api.from("profiles").select("id,name,student_no").limit(2000),
       ]);
       setLogs((l as Log[]) || []);
       const m: Record<string, string> = {};

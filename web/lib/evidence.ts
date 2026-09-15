@@ -1,7 +1,7 @@
 // 成长星图 · 证据事件层（服务端）。
 // 各模块的"里程碑产出"由服务端盖章写入 evidence_events（service_role，学生端无法伪造）。
 // 不是每条消息都存：每类事件有"里程碑门槛"（gate），只有达到门槛的产出才成为星图上的一颗星。
-import { createAdminClient } from "@/lib/supabase/admin";
+import { query } from "@/lib/db";
 
 /** 允许经 /api/ai/ask 存证的事件类型 → 里程碑门槛（AI 回复须满足才落库） */
 export const ASK_GATES: Record<string, (reply: string) => boolean> = {
@@ -43,15 +43,10 @@ export async function logEvidence(ev: {
   dims?: RadarDims | null; payload?: Record<string, unknown>; projectId?: string | null;
 }): Promise<void> {
   try {
-    const admin = createAdminClient();
-    await admin.from("evidence_events").insert({
-      user_id: ev.userId,
-      project_id: ev.projectId || null,
-      kind: ev.kind,
-      title: (ev.title || "").slice(0, 120),
-      dims: ev.dims || null,
-      payload: ev.payload || {},
-    });
+    await query(
+      "INSERT INTO evidence_events (user_id, project_id, kind, title, dims, payload) VALUES ($1, $2, $3, $4, $5, $6)",
+      [ev.userId, ev.projectId || null, ev.kind, (ev.title || "").slice(0, 120), ev.dims || null, ev.payload || {}]
+    );
   } catch { /* 存证失败静默：不影响主流程 */ }
 }
 

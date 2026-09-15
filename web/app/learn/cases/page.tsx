@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/api-client";
 import LearnChrome from "../LearnChrome";
 import CoachSession from "@/app/apply/CoachSession";
 
@@ -38,11 +38,11 @@ export default function CasesPage() {
   const [active, setActive] = useState<Case | null>(null);
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
+    const api = createClient();
+    api.auth.getUser().then(({ data }) => {
       if (!data.user) { setAuthed(false); return; }
       setAuthed(true);
-      supabase.from("cases").select("id,code,title,region,industry,points,situation,task,questions,image,doc")
+      api.from("cases").select("id,code,title,region,industry,points,situation,task,questions,image,doc")
         .order("code").then(({ data }) => setCases((data as Case[]) || []));
     });
   }, []);

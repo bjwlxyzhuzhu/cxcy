@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/db-client";
 import { resolveAIClient } from "@/lib/ai/resolve";
 import { getCredits, deductCredits } from "@/lib/credits";
 import { COST } from "@/lib/ai/models";

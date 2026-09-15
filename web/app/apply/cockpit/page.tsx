@@ -16,7 +16,7 @@ import { skillInstr } from "@/lib/skills";
 import type { Att } from "@/lib/attach";
 import { CREW, CREW_BY_KEY } from "@/lib/crew";
 import { PROVIDERS } from "@/lib/ai/providers";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/api-client";
 import { downloadWord, printPdf, downloadPptx } from "@/lib/download";
 import { logClientEvidence } from "@/lib/evidenceClient";
 
@@ -134,11 +134,11 @@ export default function CockpitPage() {
   useEffect(() => {
     (async () => {
       try {
-        const supabase = createClient();
-        const { data: u } = await supabase.auth.getSession();
-        const uId = u.session?.user?.id;
+        const api = createClient();
+        const { data: u } = await api.auth.getSession();
+        const uId = u.user?.id;
         if (!uId) return;
-        const { data } = await supabase.from("user_api_keys").select("provider, model").eq("user_id", uId).eq("purpose", "chat").maybeSingle();
+        const { data } = await api.from<{ provider?: string; model?: string }>("user_api_keys").select("provider, model").eq("user_id", uId).eq("purpose", "chat").maybeSingle();
         if (data) {
           const short = PROVIDERS.find((p) => p.id === data.provider)?.short || data.model || "我的模型";
           setOwnChat({ short, model: data.model || "" });

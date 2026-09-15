@@ -4,7 +4,7 @@ import "server-only";
 // 命中规则且 7 天内未发过同规则卡 → 调用平台模型生成四段式卡片落库（不扣学生积分）。
 // 硬约束：反谄媚（禁止表扬垫场）、对事不对人（只评产出证据，不评人格特质）、必配可执行方案。
 import OpenAI from "openai";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/db-client";
 import { getApimart } from "@/lib/ai/apimart";
 import { MODELS } from "@/lib/ai/models";
 
@@ -142,7 +142,7 @@ export async function detectAndGenerate(userId: string): Promise<void> {
       .select("rule, status, created_at")
       .eq("user_id", userId)
       .or(`status.eq.open,created_at.gte.${since}`);
-    const seen = new Set((recent || []).map((r) => r.rule));
+    const seen = new Set((recent || []).map((r: { rule: string }) => r.rule));
 
     for (const c of candidates) {
       if (seen.has(c.rule)) continue;

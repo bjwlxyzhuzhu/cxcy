@@ -67,7 +67,7 @@ export default function RosterImport() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) { setErr(data.error || ("导入失败 " + res.status)); }
       else setResult(data);
-    } catch { setErr("网络错误，请确认能访问 Supabase（国内需代理）"); }
+    } catch { setErr("网络错误，请稍后重试"); }
     setBusy(false);
   }
 

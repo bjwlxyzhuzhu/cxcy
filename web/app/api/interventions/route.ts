@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/db-client";
 import { detectAndGenerate } from "@/lib/interventions";
 import { logEvidence } from "@/lib/evidence";
 
@@ -33,13 +33,13 @@ export async function GET(req: Request) {
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    const ids = [...new Set((cards || []).map((c) => c.user_id))];
+    const ids = [...new Set((cards || []).map((c: { user_id: string }) => c.user_id))];
     const { data: profs } = ids.length
       ? await admin.from("profiles").select("id, name, student_no").in("id", ids)
       : { data: [] as { id: string; name: string | null; student_no: string | null }[] };
-    const pmap = Object.fromEntries((profs || []).map((p) => [p.id, p]));
+    const pmap = Object.fromEntries((profs || []).map((p: { id: string; name: string | null; student_no: string | null }) => [p.id, p]));
     return NextResponse.json({
-      cards: (cards || []).map((c) => ({ ...c, student: pmap[c.user_id] || null })),
+      cards: (cards || []).map((c: { user_id: string }) => ({ ...c, student: pmap[c.user_id] || null })),
     });
   }
 

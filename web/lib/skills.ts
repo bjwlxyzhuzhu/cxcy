@@ -1,5 +1,5 @@
 // 技能系统：技能 = 一段可注入智能体 system 的「专项方法指令」。
-// 目录（内置 + 商店）写在代码里，是平台提供的"货架"；用户的启用/安装/自有技能存 Supabase（见 skillsClient）。
+// 目录（内置 + 商店）写在代码里，是平台提供的"货架"；用户的启用/安装/自有技能存本地 API。
 // scope = "all" 注入每个智能体；否则只注入对应搭子 key（boss/strategy/design/teacher/student/industry/mentor/advisor）。
 
 export type SkillScope =

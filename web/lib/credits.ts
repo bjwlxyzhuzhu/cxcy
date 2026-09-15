@@ -1,16 +1,11 @@
 import "server-only";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { query, withTransaction } from "@/lib/db";
 
 /** 读取用户当前积分（预检用） */
 export async function getCredits(userId: string): Promise<number> {
-  const admin = createAdminClient();
-  const { data, error } = await admin
-    .from("profiles")
-    .select("credits")
-    .eq("id", userId)
-    .single();
-  if (error) throw error;
-  return data?.credits ?? 0;
+  const { rows } = await query<{ credits: number }>("SELECT credits FROM profiles WHERE id = $1", [userId]);
+  if (!rows[0]) throw new Error("用户档案不存在");
+  return rows[0].credits ?? 0;
 }
 
 /**
@@ -23,18 +18,13 @@ export async function deductCredits(
   cost: number,
   meta: Record<string, unknown> = {}
 ): Promise<{ ok: boolean; remaining: number }> {
-  const admin = createAdminClient();
-  const { data, error } = await admin.rpc("deduct_credits", {
-    p_user: userId,
-    p_action: action,
-    p_cost: cost,
-    p_meta: meta,
+  return withTransaction(async (client) => {
+    const { rows } = await client.query<{ credits: number }>(
+      "UPDATE profiles SET credits = credits - $1 WHERE id = $2 AND credits >= $1 RETURNING credits",
+      [cost, userId]
+    );
+    if (!rows[0]) return { ok: false, remaining: 0 };
+    await client.query("INSERT INTO usage_logs (user_id, action, cost, meta) VALUES ($1, $2, $3, $4)", [userId, action, cost, meta]);
+    return { ok: true, remaining: rows[0].credits };
   });
-  if (error) {
-    if (error.message?.includes("INSUFFICIENT_CREDITS")) {
-      return { ok: false, remaining: 0 };
-    }
-    throw error;
-  }
-  return { ok: true, remaining: data as number };
 }

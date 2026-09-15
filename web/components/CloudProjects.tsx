@@ -17,7 +17,7 @@ export default function CloudProjects({ dark, onLoad, onClose }: { dark: boolean
         const r = await fetch("/api/projects");
         const d = await r.json().catch(() => ({}));
         if (r.status === 401) setMsg("请先登录后再使用云端项目（右上角 → 登录）");
-        else if (d.needMigration) setMsg("云端存储未启用：请先在 Supabase 运行 0005_projects 迁移即可生效");
+        else if (d.needMigration) setMsg("云端存储未启用：请先执行 PostgreSQL 迁移即可生效");
         else setItems(d.items || []);
       } catch { setMsg("网络错误，请稍后重试"); }
       setLoading(false);

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/db-client";
 import { CLIENT_KINDS, logEvidence } from "@/lib/evidence";
 
 export const runtime = "nodejs";

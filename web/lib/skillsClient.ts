@@ -1,7 +1,7 @@
 "use client";
 // 技能存取：改为「本地浏览器」(localStorage)，不依赖服务器表 / 登录 / 迁移。
 // 目录（内置 + 商店技能）在 lib/skills.ts；这里只存「已安装/启用的 id」与「沉淀的自有技能」。
-// 好处：零配置、免登录、免迁移、不受国内访问 Supabase 超时影响。代价：按浏览器存、不跨设备同步。
+// 好处：零配置、免登录、免迁移。代价：按浏览器存、不跨设备同步。
 import { SKILL_BY_ID, type Skill, type SkillScope } from "@/lib/skills";
 import { logClientEvidence } from "@/lib/evidenceClient";
 

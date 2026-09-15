@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/db-client";
+import { hashPassword } from "@/lib/auth-local";
+import { query } from "@/lib/db";
+import { randomUUID } from "node:crypto";
 
 export const runtime = "nodejs";
-const DOMAIN = "bjwlxy.lab"; // 学号伪邮箱域名（与登录页/seed 一致）
-
 type Row = { student_no?: string; name?: string; class?: string; college?: string; major?: string };
 
 /** 名册批量导入：建/重置学生登录账号（学号@域名 + 统一初始密码）+ 补 profile + upsert rosters。幂等。 */
@@ -21,13 +22,6 @@ export async function POST(req: Request) {
   if (password.length < 6) return NextResponse.json({ error: "初始密码至少 6 位" }, { status: 400 });
 
   const admin = createAdminClient();
-  // 已有用户 email→id 映射（一次拉取，最多 1000；够本平台用）
-  const emailToId = new Map<string, string>();
-  try {
-    const { data } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    for (const u of data?.users || []) if (u.email) emailToId.set(u.email, u.id);
-  } catch { /* 拉取失败不致命，按新建处理 */ }
-
   type R = { student_no: string; name: string; status: "created" | "exists" | "failed"; error?: string };
   const results: R[] = [];
   for (const r of rows) {
@@ -35,28 +29,25 @@ export async function POST(req: Request) {
     const name = (r.name || "").toString().trim();
     const klass = (r.class || "").toString().trim();
     if (!no) { results.push({ student_no: "", name, status: "failed", error: "缺学号" }); continue; }
-    const email = `${no}@${DOMAIN}`;
-    let id = emailToId.get(email);
-    let status: "created" | "exists" = id ? "exists" : "created";
+    let id: string | undefined;
+    const status: "created" | "exists" = id ? "exists" : "created";
     try {
+      const existing = await query<{ id: string }>("SELECT id FROM users WHERE student_no = $1", [no]);
+      id = existing.rows[0]?.id;
       if (id) {
-        await admin.auth.admin.updateUserById(id, { password });
+        await query("UPDATE users SET password_hash = $1, name = $2 WHERE id = $3", [await hashPassword(password), name || no, id]);
       } else {
-        const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { name } });
-        if (error || !data?.user) {
-          const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-          id = list?.users?.find((u) => u.email === email)?.id;
-          if (!id) { results.push({ student_no: no, name, status: "failed", error: error?.message || "建号失败" }); continue; }
-          status = "exists";
-        } else {
-          id = data.user.id;
-        }
+        id = randomUUID();
+        await query("INSERT INTO users (id, student_no, password_hash, name, role) VALUES ($1, $2, $3, $4, 'student')", [id, no, await hashPassword(password), name || no]);
       }
-      const { error: pe } = await admin.from("profiles").update({
-        student_no: no, name: name || no, class: klass || null, college: r.college || null, major: r.major || null,
-        role: "student", credits,
-      }).eq("id", id);
-      if (pe) { results.push({ student_no: no, name, status: "failed", error: "档案更新失败：" + pe.message }); continue; }
+      await query(
+        `INSERT INTO profiles (id, student_no, name, class, college, major, role, credits)
+         VALUES ($1, $2, $3, $4, $5, $6, 'student', $7)
+         ON CONFLICT (id) DO UPDATE SET student_no = EXCLUDED.student_no,
+           name = EXCLUDED.name, class = EXCLUDED.class, college = EXCLUDED.college,
+           major = EXCLUDED.major, role = EXCLUDED.role, credits = EXCLUDED.credits`,
+        [id, no, name || no, klass || null, r.college || null, r.major || null, credits],
+      );
       await admin.from("rosters").upsert(
         { class: klass, student_no: no, name: name || no, college: r.college || null, major: r.major || null },
         { onConflict: "class,student_no" }

@@ -1,16 +1,29 @@
-# 启动：docker compose --env-file .env.local up --build
-# --env-file 让 compose 用 .env.local 既做构建参数替换、又做运行期环境注入
+# 本地完整环境请在仓库根目录使用 docker-compose.postgres.yml。
 services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cxcy}
+      POSTGRES_USER: ${POSTGRES_USER:-cxcy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - cxcy_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
   web:
     build:
       context: .
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "3000:3000"
     environment:
-      # Portainer uses SUPABASE_*; local .env.local keeps the old NEXT_PUBLIC_* names.
-      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL:-${NEXT_PUBLIC_SUPABASE_URL}}
-      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-${NEXT_PUBLIC_SUPABASE_ANON_KEY}}
-      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cxcy}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-cxcy}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET}
       APIMART_BASE_URL: ${APIMART_BASE_URL}
       APIMART_API_KEY: ${APIMART_API_KEY}
       CHAT_MODEL: ${CHAT_MODEL}
@@ -22,3 +35,5 @@ services:
       PPTGEN_PUBLIC_URL: ${PPTGEN_PUBLIC_URL}
       PPTGEN_AUTH: ${PPTGEN_AUTH}
     restart: unless-stopped
+volumes:
+  cxcy_postgres_data:

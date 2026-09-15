@@ -1,6 +1,6 @@
 /**
  * 服务端启动钩子：需要时让 Node 的 fetch 走本机代理（Clash），
- * 否则 openai/supabase 的服务端调用在某些网络下连不上（curl 走代理而 Node fetch 默认不走）。
+ * 否则外部 AI 服务的服务端调用在某些网络下连不上（curl 走代理而 Node fetch 默认不走）。
  * 代理地址从 DEV_PROXY（.env.local）或 HTTPS_PROXY/HTTP_PROXY 读取。
  *
  * 先探测代理端口是否真的在监听：开机自启时本站可能比 Clash 先起来，

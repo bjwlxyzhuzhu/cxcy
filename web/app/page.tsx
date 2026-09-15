@@ -6,7 +6,7 @@ export default async function Page() {
   try {
     profile = await getProfile();
   } catch {
-    // 数据表未建 / Supabase 暂不可达时，按未登录渲染（首页动效与登录入口照常）
+    // 数据库未建或暂不可达时，按未登录渲染（首页动效与登录入口照常）
     profile = null;
   }
   return (

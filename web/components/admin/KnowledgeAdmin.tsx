@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/api-client";
 
 type Stats = { knowledge: number; sources: { source: string; n: number }[]; cases: number; templates: number };
 type CaseRow = { id: number; code: string; title: string; region: string | null; industry: string | null };
@@ -20,10 +20,10 @@ export default function KnowledgeAdmin() {
     if (res.ok) setStats(data); else setMsg("✗ 统计失败：" + (data.error || res.status));
   }
   async function loadTables() {
-    const supabase = createClient();
+    const api = createClient();
     const [{ data: c }, { data: t }] = await Promise.all([
-      supabase.from("cases").select("id,code,title,region,industry").order("code").limit(500),
-      supabase.from("templates").select("id,name,category,ext,size_kb,file").order("sort").limit(500),
+      api.from("cases").select("id,code,title,region,industry").order("code").limit(500),
+      api.from("templates").select("id,name,category,ext,size_kb,file").order("sort").limit(500),
     ]);
     setCases((c as CaseRow[]) || []); setTpls((t as TplRow[]) || []);
   }

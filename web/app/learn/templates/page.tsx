@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/api-client";
 import LearnChrome from "../LearnChrome";
 import CoachSession from "@/app/apply/CoachSession";
 
@@ -15,11 +15,11 @@ export default function TemplatesPage() {
   const [active, setActive] = useState<Tpl | null>(null);
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
+    const api = createClient();
+    api.auth.getUser().then(({ data }) => {
       if (!data.user) { setAuthed(false); return; }
       setAuthed(true);
-      supabase.from("templates").select("id,name,category,file,ext,size_kb,sort").order("sort").then(({ data }) => setTpls((data as Tpl[]) || []));
+      api.from("templates").select("id,name,category,file,ext,size_kb,sort").order("sort").then(({ data }) => setTpls((data as Tpl[]) || []));
     });
   }, []);
 

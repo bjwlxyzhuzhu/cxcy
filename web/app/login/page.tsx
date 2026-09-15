@@ -1,9 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-
-const DOMAIN = "bjwlxy.lab"; // 学号伪邮箱域名（与 seed 脚本一致）
 
 export default function LoginPage() {
   const [no, setNo] = useState("");
@@ -21,20 +18,22 @@ export default function LoginPage() {
     setErr("");
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
-        email: `${no.trim()}@${DOMAIN}`,
-        password: pwd,
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ studentNo: no.trim(), password: pwd }),
       });
-      if (error) {
-        setErr("登录失败：" + (error.message || "学号或密码错误"));
+      const body = await response.json();
+      if (!response.ok) {
+        setErr("登录失败：" + (body.error || "学号或密码错误"));
         setLoading(false);
         return;
       }
       router.push("/");
       router.refresh();
     } catch {
-      setErr("网络错误，请确认能访问 Supabase（国内需代理）");
+      setErr("网络错误，请稍后重试");
       setLoading(false);
     }
   }

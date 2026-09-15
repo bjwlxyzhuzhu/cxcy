@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/db-client";
 
 export const runtime = "nodejs";
 
@@ -15,13 +15,13 @@ export async function GET(req: Request) {
   const user = await getUser();
   if (!user) return NextResponse.json({ error: "未登录" }, { status: 401 });
   const id = new URL(req.url).searchParams.get("id");
-  const supabase = createClient();
+  const db = createClient();
   if (id) {
-    const { data, error } = await supabase.from("projects").select("id,name,draft,sections,team,updated_at").eq("id", id).maybeSingle();
+    const { data, error } = await db.from("projects").select("id,name,draft,sections,team,updated_at").eq("id", id).maybeSingle();
     if (error) { if (missingTable(error)) return NextResponse.json({ needMigration: true, project: null }); return NextResponse.json({ error: error.message }, { status: 500 }); }
     return NextResponse.json({ project: data || null });
   }
-  const { data, error } = await supabase.from("projects").select("id,name,updated_at").order("updated_at", { ascending: false }).limit(50);
+  const { data, error } = await db.from("projects").select("id,name,updated_at").order("updated_at", { ascending: false }).limit(50);
   if (error) { if (missingTable(error)) return NextResponse.json({ needMigration: true, items: [] }); return NextResponse.json({ error: error.message }, { status: 500 }); }
   return NextResponse.json({ items: (data || []) as Pick<Row, "id" | "name" | "updated_at">[] });
 }
@@ -38,14 +38,14 @@ export async function POST(req: Request) {
     sections: body.sections && typeof body.sections === "object" ? body.sections : {},
     team: Array.isArray(body.team) ? body.team : [],
   };
-  const supabase = createClient();
+  const db = createClient();
   if (body.id) {
-    const { data, error } = await supabase.from("projects").update(payload).eq("id", body.id).select("id").maybeSingle();
-    if (error) { if (missingTable(error)) return NextResponse.json({ error: "云端存储未启用：请先在 Supabase 运行 0005_projects 迁移", needMigration: true }, { status: 400 }); return NextResponse.json({ error: error.message }, { status: 500 }); }
+    const { data, error } = await db.from("projects").update(payload).eq("id", body.id).select("id").maybeSingle();
+    if (error) { if (missingTable(error)) return NextResponse.json({ error: "云端存储未启用：请先执行 PostgreSQL 迁移", needMigration: true }, { status: 400 }); return NextResponse.json({ error: error.message }, { status: 500 }); }
     return NextResponse.json({ id: data?.id || body.id });
   }
-  const { data, error } = await supabase.from("projects").insert(payload).select("id").maybeSingle();
-  if (error) { if (missingTable(error)) return NextResponse.json({ error: "云端存储未启用：请先在 Supabase 运行 0005_projects 迁移", needMigration: true }, { status: 400 }); return NextResponse.json({ error: error.message }, { status: 500 }); }
+  const { data, error } = await db.from("projects").insert(payload).select("id").maybeSingle();
+  if (error) { if (missingTable(error)) return NextResponse.json({ error: "云端存储未启用：请先执行 PostgreSQL 迁移", needMigration: true }, { status: 400 }); return NextResponse.json({ error: error.message }, { status: 500 }); }
   return NextResponse.json({ id: data?.id });
 }
 
@@ -54,8 +54,8 @@ export async function DELETE(req: Request) {
   if (!user) return NextResponse.json({ error: "未登录" }, { status: 401 });
   const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "缺少 id" }, { status: 400 });
-  const supabase = createClient();
-  const { error } = await supabase.from("projects").delete().eq("id", id);
+  const db = createClient();
+  const { error } = await db.from("projects").delete().eq("id", id);
   if (error) { if (missingTable(error)) return NextResponse.json({ error: "云端存储未启用", needMigration: true }, { status: 400 }); return NextResponse.json({ error: error.message }, { status: 500 }); }
   return NextResponse.json({ ok: true });
 }

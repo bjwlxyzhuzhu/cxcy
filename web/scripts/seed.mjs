@@ -1,54 +1,50 @@
-// 创建演示账号（admin + 学生）。
-// 用法（在 web/ 目录）：node --env-file=.env.local scripts/seed.mjs
-// 前提：已在 Supabase 跑过 supabase/migrations/0001_init.sql
-import { createClient } from "@supabase/supabase-js";
-import { setGlobalDispatcher, ProxyAgent } from "undici";
+import pg from "pg";
+import bcrypt from "bcryptjs";
 
-const proxy = process.env.DEV_PROXY || process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
-if (proxy) setGlobalDispatcher(new ProxyAgent(proxy));
-
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!url || !key) {
-  console.error("✗ 缺少环境变量。请用：node --env-file=.env.local scripts/seed.mjs");
+const { Pool } = pg;
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  console.error("缺少 DATABASE_URL。请先在环境变量或 Portainer Stack 中配置 PostgreSQL 连接串。");
   process.exit(1);
 }
-const admin = createClient(url, key, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
-const DOMAIN = "bjwlxy.lab"; // 学号伪邮箱域名（与登录页一致）
+const pool = new Pool({ connectionString: databaseUrl });
 
-async function ensure(no, name, role, pwd, credits) {
-  const email = `${no}@${DOMAIN}`;
-  let id;
-  const { data, error } = await admin.auth.admin.createUser({
-    email,
-    password: pwd,
-    email_confirm: true,
-    user_metadata: { name },
-  });
-  if (error) {
-    // 已存在 → 查找并重置密码（让 seed 可重复运行）
-    const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    id = list?.users?.find((u) => u.email === email)?.id;
-    if (id) await admin.auth.admin.updateUserById(id, { password: pwd });
-  } else {
-    id = data.user.id;
+async function ensureUser({ studentNo, name, role, password, credits }) {
+  const passwordHash = await bcrypt.hash(password, 12);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await client.query(
+      `INSERT INTO public.users (student_no, password_hash, name, role)
+       VALUES ($1, $2, $3, $4::public.user_role)
+       ON CONFLICT (student_no) DO UPDATE SET password_hash = EXCLUDED.password_hash,
+         name = EXCLUDED.name, role = EXCLUDED.role RETURNING id`,
+      [studentNo, passwordHash, name, role],
+    );
+    const userId = result.rows[0].id;
+    await client.query(
+      `INSERT INTO public.profiles (id, student_no, name, role, credits)
+       VALUES ($1, $2, $3, $4::public.user_role, $5)
+       ON CONFLICT (id) DO UPDATE SET student_no = EXCLUDED.student_no,
+         name = EXCLUDED.name, role = EXCLUDED.role, credits = EXCLUDED.credits`,
+      [userId, studentNo, name, role, credits],
+    );
+    await client.query("DELETE FROM public.sessions WHERE user_id = $1", [userId]);
+    await client.query("COMMIT");
+    console.log(`✓ ${role.padEnd(7)} 学号:${studentNo}  密码:${password}  (${name})`);
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
   }
-  if (!id) {
-    console.error("✗ 失败:", email, error?.message);
-    return;
-  }
-  // profiles 由触发器自动建，这里补学号/角色/积分
-  const { error: pe } = await admin
-    .from("profiles")
-    .update({ student_no: no, name, role, credits })
-    .eq("id", id);
-  if (pe) console.error("  ⚠ 档案更新失败:", pe.message);
-  console.log(`✓ ${role.padEnd(7)} 学号:${no}  密码:${pwd}  (${name})`);
 }
 
-console.log("== 创建演示账号 ==");
-await ensure("admin", "课程管理员", "admin", "Admin@2026", 9999);
-await ensure("202596057038", "演示学生", "student", "Student@2026", 120);
-console.log("== 完成。登录页用「学号 + 密码」登录（学号即 admin / 202596057038） ==");
+try {
+  console.log("== 创建演示账号（本地 PostgreSQL） ==");
+  await ensureUser({ studentNo: "admin", name: "课程管理员", role: "admin", password: "Admin@2026", credits: 9999 });
+  await ensureUser({ studentNo: "202596057038", name: "演示学生", role: "student", password: "Student@2026", credits: 120 });
+  console.log("== 完成。登录页使用学号 + 密码登录 ==");
+} finally {
+  await pool.end();
+}

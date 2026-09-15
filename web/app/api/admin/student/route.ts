@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/db-client";
+import { hashPassword } from "@/lib/auth-local";
+import { query } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -34,8 +36,8 @@ export async function POST(req: Request) {
     if (op === "password") {
       const v = String(body.value || "");
       if (v.length < 6) return NextResponse.json({ error: "密码至少 6 位" }, { status: 400 });
-      const { error } = await admin.auth.admin.updateUserById(user_id, { password: v });
-      if (error) throw error;
+      await query("UPDATE users SET password_hash = $1 WHERE id = $2", [await hashPassword(v), user_id]);
+      await query("DELETE FROM sessions WHERE user_id = $1", [user_id]);
       return NextResponse.json({ ok: true });
     }
     return NextResponse.json({ error: "未知操作" }, { status: 400 });

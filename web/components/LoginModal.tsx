@@ -2,9 +2,7 @@
 // 当前页登录弹窗：在任意页面点「登录」即就地弹出，登录成功后停留在当前页（不跳首页）。
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
-const DOMAIN = "bjwlxy.lab"; // 学号伪邮箱域名（与 seed 一致）
 
 export default function LoginModal({ open, onClose, onSuccess, accent = "#22d3ee" }: { open: boolean; onClose: () => void; onSuccess?: () => void; accent?: string }) {
   const [no, setNo] = useState("");
@@ -23,11 +21,11 @@ export default function LoginModal({ open, onClose, onSuccess, accent = "#22d3ee
     setSso("login");
     await new Promise((r) => setTimeout(r, 700));  // 模拟授权回调
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({ email: `202596057038@${DOMAIN}`, password: "Student@2026" });
-      if (error) { setErr("学习通登录失败（演示）：" + (error.message || "")); setSso(""); return; }
+      const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ studentNo: "202596057038", password: "Student@2026" }) });
+      const body = await response.json();
+      if (!response.ok) { setErr("学习通登录失败（演示）：" + (body.error || "")); setSso(""); return; }
       router.refresh(); onSuccess?.(); onClose();
-    } catch { setErr("网络错误，请确认能访问 Supabase"); setSso(""); }
+    } catch { setErr("网络错误，请稍后重试"); setSso(""); }
   }
 
   async function submit(e: React.FormEvent) {
@@ -35,13 +33,13 @@ export default function LoginModal({ open, onClose, onSuccess, accent = "#22d3ee
     if (!no.trim() || !pwd) { setErr("请输入学号和密码"); return; }
     setErr(""); setLoading(true);
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({ email: `${no.trim()}@${DOMAIN}`, password: pwd });
-      if (error) { setErr("登录失败：" + (error.message || "学号或密码错误")); setLoading(false); return; }
+      const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ studentNo: no.trim(), password: pwd }) });
+      const body = await response.json();
+      if (!response.ok) { setErr("登录失败：" + (body.error || "学号或密码错误")); setLoading(false); return; }
       router.refresh();      // 刷新当前页服务端内容，URL 不变、不跳首页
       onSuccess?.();
       onClose();
-    } catch { setErr("网络错误，请确认能访问 Supabase（国内需代理）"); setLoading(false); }
+    } catch { setErr("网络错误，请稍后重试"); setLoading(false); }
   }
 
   const input: React.CSSProperties = { width: "100%", padding: "11px 13px", borderRadius: 11, border: "1px solid rgba(120,200,255,.25)", background: "rgba(255,255,255,.05)", color: "var(--ink)", fontSize: 15, outline: "none", fontFamily: "inherit", boxSizing: "border-box" };

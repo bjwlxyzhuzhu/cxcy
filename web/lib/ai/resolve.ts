@@ -1,6 +1,6 @@
 import "server-only";
 import OpenAI from "openai";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { query } from "@/lib/db";
 import { getApimart } from "./apimart";
 import { MODELS } from "./models";
 import type { Purpose } from "./providers";
@@ -11,13 +11,11 @@ import type { Purpose } from "./providers";
  * - 否则 → 平台默认（APIMart），usingOwnKey=false，调用方按积分规则扣分。
  */
 export async function resolveAIClient(userId: string, purpose: Purpose) {
-  const admin = createAdminClient();
-  const { data } = await admin
-    .from("user_api_keys")
-    .select("base_url, api_key, model")
-    .eq("user_id", userId)
-    .eq("purpose", purpose)
-    .maybeSingle();
+  const { rows } = await query<{ base_url: string; api_key: string; model: string }>(
+    "SELECT base_url, api_key, model FROM user_api_keys WHERE user_id = $1 AND purpose = $2 LIMIT 1",
+    [userId, purpose]
+  );
+  const data = rows[0];
 
   if (data?.api_key && data?.base_url) {
     return {

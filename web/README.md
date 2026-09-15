@@ -10,15 +10,13 @@ pnpm dev              # http://localhost:3000
 pnpm build            # 生产构建（已验证通过）
 ```
 
-## 首次激活（让登录/积分真正可用）
+## 首次激活（本地 PostgreSQL）
 
-首页动效无需任何配置即可看；**登录与扣积分**需两步一次性激活：
+登录、积分和知识库都直接访问本地 PostgreSQL。使用仓库根目录的 `docker-compose.postgres.yml` 时，`migrate` 服务会自动执行迁移；演示账号可执行：
 
-1. **建表**：打开 Supabase 控制台 → SQL Editor → New query → 粘贴 `supabase/migrations/0001_init.sql` 全文 → Run。
-2. **建演示账号**：
-   ```bash
-   node --env-file=.env.local scripts/seed.mjs
-   ```
+```bash
+docker compose -f docker-compose.postgres.yml run --rm migrate node scripts/seed.mjs
+```
 
 ### 演示账号（登录页用「学号 + 密码」）
 | 角色 | 学号 | 密码 |
@@ -29,7 +27,7 @@ pnpm build            # 生产构建（已验证通过）
 登录后右上角显示真实积分；点右下角**宇航员小航**打开对话，发消息会走 `/api/ai/chat`（APIMart）并**每次扣 1 积分**（数据库 `deduct_credits` 原子扣分 + 写 `usage_logs`）。
 
 ## 环境变量（`.env.local`，不提交）
-见 `.env.example`。`NEXT_PUBLIC_*` 为浏览器端（受 RLS）；`SUPABASE_SERVICE_ROLE_KEY` / `APIMART_API_KEY` 仅服务端。
+见 `.env.example`。`DATABASE_URL` 和 `SESSION_SECRET` 仅服务端使用；浏览器只通过内部 `/api` 路由访问数据。
 
 ## 目录
 ```
@@ -43,17 +41,16 @@ components/
   GalaxyHome.tsx      首页 React 外壳 + 小航对话
   galaxyEngine.js     银河动效引擎（机器抽取自原型，勿手改）
 lib/
-  supabase/{client,server,admin}.ts   三类客户端
+  db.ts · db-client.ts · auth-local.ts  PostgreSQL 与本地 Session
   ai/{apimart,models}.ts · credits.ts · auth.ts
-supabase/migrations/0001_init.sql      建表 + RLS + deduct_credits RPC
-scripts/seed.mjs       演示账号
-middleware.ts          会话刷新
+db/migrations/0001_init.sql             建表、索引、pgvector 与积分函数
+scripts/migrate.mjs · scripts/seed.mjs  迁移与演示账号
 Dockerfile · docker-compose.yml        部署骨架（9 月底阿里云上线用）
 ```
 
-## Docker（部署用，9 月底上线）
+## Docker（部署用）
 ```bash
-docker compose --env-file .env.local up --build   # → http://服务器:3000
+docker compose -f docker-compose.postgres.yml --env-file .env.local up -d
 ```
 
 ## GitHub Actions 镜像
@@ -62,8 +59,7 @@ docker compose --env-file .env.local up --build   # → http://服务器:3000
 构建 `linux/amd64` 与 `linux/arm64` 镜像并发布到 GitHub Container Registry；Pull Request
 只执行构建检查，不会发布镜像。
 
-镜像不依赖 GitHub Actions 中的 Supabase 变量。容器启动时从 Portainer 注入 Supabase 配置，
-因此同一个 Stack 可以同时部署 Supabase 和 `cxcy`，无需在 GitHub 重复维护 URL 或 Key。
+镜像不依赖任何 Supabase 变量。Portainer 只需向 Stack 注入 PostgreSQL 密码、`DATABASE_URL` 组成参数、`SESSION_SECRET` 及可选 AI 配置。
 
 发布成功后可在服务器上运行（将运行期密钥写入服务器上的 `.env.local`）：
 
@@ -79,7 +75,7 @@ docker run --env-file .env.local -p 3000:3000 ghcr.io/bjwlxyzhuzhu/cxcy:latest
 所有动效定稿在 `../设计风格预览/风格A_银河探索.html`；`galaxyEngine.js` 由它机器生成。改设计请改原型再重新抽取，不要直接改引擎。
 
 ## 进度
-- ✅ M1：脚手架 · 设计系统/首页移植 · Supabase 登录 · profiles/credits · 扣积分 API · Docker 骨架
+- ✅ M1：脚手架 · 设计系统/首页移植 · PostgreSQL 登录 · profiles/credits · 扣积分 API · Docker 骨架
 - ⏭ M2 起：学习中心 6 模块 + AI 客服 RAG（知识库在 `../RAG/`）；应用中心各功能；管理端（名单导入、知识库上传带标签）
 
 ## 生产运行与开机自启（本机常驻）

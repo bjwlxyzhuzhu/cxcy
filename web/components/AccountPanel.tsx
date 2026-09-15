@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/api-client";
 import { PROVIDERS, PURPOSES, providersFor, type Purpose } from "@/lib/ai/providers";
 import ModelSelect from "./ModelSelect";
 
@@ -43,8 +43,8 @@ export default function AccountPanel({
   useEffect(() => {
     if (!open) return;
     setMsg("");
-    const supabase = createClient();
-    supabase
+    const api = createClient();
+    api
       .from("user_api_keys")
       .select("purpose, provider, base_url, api_key, model")
       .then(({ data }) => {
@@ -58,7 +58,7 @@ export default function AccountPanel({
           return next;
         });
       });
-    supabase
+    api
       .from("usage_logs")
       .select("action, cost, created_at")
       .order("created_at", { ascending: false })
@@ -78,11 +78,11 @@ export default function AccountPanel({
 
   async function saveKey(p: Purpose) {
     setBusy(true); setMsg("");
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const api = createClient();
+    const { data: { user } } = await api.auth.getUser();
     if (!user) { setMsg("未登录"); setBusy(false); return; }
     const k = keys[p];
-    const { error } = await supabase.from("user_api_keys").upsert({
+    const { error } = await api.from("user_api_keys").upsert({
       user_id: user.id, purpose: p, provider: k.provider, base_url: k.base_url, api_key: k.api_key, model: k.model,
     });
     setBusy(false);
@@ -91,9 +91,9 @@ export default function AccountPanel({
   }
   async function clearKey(p: Purpose) {
     setBusy(true);
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) await supabase.from("user_api_keys").delete().eq("user_id", user.id).eq("purpose", p);
+    const api = createClient();
+    const { data: { user } } = await api.auth.getUser();
+    if (user) await api.from("user_api_keys").delete().eq("user_id", user.id).eq("purpose", p);
     setKeys((k) => ({ ...k, [p]: emptyKey() }));
     setBusy(false); setMsg("已清除，恢复为平台默认（扣积分）");
   }

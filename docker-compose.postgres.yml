@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cxcy}
+      POSTGRES_USER: ${POSTGRES_USER:-cxcy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a strong POSTGRES_PASSWORD}
+    volumes:
+      - cxcy_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrate:
+    image: ${CXCY_IMAGE:-ghcr.io/bjwlxyzhuzhu/cxcy:latest}
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cxcy}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-cxcy}
+    command: ["node", "scripts/migrate.mjs"]
+
+  cxcy:
+    image: ${CXCY_IMAGE:-ghcr.io/bjwlxyzhuzhu/cxcy:latest}
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "${CXCY_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cxcy}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-cxcy}
+      SESSION_SECRET: ${SESSION_SECRET:?set a random value of at least 32 characters}
+      APIMART_BASE_URL: ${APIMART_BASE_URL:-}
+      APIMART_API_KEY: ${APIMART_API_KEY:-}
+      CHAT_MODEL: ${CHAT_MODEL:-}
+      IMAGE_MODEL: ${IMAGE_MODEL:-}
+      EMBED_MODEL: ${EMBED_MODEL:-text-embedding-3-small}
+      CHAT_BASE_URL: ${CHAT_BASE_URL:-}
+      CHAT_API_KEY: ${CHAT_API_KEY:-}
+      PPTGEN_BASE_URL: ${PPTGEN_BASE_URL:-}
+      PPTGEN_PUBLIC_URL: ${PPTGEN_PUBLIC_URL:-}
+      PPTGEN_AUTH: ${PPTGEN_AUTH:-}
+
+volumes:
+  cxcy_postgres_data:

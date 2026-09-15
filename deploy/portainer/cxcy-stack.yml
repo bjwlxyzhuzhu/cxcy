@@ -1,31 +1,50 @@
-# 将此 services.cxcy 合并到 Supabase 官方 docker-compose.yml 的 services 下，
-# 然后在 Portainer Web Editor 以一个 Stack 一起部署。
-# Supabase 官方 Compose 的默认网络会自动让 cxcy 访问 kong:8000；浏览器 URL
-# 必须使用 API_EXTERNAL_URL（公网地址），不能写 Docker 内部服务名。
+# 兼容旧路径：请在 Portainer Web Editor 粘贴仓库根目录的 docker-compose.postgres.yml。
+# 该文件已改为 PostgreSQL + cxcy 单 Stack，不再使用 Supabase。
 services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cxcy}
+      POSTGRES_USER: ${POSTGRES_USER:-cxcy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - cxcy_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  migrate:
+    image: ${CXCY_IMAGE:-ghcr.io/bjwlxyzhuzhu/cxcy:latest}
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cxcy}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-cxcy}
+    command: ["node", "scripts/migrate.mjs"]
   cxcy:
-    container_name: cxcy-web
-    image: ghcr.io/bjwlxyzhuzhu/cxcy:latest
+    image: ${CXCY_IMAGE:-ghcr.io/bjwlxyzhuzhu/cxcy:latest}
     restart: unless-stopped
     depends_on:
-      kong:
-        condition: service_started
+      migrate:
+        condition: service_completed_successfully
     ports:
-      # Supabase Studio 默认占用宿主机 3000；cxcy 对外使用 3001。
-      - "3001:3000"
+      - "${CXCY_PORT:-3000}:3000"
     environment:
       NODE_ENV: production
-      PORT: "3000"
-      SUPABASE_PUBLIC_URL: ${API_EXTERNAL_URL}
-      SUPABASE_ANON_KEY: ${ANON_KEY}
-      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
-      APIMART_BASE_URL: ${APIMART_BASE_URL}
-      APIMART_API_KEY: ${APIMART_API_KEY}
-      CHAT_MODEL: ${CHAT_MODEL}
-      IMAGE_MODEL: ${IMAGE_MODEL}
-      EMBED_MODEL: ${EMBED_MODEL}
-      CHAT_BASE_URL: ${CHAT_BASE_URL}
-      CHAT_API_KEY: ${CHAT_API_KEY}
-      PPTGEN_BASE_URL: ${PPTGEN_BASE_URL}
-      PPTGEN_PUBLIC_URL: ${PPTGEN_PUBLIC_URL}
-      PPTGEN_AUTH: ${PPTGEN_AUTH}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cxcy}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-cxcy}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET}
+      APIMART_BASE_URL: ${APIMART_BASE_URL:-}
+      APIMART_API_KEY: ${APIMART_API_KEY:-}
+      CHAT_MODEL: ${CHAT_MODEL:-}
+      IMAGE_MODEL: ${IMAGE_MODEL:-}
+      EMBED_MODEL: ${EMBED_MODEL:-text-embedding-3-small}
+      CHAT_BASE_URL: ${CHAT_BASE_URL:-}
+      CHAT_API_KEY: ${CHAT_API_KEY:-}
+      PPTGEN_BASE_URL: ${PPTGEN_BASE_URL:-}
+      PPTGEN_PUBLIC_URL: ${PPTGEN_PUBLIC_URL:-}
+      PPTGEN_AUTH: ${PPTGEN_AUTH:-}
+volumes:
+  cxcy_postgres_data:

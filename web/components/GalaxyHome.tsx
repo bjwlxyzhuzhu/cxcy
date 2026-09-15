@@ -12,7 +12,7 @@ import MicButton from "./MicButton";
 import SkillPicker, { resolveActiveSkills, pluginNote } from "./SkillPicker";
 import RichMsg from "./ChartBlock";
 import LiveWall from "./LiveWall";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/api-client";
 import { PROVIDERS } from "@/lib/ai/providers";
 import { loadToolbox, type Toolbox } from "@/lib/skillsClient";
 import { skillInstrAll } from "@/lib/skills";
@@ -145,11 +145,11 @@ export default function GalaxyHome({
     if (!loggedIn) { setOwnChat(null); return; }
     (async () => {
       try {
-        const supabase = createClient();
-        const { data: u } = await supabase.auth.getSession();
-        const uId = u.session?.user?.id;
+        const api = createClient();
+        const { data: u } = await api.auth.getSession();
+        const uId = u.user?.id;
         if (!uId) return;
-        const { data } = await supabase.from("user_api_keys").select("provider, model").eq("user_id", uId).eq("purpose", "chat").maybeSingle();
+        const { data } = await api.from<{ provider?: string; model?: string }>("user_api_keys").select("provider, model").eq("user_id", uId).eq("purpose", "chat").maybeSingle();
         if (data) setOwnChat({ short: PROVIDERS.find((p) => p.id === data.provider)?.short || data.model || "我的模型" });
       } catch { /* 无绑定 → 用平台默认 */ }
     })();

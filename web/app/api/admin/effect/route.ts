@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/db-client";
 
 export const runtime = "nodejs";
 
@@ -24,18 +24,18 @@ export async function GET() {
   const [students, chats, chatUsers, topics, drafts, exportsN, defenses, skills, visits, icards, evRows] = await Promise.all([
     safe(admin.from("profiles").select("id", head).eq("role", "student")),
     safe(admin.from("usage_logs").select("id", head)),
-    (async () => { try { const { data } = await admin.from("usage_logs").select("user_id").limit(20000); return new Set((data || []).map((r) => r.user_id)).size; } catch { return 0; } })(),
+    (async () => { try { const { data } = await admin.from("usage_logs").select("user_id").limit(20000); return new Set((data || []).map((r: { user_id: string }) => r.user_id)).size; } catch { return 0; } })(),
     safe(admin.from("evidence_events").select("id", head).eq("kind", "topic_match")),
     safe(admin.from("evidence_events").select("id", head).in("kind", ["bp_draft", "crew_final"])),
     safe(admin.from("evidence_events").select("id", head).eq("kind", "export_doc")),
     safe(admin.from("evidence_events").select("id", head).eq("kind", "defense_radar")),
     safe(admin.from("evidence_events").select("id", head).eq("kind", "skill_use")),
-    (async () => { try { const { data } = await admin.from("site_visits").select("count"); return (data || []).reduce((s, r) => s + (r.count || 0), 0); } catch { return 0; } })(),
+    (async () => { try { const { data } = await admin.from("site_visits").select("count"); return (data || []).reduce((s: number, r: { count?: number }) => s + (r.count || 0), 0); } catch { return 0; } })(),
     (async () => {
       try {
         const { data } = await admin.from("intervention_cards").select("status");
         const all = data || [];
-        return { total: all.length, responded: all.filter((c) => c.status !== "open" && c.status !== "retracted").length, disputed: all.filter((c) => c.status === "disputed").length };
+        return { total: all.length, responded: all.filter((c: { status: string }) => c.status !== "open" && c.status !== "retracted").length, disputed: all.filter((c: { status: string }) => c.status === "disputed").length };
       } catch { return { total: 0, responded: 0, disputed: 0 }; }
     })(),
     (async () => {

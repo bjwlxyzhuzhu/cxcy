@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/api-client";
 
 type P = { id: string; student_no: string | null; name: string | null; class: string | null; role: string; credits: number; created_at: string };
 const ROLE_LABEL: Record<string, string> = { student: "学生", teacher: "教师", admin: "管理员" };
@@ -13,8 +13,8 @@ export default function StudentManager({ meId }: { meId: string }) {
 
   async function load() {
     setLoading(true);
-    const supabase = createClient();
-    const { data } = await supabase.from("profiles").select("id,student_no,name,class,role,credits,created_at").order("created_at", { ascending: true }).limit(2000);
+    const api = createClient();
+    const { data } = await api.from("profiles").select("id,student_no,name,class,role,credits,created_at").order("created_at", { ascending: true }).limit(2000);
     setList((data as P[]) || []);
     setLoading(false);
   }
