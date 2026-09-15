@@ -4,11 +4,21 @@ services:
   web:
     build:
       context: .
-      args:
-        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
     ports:
       - "3000:3000"
-    env_file:
-      - .env.local
+    environment:
+      # Portainer uses SUPABASE_*; local .env.local keeps the old NEXT_PUBLIC_* names.
+      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL:-${NEXT_PUBLIC_SUPABASE_URL}}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-${NEXT_PUBLIC_SUPABASE_ANON_KEY}}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      APIMART_BASE_URL: ${APIMART_BASE_URL}
+      APIMART_API_KEY: ${APIMART_API_KEY}
+      CHAT_MODEL: ${CHAT_MODEL}
+      IMAGE_MODEL: ${IMAGE_MODEL}
+      EMBED_MODEL: ${EMBED_MODEL}
+      CHAT_BASE_URL: ${CHAT_BASE_URL}
+      CHAT_API_KEY: ${CHAT_API_KEY}
+      PPTGEN_BASE_URL: ${PPTGEN_BASE_URL}
+      PPTGEN_PUBLIC_URL: ${PPTGEN_PUBLIC_URL}
+      PPTGEN_AUTH: ${PPTGEN_AUTH}
     restart: unless-stopped

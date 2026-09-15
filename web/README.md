@@ -56,6 +56,25 @@ Dockerfile · docker-compose.yml        部署骨架（9 月底阿里云上线�
 docker compose --env-file .env.local up --build   # → http://服务器:3000
 ```
 
+## GitHub Actions 镜像
+
+仓库内的 `.github/workflows/docker-image.yml` 会在 `main` 分支推送或手动触发时，
+构建 `linux/amd64` 与 `linux/arm64` 镜像并发布到 GitHub Container Registry；Pull Request
+只执行构建检查，不会发布镜像。
+
+镜像不依赖 GitHub Actions 中的 Supabase 变量。容器启动时从 Portainer 注入 Supabase 配置，
+因此同一个 Stack 可以同时部署 Supabase 和 `cxcy`，无需在 GitHub 重复维护 URL 或 Key。
+
+发布成功后可在服务器上运行（将运行期密钥写入服务器上的 `.env.local`）：
+
+```bash
+docker pull ghcr.io/bjwlxyzhuzhu/cxcy:latest
+docker run --env-file .env.local -p 3000:3000 ghcr.io/bjwlxyzhuzhu/cxcy:latest
+```
+
+首次拉取私有镜像时，需要使用具有 `read:packages` 权限的 GitHub Personal Access Token
+登录 `ghcr.io`。如需公开镜像，可在仓库的 **Packages** 页面将可见性改为 Public。
+
 ## 设计来源
 所有动效定稿在 `../设计风格预览/风格A_银河探索.html`；`galaxyEngine.js` 由它机器生成。改设计请改原型再重新抽取，不要直接改引擎。
 
