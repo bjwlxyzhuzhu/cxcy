@@ -57,7 +57,7 @@ web/supabase/migrations/_ALL.sql
 /rest/v1/*      → Supabase Kong :8000
 /storage/v1/*   → Supabase Kong :8000
 /realtime/v1/*  → Supabase Kong :8000
-其余路径        → cxcy :3000
+其余路径        → cxcy :3001（容器内仍为 3000）
 ```
 
 因此 `API_EXTERNAL_URL` 应填写浏览器实际访问的地址，例如
