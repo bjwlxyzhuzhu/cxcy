@@ -139,6 +139,10 @@ export default function LoginPage() {
             {loading ? "登录中…" : "登录 →"}
           </button>
 
+          <a href="/register" style={{ display: "block", textAlign: "center", marginTop: 14, fontSize: 13, color: "var(--cyan)" }}>
+            还没有账号？立即注册
+          </a>
+
           <a href="/" style={{ display: "inline-block", marginTop: 14, fontSize: 13, color: "var(--cyan)" }}>
             ← 返回首页
           </a>

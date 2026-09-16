@@ -19,9 +19,10 @@ export default function LiveWall() {
   useEffect(() => {
     // 访问计数（每会话一次）+ 拉数据
     try {
-      if (!sessionStorage.getItem("visited_v1")) {
-        sessionStorage.setItem("visited_v1", "1");
-        void fetch("/api/stats", { method: "POST" }).catch(() => {});
+      if (!sessionStorage.getItem("visited_v2")) {
+        const visitorId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        sessionStorage.setItem("visited_v2", visitorId);
+        void fetch("/api/stats", { method: "POST", headers: { "x-visitor-id": visitorId } }).catch(() => {});
       }
     } catch { /* 隐私模式等 */ }
     fetch("/api/stats").then((r) => r.json()).then((d) => { if (d && Array.isArray(d.feed)) setWall(d); }).catch(() => {});

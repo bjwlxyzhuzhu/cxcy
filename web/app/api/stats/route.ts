@@ -7,10 +7,10 @@ export const runtime = "nodejs";
 /**
  * P4 · 首页实时动态墙（公开，无需登录）。
  * GET：平台累计数字 + 最近里程碑动态（学生姓名脱敏为"某同学"，不含学号）。
- *   数据全部来自真实表（site_visits / profiles / usage_logs / evidence_events）。
+ *   数据全部来自真实表（site_visit_events / profiles / usage_logs / evidence_events）。
  *   若平台尚无真实动态且设置了 WALL_DEMO=1，返回带 demo:true 标记的示例条目
  *  （前端会明确标注"演示数据"，正式评审前置空该变量即可）。
- * POST：访问计数 +1（按天，服务端写入）。
+ * POST：记录一次真实访问会话（每天同一会话只计一次，服务端写入）。
  */
 
 const KIND_TEXT: Record<string, (t: string, total?: number) => string> = {
@@ -55,7 +55,7 @@ export async function GET() {
   };
 
   const [visits, students, chats, docs, events] = await Promise.all([
-    (async () => { try { const { data } = await admin.from("site_visits").select("count"); return (data || []).reduce((s: number, r: { count?: number | string }) => s + (Number(r.count) || 0), 0); } catch { return 0; } })(),
+    (async () => { try { const result = await query<{ count: string }>("select count(*)::text as count from public.site_visit_events"); return Number(result.rows[0]?.count || 0); } catch { return 0; } })(),
     safeCount(admin.from("profiles").select("id", { count: "exact", head: true }).eq("role", "student")),
     safeCount(admin.from("usage_logs").select("id", { count: "exact", head: true })),
     safeCount(admin.from("evidence_events").select("id", { count: "exact", head: true }).in("kind", ["export_doc", "bp_draft", "crew_final"])),
@@ -97,10 +97,12 @@ export async function GET() {
   return NextResponse.json(body);
 }
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
     const day = new Date().toISOString().slice(0, 10);
-    await query("INSERT INTO public.site_visits (day, count) VALUES ($1, 1) ON CONFLICT (day) DO UPDATE SET count = public.site_visits.count + 1", [day]);
+    const visitorId = req.headers.get("x-visitor-id")?.trim().slice(0, 128);
+    if (!visitorId) return NextResponse.json({ ok: false, error: "缺少访问会话标识" }, { status: 400 });
+    await query("insert into public.site_visit_events(day, visitor_id) values($1,$2) on conflict (day, visitor_id) do nothing", [day, visitorId]);
     cache = null;
   } catch { /* 表未建或写失败：静默 */ }
   return NextResponse.json({ ok: true });
