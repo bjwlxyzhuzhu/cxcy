@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/db-client";
+import { query } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -54,7 +55,7 @@ export async function GET() {
   };
 
   const [visits, students, chats, docs, events] = await Promise.all([
-    (async () => { try { const { data } = await admin.from("site_visits").select("count"); return (data || []).reduce((s: number, r: { count?: number }) => s + (r.count || 0), 0); } catch { return 0; } })(),
+    (async () => { try { const { data } = await admin.from("site_visits").select("count"); return (data || []).reduce((s: number, r: { count?: number | string }) => s + (Number(r.count) || 0), 0); } catch { return 0; } })(),
     safeCount(admin.from("profiles").select("id", { count: "exact", head: true }).eq("role", "student")),
     safeCount(admin.from("usage_logs").select("id", { count: "exact", head: true })),
     safeCount(admin.from("evidence_events").select("id", { count: "exact", head: true }).in("kind", ["export_doc", "bp_draft", "crew_final"])),
@@ -98,11 +99,9 @@ export async function GET() {
 
 export async function POST() {
   try {
-    const admin = createAdminClient();
     const day = new Date().toISOString().slice(0, 10);
-    const { data } = await admin.from("site_visits").select("count").eq("day", day).maybeSingle();
-    if (data) await admin.from("site_visits").update({ count: (data.count || 0) + 1 }).eq("day", day);
-    else await admin.from("site_visits").insert({ day, count: 1 });
+    await query("INSERT INTO public.site_visits (day, count) VALUES ($1, 1) ON CONFLICT (day) DO UPDATE SET count = public.site_visits.count + 1", [day]);
+    cache = null;
   } catch { /* 表未建或写失败：静默 */ }
   return NextResponse.json({ ok: true });
 }

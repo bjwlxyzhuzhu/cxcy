@@ -101,7 +101,7 @@ export default function LoginPage() {
             style={{ ...input, margin: "6px 0 14px" }}
             value={no}
             onChange={(e) => setNo(e.target.value)}
-            placeholder="如 202596057038 或 admin"
+            placeholder="请输入学号或管理员账号"
             autoComplete="username"
           />
           <label style={{ fontSize: 12, color: "var(--mut)" }}>密码</label>
@@ -139,20 +139,6 @@ export default function LoginPage() {
             {loading ? "登录中…" : "登录 →"}
           </button>
 
-          <div
-            style={{
-              marginTop: 16,
-              fontSize: 12,
-              color: "var(--mut)",
-              lineHeight: 1.7,
-              borderTop: "1px solid var(--line)",
-              paddingTop: 12,
-            }}
-          >
-            演示账号：<br />
-            学生 <b style={{ color: "var(--ink)" }}>202596057038</b> / Student@2026<br />
-            管理员 <b style={{ color: "var(--ink)" }}>admin</b> / Admin@2026
-          </div>
           <a href="/" style={{ display: "inline-block", marginTop: 14, fontSize: 13, color: "var(--cyan)" }}>
             ← 返回首页
           </a>

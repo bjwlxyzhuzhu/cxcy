@@ -59,7 +59,7 @@ export default function LoginModal({ open, onClose, onSuccess, accent = "#22d3ee
         <p style={{ color: "var(--mut)", fontSize: 13, margin: "10px 0 16px" }}>用学号登录，登录后停留在当前页面</p>
 
         <label style={{ fontSize: 12, color: "var(--mut)" }}>学号</label>
-        <input style={{ ...input, margin: "6px 0 13px" }} value={no} onChange={(e) => setNo(e.target.value)} placeholder="如 202596057038 或 admin" autoComplete="username" />
+        <input style={{ ...input, margin: "6px 0 13px" }} value={no} onChange={(e) => setNo(e.target.value)} placeholder="请输入学号或管理员账号" autoComplete="username" />
         <label style={{ fontSize: 12, color: "var(--mut)" }}>密码</label>
         <input style={{ ...input, margin: "6px 0 4px" }} type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="密码" autoComplete="current-password" />
 
@@ -80,9 +80,6 @@ export default function LoginModal({ open, onClose, onSuccess, accent = "#22d3ee
           <span style={{ fontSize: 10.5, color: "#ffd9a0", border: "1px solid rgba(255,180,80,.4)", padding: "1px 6px", borderRadius: 999 }}>演示</span>
         </button>
 
-        <div style={{ marginTop: 14, fontSize: 12, color: "var(--mut)", lineHeight: 1.7, borderTop: "1px solid rgba(120,200,255,.18)", paddingTop: 11 }}>
-          演示账号：<br />学生 <b style={{ color: "var(--ink)" }}>202596057038</b> / Student@2026<br />管理员 <b style={{ color: "var(--ink)" }}>admin</b> / Admin@2026
-        </div>
       </form>
     </div>
   );

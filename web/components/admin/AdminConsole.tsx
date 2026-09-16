@@ -9,6 +9,7 @@ import ChaoxingAdmin from "./ChaoxingAdmin";
 import InterventionAdmin from "./InterventionAdmin";
 import EffectPanel from "./EffectPanel";
 import ResearchExport from "./ResearchExport";
+import ExperimentAdmin from "./ExperimentAdmin";
 
 const TABS = [
   { key: "roster", label: "📋 名册导入" },
@@ -18,6 +19,7 @@ const TABS = [
   { key: "effect", label: "📈 成效面板" },
   { key: "interventions", label: "🦉 干预督导" },
   { key: "research", label: "📦 研究数据导出" },
+  { key: "experiment", label: "🛰️ 课堂实验" },
   { key: "chaoxing", label: "🔗 超星对接" },
 ] as const;
 type TabKey = typeof TABS[number]["key"];
@@ -47,6 +49,7 @@ export default function AdminConsole({ me }: { me: { id: string; name: string | 
       {tab === "interventions" && <InterventionAdmin />}
       {tab === "chaoxing" && <ChaoxingAdmin />}
       {tab === "research" && <ResearchExport />}
+      {tab === "experiment" && <ExperimentAdmin />}
     </LearnChrome>
   );
 }

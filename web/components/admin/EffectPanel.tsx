@@ -24,11 +24,18 @@ export default function EffectPanel() {
   if (err) return <p style={{ color: "#f87171", fontSize: 14 }}>{err}</p>;
   if (!d) return <p style={{ color: "var(--mut)", fontSize: 14 }}>正在统计…</p>;
 
+  const nf = new Intl.NumberFormat("zh-CN");
+  const formatNumber = (value: string | number) => {
+    if (typeof value !== "number" || !Number.isFinite(value)) return value;
+    return Number.isInteger(value) ? nf.format(value) : value.toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  };
+  const n = (value: number) => formatNumber(value);
+
   const sixth =
-    `平台累计访问 ${d.coverage.visits} 次；注册学生 ${d.coverage.students} 人，活跃使用 ${d.coverage.activeUsers} 人，累计人机对话 ${d.coverage.chats} 轮（人均 ${d.coverage.chatsPerUser} 轮）。` +
-    `学生共形成选题结论 ${d.output.topics} 项、商业计划书成稿 ${d.output.drafts} 份、导出参赛文档 ${d.output.exports} 份、启用方法技能 ${d.output.skills} 次。` +
-    `模拟答辩累计 ${d.growth.defenses} 场，${d.growth.paired} 名学生完成能力前后测：雷达均分由期初 ${d.growth.preAvg} 提升至 ${d.growth.postAvg}（提升 ${d.growth.delta} 分）。` +
-    `系统共发出学习干预 ${d.intervention.total} 次，学生回应率 ${d.intervention.responseRate ?? "—"}%${d.intervention.disputed ? `（其中 ${d.intervention.disputed} 次申诉均经教师裁决）` : ""}。` +
+    `平台累计访问 ${n(d.coverage.visits)} 次；注册学生 ${n(d.coverage.students)} 人，活跃使用 ${n(d.coverage.activeUsers)} 人，累计人机对话 ${n(d.coverage.chats)} 轮（人均 ${n(d.coverage.chatsPerUser)} 轮）。` +
+    `学生共形成选题结论 ${n(d.output.topics)} 项、商业计划书成稿 ${n(d.output.drafts)} 份、导出参赛文档 ${n(d.output.exports)} 份、启用方法技能 ${n(d.output.skills)} 次。` +
+    `模拟答辩累计 ${n(d.growth.defenses)} 场，${n(d.growth.paired)} 名学生完成能力前后测：雷达均分由期初 ${n(d.growth.preAvg)} 提升至 ${n(d.growth.postAvg)}（提升 ${n(d.growth.delta)} 分）。` +
+    `系统共发出学习干预 ${n(d.intervention.total)} 次，学生回应率 ${d.intervention.responseRate === null ? "—" : n(d.intervention.responseRate) + "%"}${d.intervention.disputed ? `（其中 ${n(d.intervention.disputed)} 次申诉均经教师裁决）` : ""}。` +
     `以上数据均由平台证据链自动记录（服务端时间戳、可回放、不可篡改）。`;
 
   const copy = async () => {
@@ -41,7 +48,7 @@ export default function EffectPanel() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(110px,1fr))", gap: 10 }}>
         {items.map(([lb, v]) => (
           <div key={lb}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "var(--cyan)" }}>{v}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "var(--cyan)" }}>{formatNumber(v)}</div>
             <div style={{ fontSize: 11.5, color: "var(--mut)" }}>{lb}</div>
           </div>
         ))}
