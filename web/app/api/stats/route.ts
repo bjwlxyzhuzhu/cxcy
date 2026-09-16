@@ -55,7 +55,13 @@ export async function GET() {
   };
 
   const [visits, students, chats, docs, events] = await Promise.all([
-    (async () => { try { const result = await query<{ count: string }>("select count(*)::text as count from public.site_visit_events"); return Number(result.rows[0]?.count || 0); } catch { return 0; } })(),
+    (async () => {
+      try { const result = await query<{ count: string }>("select count(*)::text as count from public.site_visit_events"); return Number(result.rows[0]?.count || 0); }
+      catch {
+        try { const result = await query<{ count: string }>("select coalesce(sum(count),0)::text as count from public.site_visits"); return Number(result.rows[0]?.count || 0); }
+        catch { return 0; }
+      }
+    })(),
     safeCount(admin.from("profiles").select("id", { count: "exact", head: true }).eq("role", "student")),
     safeCount(admin.from("usage_logs").select("id", { count: "exact", head: true })),
     safeCount(admin.from("evidence_events").select("id", { count: "exact", head: true }).in("kind", ["export_doc", "bp_draft", "crew_final"])),
@@ -102,7 +108,12 @@ export async function POST(req: Request) {
     const day = new Date().toISOString().slice(0, 10);
     const visitorId = req.headers.get("x-visitor-id")?.trim().slice(0, 128);
     if (!visitorId) return NextResponse.json({ ok: false, error: "缺少访问会话标识" }, { status: 400 });
-    await query("insert into public.site_visit_events(day, visitor_id) values($1,$2) on conflict (day, visitor_id) do nothing", [day, visitorId]);
+    try {
+      await query("insert into public.site_visit_events(day, visitor_id) values($1,$2) on conflict (day, visitor_id) do nothing", [day, visitorId]);
+    } catch {
+      // 兼容尚未执行 0011 迁移的旧部署：仍写入原有按日访问表。
+      await query("insert into public.site_visits(day, count) values($1,1) on conflict (day) do update set count=public.site_visits.count+1", [day]);
+    }
     cache = null;
   } catch { /* 表未建或写失败：静默 */ }
   return NextResponse.json({ ok: true });

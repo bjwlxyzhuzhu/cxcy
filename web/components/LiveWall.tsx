@@ -22,7 +22,11 @@ export default function LiveWall() {
       if (!sessionStorage.getItem("visited_v2")) {
         const visitorId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         sessionStorage.setItem("visited_v2", visitorId);
-        void fetch("/api/stats", { method: "POST", headers: { "x-visitor-id": visitorId } }).catch(() => {});
+        void fetch("/api/stats", { method: "POST", headers: { "x-visitor-id": visitorId } })
+          .then(() => fetch("/api/stats"))
+          .then((r) => r.json())
+          .then((d) => { if (d && Array.isArray(d.feed)) setWall(d); })
+          .catch(() => {});
       }
     } catch { /* 隐私模式等 */ }
     fetch("/api/stats").then((r) => r.json()).then((d) => { if (d && Array.isArray(d.feed)) setWall(d); }).catch(() => {});

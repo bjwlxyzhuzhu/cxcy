@@ -80,6 +80,10 @@ export default function LoginModal({ open, onClose, onSuccess, accent = "#22d3ee
           <span style={{ fontSize: 10.5, color: "#ffd9a0", border: "1px solid rgba(255,180,80,.4)", padding: "1px 6px", borderRadius: 999 }}>演示</span>
         </button>
 
+        <a href="/register" style={{ display: "block", textAlign: "center", marginTop: 14, color: accent, fontSize: 13, textDecoration: "none" }}>
+          还没有账号？立即注册学生账号 →
+        </a>
+
       </form>
     </div>
   );
