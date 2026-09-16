@@ -30,7 +30,7 @@ export async function GET() {
     safe(admin.from("evidence_events").select("id", head).eq("kind", "export_doc")),
     safe(admin.from("evidence_events").select("id", head).eq("kind", "defense_radar")),
     safe(admin.from("evidence_events").select("id", head).eq("kind", "skill_use")),
-    (async () => { try { const { data } = await admin.from("site_visits").select("count"); return (data || []).reduce((s: number, r: { count?: number | string }) => s + (Number(r.count) || 0), 0); } catch { return 0; } })(),
+    (async () => { try { const { count } = await admin.from("site_visit_events").select("day", { count: "exact", head: true }); return count || 0; } catch { return 0; } })(),
     (async () => {
       try {
         const { data } = await admin.from("intervention_cards").select("status");
