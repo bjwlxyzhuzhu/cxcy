@@ -2,7 +2,7 @@
 import { useState } from "react";
 import * as XLSX from "xlsx";
 
-const SHEETS = ["students", "challenge_sessions", "dialogue_turns", "plan_versions", "ct_ratings", "peer_feedback", "usage_logs", "evidence_events", "projects"];
+const SHEETS = ["students", "challenge_sessions", "dialogue_turns", "plan_versions", "ct_ratings", "peer_feedback", "usage_logs", "evidence_events", "projects", "experiment_runs", "experiment_participants", "experiment_events"];
 
 export default function ResearchExport() {
   const [busy, setBusy] = useState(false);

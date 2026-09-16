@@ -280,6 +280,7 @@ export default function GalaxyHome({
           <div className="spacer" />
           <a href="/me/growth" className="chip" title="成长星图 · 你的能力成长证据链" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 700 }}>🌌 成长星图</a>
           <a href="/apply/skills" className="chip" title="技能商店 · 浏览 / 安装 / 沉淀技能" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 700 }}>🛒 技能商店</a>
+          <a href="/experiment" className="chip" title="进入课堂实验" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 700 }}>🛰️ 课堂实验</a>
           <button className="chip langbtn" id="langBtn" title="切换语言 / Switch language">
             🌐 <span id="langTxt">EN</span>
           </button>

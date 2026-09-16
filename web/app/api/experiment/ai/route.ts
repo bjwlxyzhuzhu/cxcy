@@ -1,0 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextResponse } from "next/server";
+import { getParticipant, CASE_TEXT, EXPERT_ROLES } from "@/lib/experiment";
+import { getApimart } from "@/lib/ai/apimart";
+export const runtime="nodejs";
+export async function POST(req:Request){ const p=await getParticipant(); if(!p) return NextResponse.json({error:"请先加入实验"},{status:401}); let b:any; try{b=await req.json()}catch{return NextResponse.json({error:"请求格式错误"},{status:400})}; const stage=String(b.stage||""); const role=String(b.role||""); const prompt=String(b.prompt||"").slice(0,12000); const cohort=p.cohort==="single"?"一名综合型创业评审专家":EXPERT_ROLES.join("、"); const sys=`你是“多智能体协作—双层对抗”课堂实验中的${role||cohort}。案例：${CASE_TEXT}\n当前实验组：${cohort}。阶段：${stage}。必须推动质疑、反例、证据追问和观点修正，禁止替学生直接代写结论。驾驶舱内部审辩时先指出证据不足、反例、风险或假设冲突；学生专家阶段只找问题并追问；答辩阶段每次只问一个问题。若生成方案，明确标注保留/修改/否决。`; try{const r=await getApimart().chat.completions.create({model:process.env.CHAT_MODEL||"deepseek-chat",messages:[{role:"system",content:sys},{role:"user",content:prompt}],max_tokens:900}); return NextResponse.json({text:r.choices?.[0]?.message?.content||""});}catch(e){return NextResponse.json({error:"AI 调用失败："+(e instanceof Error?e.message:"未知错误")},{status:502})} }
