@@ -1,2 +1,6 @@
-allowBuilds:
-  unrs-resolver: set this to true or false
+packages:
+  - "."
+
+# pnpm 10+：允许 Next.js 构建所需的原生解析器执行安装脚本。
+onlyBuiltDependencies:
+  - unrs-resolver
