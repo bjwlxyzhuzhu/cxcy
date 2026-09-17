@@ -1,6 +1,7 @@
 import { getSessionUser } from "@/lib/auth-local";
 import { ownRecords, isUuid } from "@/lib/learning-records";
 import { reportResponse } from "@/lib/report-export";
+import { learningReport } from "@/lib/experiment-report";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
@@ -15,17 +16,7 @@ export async function GET(req: Request) {
     if (!data)
       return Response.json({ error: "无权访问此记录" }, { status: 404 });
     return await reportResponse(
-      {
-        title: data.session.title,
-        metadata: {
-          session_id: id,
-          module: data.session.module,
-          created_at: data.session.created_at,
-          exported_at: new Date().toISOString(),
-          note: "学生原话和AI内容按role区分；未评分为NA",
-        },
-        rows: data.records,
-      },
+      learningReport(data.session, data.records),
       url.searchParams.get("format") || "docx",
     );
   } catch (e) {

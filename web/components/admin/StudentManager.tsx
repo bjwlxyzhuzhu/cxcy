@@ -1,4 +1,5 @@
 "use client";
+import AllRecordsExport from "./AllRecordsExport";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/api-client";
 
@@ -166,6 +167,7 @@ export default function StudentManager({ meId }: { meId: string }) {
 
   return (
     <div>
+      <AllRecordsExport />
       <p style={{ color: "var(--mut)", fontSize: 13 }}>
         在线：最近2分钟内有页面活动；后台每30秒更新。关闭页面后最多约2分钟显示离线。
         {presenceError}

@@ -6,6 +6,11 @@ export type Report = {
   title: string;
   metadata: Record<string, unknown>;
   rows: Record<string, unknown>[];
+  sections?: {
+    name: string;
+    rows: Record<string, unknown>[];
+    columns?: string[];
+  }[];
 };
 export const FORMATS = [
   "docx",
@@ -69,10 +74,18 @@ export function spreadsheetRows(rows: Report["rows"]) {
 const lines = (r: Report) => [
   r.title,
   ...Object.entries(r.metadata).map(([k, v]) => k + "：" + stringValue(v)),
-  ...r.rows.flatMap((row, i) => [
+  ...(r.sections || [{ name: "完整记录", rows: r.rows }]).flatMap((section) => [
     "",
-    `记录 ${i + 1}`,
-    ...Object.entries(flatten(row)).map(([k, v]) => k + "：" + stringValue(v)),
+    "【" + section.name + "】",
+    ...(section.rows.length
+      ? section.rows.flatMap((row, i) => [
+          "",
+          `记录 ${i + 1}`,
+          ...Object.entries(flatten(row)).map(
+            ([k, v]) => k + "：" + stringValue(v),
+          ),
+        ])
+      : ["暂无记录（缺失不计0分）"]),
   ]),
 ];
 const csvCell = (v: unknown) => {
@@ -152,6 +165,17 @@ export async function renderReport(
     const sheet = XLSX.utils.json_to_sheet(spreadsheetRows(report.rows));
     sheet["!cols"] = Array.from({ length: 30 }, () => ({ wch: 24 }));
     XLSX.utils.book_append_sheet(wb, sheet, "完整记录");
+    for (const section of report.sections || []) {
+      const part = XLSX.utils.json_to_sheet(
+        spreadsheetRows(section.rows),
+        section.columns
+          ? { header: ["record", "part", ...section.columns] }
+          : {},
+      );
+      part["!cols"] = Array.from({ length: 50 }, () => ({ wch: 24 }));
+      if (part["!ref"]) part["!autofilter"] = { ref: part["!ref"] };
+      XLSX.utils.book_append_sheet(wb, part, section.name.slice(0, 31));
+    }
     return {
       data: XLSX.write(wb, { type: "buffer", bookType: "xlsx" }),
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -176,15 +200,13 @@ export async function renderReport(
             },
           },
           children: lines(report).flatMap((s, i) =>
-            s
-              .split("\n")
-              .map(
-                (line) =>
-                  new Paragraph({
-                    ...(i === 0 ? { heading: HeadingLevel.TITLE } : {}),
-                    children: [new TextRun({ text: line })],
-                  }),
-              ),
+            s.split("\n").map(
+              (line) =>
+                new Paragraph({
+                  ...(i === 0 ? { heading: HeadingLevel.TITLE } : {}),
+                  children: [new TextRun({ text: line })],
+                }),
+            ),
           ),
         },
       ],

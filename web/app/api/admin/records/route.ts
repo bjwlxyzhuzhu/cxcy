@@ -2,7 +2,12 @@ import { requireAdmin } from "@/lib/admin";
 import { query } from "@/lib/db";
 import { reportResponse } from "@/lib/report-export";
 import { summarize, type ExpEvent } from "@/lib/experiment-protocol";
-import { scenarioFor } from "@/lib/experiment-scenarios";
+import {
+  learningReport,
+  experimentReport,
+  type ExportRun,
+  type ExportEvent,
+} from "@/lib/experiment-report";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
@@ -29,24 +34,12 @@ export async function GET(req: Request) {
         )
       ).rows;
       return format
-        ? await reportResponse(
-            {
-              title: s.title,
-              metadata: {
-                session_id: s.id,
-                module: s.module,
-                student_no: s.student_no,
-                exported_at: new Date().toISOString(),
-              },
-              rows,
-            },
-            format,
-          )
+        ? await reportResponse(learningReport(s, rows, s.student_no), format)
         : Response.json({ session: s, records: rows });
     }
     if (runId) {
       const run = (
-        await query(
+        await query<ExportRun>(
           "select * from experiment_runs where id=$1 and (created_by=$2 or $3='admin')",
           [runId, u.id, u.role],
         )
@@ -81,67 +74,29 @@ export async function GET(req: Request) {
         ...summarize(events.filter((e) => e.participant_id === p.id)),
       }));
       if (format) {
-        const stage = url.searchParams.get("stage");
         const participantId = url.searchParams.get("participantId");
-        const byId = new Map(
-          participants
-            .filter(
-              (p) => p.consent && (!participantId || p.id === participantId),
-            )
-            .map((p) => [p.id, p]),
-        );
-        const rows = events
-          .filter(
-            (e) => byId.has(e.participant_id) && (!stage || e.stage === stage),
-          )
-          .map(({ participant_id, ...e }) => ({
-            ...e,
-            participant_code: byId.get(participant_id)?.participant_code,
-            cohort: byId.get(participant_id)?.cohort,
-          }));
+        const cohort = url.searchParams.get("cohort");
+        if (cohort && !["single", "panel"].includes(cohort))
+          return Response.json({ error: "无效分组" }, { status: 400 });
         const drafts = (
-          await query(
-            "select participant_id,stage,payload,updated_at from experiment_drafts where participant_id in (select id from experiment_participants where run_id=$1 and consent=true)",
+          await query<ExportEvent>(
+            "select participant_id,stage,payload,updated_at as created_at,'draft' as event_type from experiment_drafts where participant_id in (select id from experiment_participants where run_id=$1)",
             [runId],
           )
-        ).rows
-          .filter(
-            (d) => byId.has(d.participant_id) && (!stage || d.stage === stage),
-          )
-          .map(({ participant_id, ...d }) => ({
-            ...d,
-            event_type: "draft",
-            participant_code: byId.get(participant_id)?.participant_code,
-          }));
+        ).rows;
         return await reportResponse(
-          {
+          experimentReport({
+            audience: "teaching",
             title: run.title,
-            metadata: {
-              run_id: runId,
-              protocol: run.protocol_version,
-              scenario: scenarioFor(run.scenario),
-              exported_at: new Date().toISOString(),
-              note: "稳定编号配对；未完成不记0分；完成率不代表能力提升；正文可能含学生自行输入的个人信息",
-            },
-            rows: [
-              ...summaries
-                .filter((p) => byId.has(p.id))
-                .map((p) => ({
-                  participant_code: p.participant_code,
-                  cohort: p.cohort,
-                  stage: p.stage,
-                  paired: p.paired,
-                  completed: p.completed,
-                  answers: p.answers,
-                  skipped: p.skipped,
-                  help: p.help,
-                  abilityScore: null,
-                  record_type: "participant_summary",
-                })),
-              ...rows,
-              ...drafts,
-            ],
-          },
+            runs: [run],
+            participants: participants
+              .filter((p) => !participantId || p.id === participantId)
+              .map((p) => ({ ...p, run_id: runId })),
+            events,
+            drafts,
+            cohort,
+            stage: url.searchParams.get("stage"),
+          }),
           format,
         );
       }

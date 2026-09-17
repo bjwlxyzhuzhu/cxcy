@@ -1,6 +1,11 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { withTransaction, query } from "@/lib/db";
+import {
+  syncLearningSupervision,
+  syncStudentOverview,
+  trySupervision,
+} from "./supervision";
 export const MODULES: Record<string, string> = {
   topic: "选题与赛道",
   expert: "专家打磨",
@@ -83,6 +88,15 @@ export async function finishRecord(
     await c.query("update learning_sessions set updated_at=now() where id=$1", [
       sessionId,
     ]);
+  });
+  await trySupervision(() => syncLearningSupervision(sessionId));
+  await trySupervision(async () => {
+    const s = (
+      await query("select user_id from learning_sessions where id=$1", [
+        sessionId,
+      ])
+    ).rows[0];
+    if (s) await syncStudentOverview(s.user_id);
   });
 }
 export async function ownRecords(userId: string, sessionId: string) {

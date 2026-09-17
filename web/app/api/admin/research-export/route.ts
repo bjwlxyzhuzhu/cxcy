@@ -3,6 +3,12 @@ import { requireAdmin } from "@/lib/admin";
 import { query } from "@/lib/db";
 import { reportResponse, flatten } from "@/lib/report-export";
 import { createHash } from "node:crypto";
+import {
+  experimentReport,
+  type ExportRun,
+  type ExportParticipant,
+  type ExportEvent,
+} from "@/lib/experiment-report";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 type Row = Record<string, unknown>;
@@ -73,9 +79,16 @@ export async function GET(req: Request) {
         .filter((s) => pid.has(s.user_id))
         .map((s) => [s.id, { pid: pid.get(s.user_id), module: s.module }]),
     );
+    const experiment = experimentReport({
+      title: "课堂实验研究数据",
+      runs: runs as ExportRun[],
+      participants: participants as ExportParticipant[],
+      events: events as ExportEvent[],
+    });
     const data: Record<string, unknown> = {
       exported_at: new Date().toISOString(),
-      schema_version: "research-export-2",
+      schema_version: "research-export-3",
+      experiment_analysis: experiment.sections,
       note: "结构化身份字段已去除；自由文本中学生自行输入的个人信息需发布前人工复核。历史问卷不能按序号或IP自动配对；未完成不计0分。",
       students: eligible.map((p) => ({
         research_pid: pid.get(p.id),
@@ -117,6 +130,9 @@ export async function GET(req: Request) {
           id: e.id,
           experiment_pid: exp.get(e.participant_id),
           run_id: e.run_id,
+          cohort: participants.find((p) => p.id === e.participant_id)?.cohort,
+          measurement_phase:
+            e.stage === "t0" ? "前测" : e.stage === "t1" ? "后测" : "过程/反馈",
           stage: e.stage,
           event_type: e.event_type,
           payload: e.payload,
@@ -143,7 +159,7 @@ export async function GET(req: Request) {
     const format = new URL(req.url).searchParams.get("format");
     if (format) {
       const rows = Object.entries(data)
-        .filter(([, v]) => Array.isArray(v))
+        .filter(([k, v]) => k !== "experiment_analysis" && Array.isArray(v))
         .flatMap(([table, rows]) =>
           (rows as Row[]).map((row) => ({ table, ...flatten(row) })),
         );
@@ -155,7 +171,14 @@ export async function GET(req: Request) {
             exported_at: data.exported_at,
             note: data.note,
           },
-          rows,
+          rows: [
+            ...experiment.rows,
+            ...rows.map((r) => ({ 数据表: "其他原始记录", ...r })),
+          ],
+          sections: [
+            ...(experiment.sections || []),
+            { name: "其他原始记录", rows },
+          ],
         },
         format,
       );

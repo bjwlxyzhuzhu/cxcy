@@ -25,6 +25,7 @@ import {
   experimentPath,
 } from "@/lib/experiment-scenarios";
 import { getSessionUser } from "@/lib/auth-local";
+import { syncExperimentSupervision, trySupervision } from "@/lib/supervision";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET() {
@@ -173,6 +174,18 @@ export async function POST(req: Request) {
           { error: "实验不存在、已关闭或无管理权限" },
           { status: 403 },
         );
+      if (action === "teacher_close") {
+        const participants = (
+          await query(
+            "select id from experiment_participants where run_id=$1",
+            [b.runId],
+          )
+        ).rows;
+        await trySupervision(async () => {
+          for (const row of participants)
+            await syncExperimentSupervision(row.id);
+        });
+      }
       return NextResponse.json(result.rows[0]);
     }
     const p = await getParticipant();
@@ -403,7 +416,10 @@ export async function POST(req: Request) {
         ...(action === "question" ? { question: payload } : {}),
       };
     });
-    return NextResponse.json(result);
+    const supervisionSynced =
+      action === "draft" ||
+      (await trySupervision(() => syncExperimentSupervision(p.id)));
+    return NextResponse.json({ ...result, supervisionSynced });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "提交失败";
     return NextResponse.json(

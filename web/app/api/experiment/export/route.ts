@@ -1,7 +1,7 @@
 import { getParticipant } from "@/lib/experiment";
 import { query } from "@/lib/db";
 import { reportResponse } from "@/lib/report-export";
-import { scenarioFor } from "@/lib/experiment-scenarios";
+import { experimentReport, type ExportEvent } from "@/lib/experiment-report";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
@@ -11,33 +11,35 @@ export async function GET(req: Request) {
   const stage = url.searchParams.get("stage");
   try {
     const events = (
-      await query(
-        "select id,event_type,stage,payload,created_at from experiment_events where participant_id=$1 and ($2::text is null or stage=$2) order by id",
-        [p.id, stage],
+      await query<ExportEvent>(
+        "select id,event_type,stage,payload,created_at from experiment_events where participant_id=$1 order by id",
+        [p.id],
       )
     ).rows;
     const drafts = (
-      await query(
-        "select 'draft' as event_type,stage,payload,updated_at as created_at from experiment_drafts where participant_id=$1 and ($2::text is null or stage=$2)",
-        [p.id, stage],
+      await query<ExportEvent>(
+        "select 'draft' as event_type,stage,payload,updated_at as created_at from experiment_drafts where participant_id=$1",
+        [p.id],
       )
     ).rows;
     return await reportResponse(
-      {
-        title:
-          p.run_title + "_" + p.participant_code + (stage ? "_" + stage : ""),
-        metadata: {
-          participant_code: p.participant_code,
-          run_id: p.run_id,
-          cohort: p.cohort,
-          protocol: p.protocol_version,
-          scenario: scenarioFor(p.scenario),
-          stage: p.stage,
-          exported_at: new Date().toISOString(),
-          note: "draft为未提交草稿；跳过/未完成不等于0分；AI帮助与学生作答分开记录",
-        },
-        rows: [...events, ...drafts],
-      },
+      experimentReport({
+        audience: "self",
+        title: p.run_title + "_" + p.participant_code,
+        runs: [
+          {
+            id: p.run_id,
+            title: p.run_title,
+            protocol_version: p.protocol_version,
+            scenario: p.scenario,
+            starts_at: p.starts_at,
+          },
+        ],
+        participants: [p],
+        events: events.map((e) => ({ ...e, participant_id: p.id })),
+        drafts: drafts.map((e) => ({ ...e, participant_id: p.id })),
+        stage,
+      }),
       url.searchParams.get("format") || "docx",
     );
   } catch (e) {

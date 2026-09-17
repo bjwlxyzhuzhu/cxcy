@@ -24,9 +24,19 @@ async function main() {
   await db.exec(
     readFileSync("db/migrations/0014_experiment_scenarios.sql", "utf8"),
   );
+  const initialSchema = readFileSync("db/migrations/0001_init.sql", "utf8");
+  const cardsStart = initialSchema.indexOf(
+    "create table if not exists public.intervention_cards",
+  );
+  const cardsEnd = initialSchema.indexOf("-- 学生可读自己的卡", cardsStart);
+  await db.exec(initialSchema.slice(cardsStart, cardsEnd));
+  await db.exec(
+    readFileSync("db/migrations/0015_supervision_sources.sql", "utf8"),
+  );
   const pass = await bcrypt.hash("Fixture-only-2026", 4);
   for (const [studentNo, role] of [
     ["teacher-test", "admin"],
+    ["ordinary-teacher", "teacher"],
     ["student-test", "student"],
     ["other-test", "student"],
   ]) {
@@ -130,6 +140,7 @@ async function main() {
     };
   };
   const teacher = makeClient(),
+    ordinaryTeacher = makeClient(),
     student = makeClient(),
     other = makeClient();
   const ok = async (r: Response) => {
@@ -154,6 +165,7 @@ async function main() {
     assert.equal((await student("/api/records")).status, 401);
     for (const [client, name] of [
       [teacher, "teacher-test"],
+      [ordinaryTeacher, "ordinary-teacher"],
       [student, "student-test"],
       [other, "other-test"],
     ] as const)
@@ -185,6 +197,14 @@ async function main() {
     };
     await ok(await student("/api/ai/ask", ask));
     await ok(await student("/api/ai/ask", ask));
+    assert.equal(
+      (
+        await db.query("select * from intervention_cards where source_key=$1", [
+          "learning:" + sid + ":learning_review",
+        ])
+      ).rows.length,
+      1,
+    );
     let history = await ok(await student("/api/records?sessionId=" + sid));
     assert.equal(history.records.length, 2);
     assert.equal((await other("/api/records?sessionId=" + sid)).status, 404);
@@ -533,6 +553,146 @@ async function main() {
       },
     });
     assert.equal(custom.scenario.id, "custom-v1");
+    const directCards = (
+      await db.query<{
+        id: number;
+        rule: string;
+        context: { participant_id: string };
+      }>("select * from intervention_cards where context->>'run_id'=$1", [
+        run.id,
+      ])
+    ).rows;
+    assert.ok(directCards.some((c) => c.rule === "experiment_skipped"));
+    assert.ok(directCards.some((c) => c.rule === "experiment_review"));
+    assert.ok(!directCards.some((c) => c.rule === "experiment_missing"));
+    const queue = await ok(await teacher("/api/interventions?all=1"));
+    assert.ok(queue.total > 3);
+    const again = await ok(await teacher("/api/interventions?all=1"));
+    assert.equal(again.total, queue.total);
+    assert.equal(again.checked, 0);
+    const overviewCards = await ok(
+      await teacher("/api/interventions?all=1&kind=overview"),
+    );
+    assert.equal(overviewCards.total, 2);
+    assert.ok(
+      overviewCards.cards.every((c: any) => c.context.kind === "overview"),
+    );
+    const oldUser = (
+      await db.query<{ id: string }>(
+        "insert into users(student_no,password_hash,name,role) values('historical-only',$1,'历史同学','student') returning id",
+        [pass],
+      )
+    ).rows[0].id;
+    await db.query("insert into projects(id,user_id) values($1,$2)", [
+      randomUUID(),
+      oldUser,
+    ]);
+    const noDataUser = (
+      await db.query<{ id: string }>(
+        "insert into users(student_no,password_hash,name,role) values('no-data',$1,'未提交同学','student') returning id",
+        [pass],
+      )
+    ).rows[0].id;
+    const backfill = await ok(
+      await teacher("/api/interventions?all=1&kind=overview"),
+    );
+    assert.equal(backfill.total, 4);
+    assert.ok(
+      backfill.cards
+        .find((c: any) => c.user_id === oldUser)
+        .evidence.includes("历史项目1条"),
+    );
+    assert.match(
+      backfill.cards.find((c: any) => c.user_id === noDataUser).sharp,
+      /等待/,
+    );
+    const card = directCards.find((c) => c.rule === "experiment_review")!;
+    assert.equal(
+      (await other("/api/interventions", { id: card.id, action: "accepted" }))
+        .status,
+      403,
+    );
+    await ok(
+      await teacher("/api/interventions", {
+        id: card.id,
+        action: "note",
+        note: "测试教师备注保留",
+      }),
+    );
+    await ok(
+      await teacher("/api/interventions", {
+        id: card.id,
+        action: "retract",
+        note: "测试撤回",
+      }),
+    );
+    await db.query("delete from supervision_checkpoints where source_key=$1", [
+      "experiment:" + card.context.participant_id,
+    ]);
+    await ok(await teacher("/api/interventions?all=1"));
+    const kept = (
+      await db.query<{ status: string; teacher_note: string }>(
+        "select status,teacher_note from intervention_cards where id=$1",
+        [card.id],
+      )
+    ).rows[0];
+    assert.equal(kept.status, "retracted");
+    assert.equal(kept.teacher_note, "测试撤回");
+    const analysisExport = await ok(
+      await teacher("/api/admin/records?runId=" + run.id + "&format=json"),
+    );
+    assert.ok(
+      analysisExport.sections.some((s: any) => s.name === "前后测配对"),
+    );
+    assert.ok(
+      analysisExport.sections.find((s: any) => s.name === "前测").rows[0]
+        .提交时间,
+    );
+    assert.ok(
+      analysisExport.sections.find((s: any) => s.name === "阶段用时").rows[0]
+        .阶段开始时间,
+    );
+    const bExport = await ok(
+      await teacher(
+        "/api/admin/records?runId=" + run.id + "&cohort=panel&format=json",
+      ),
+    );
+    assert.equal(
+      bExport.sections.find((s: any) => s.name === "参与者与缺项").rows.length,
+      0,
+    );
+    for (const client of [makeClient(), student, other, ordinaryTeacher]) {
+      assert.equal(
+        (await client("/api/admin/records/export?format=json")).status,
+        403,
+      );
+    }
+    const allTeaching = await ok(
+      await teacher("/api/admin/records/export?format=json"),
+    );
+    const allParticipants = allTeaching.sections.find(
+      (s: any) => s.name === "参与者与缺项",
+    ).rows;
+    assert.ok(allParticipants.some((r: any) => r.学号 === "student-test"));
+    assert.ok(allParticipants.some((r: any) => r.学号 === "other-test"));
+    assert.ok(
+      allTeaching.sections
+        .find((s: any) => s.name === "前测")
+        .rows.every((r: any) => r.提交时间 && r.分组),
+    );
+    assert.equal(
+      allTeaching.sections.find((s: any) => s.name === "历史项目").rows[0].学号,
+      "historical-only",
+    );
+    assert.ok(!JSON.stringify(allTeaching).includes("password_hash"));
+    assert.ok(!JSON.stringify(allTeaching).includes(restoredCode));
+    for (const format of ["xlsx", "docx", "pdf", "csv", "rtf", "md"]) {
+      const exported = await teacher(
+        "/api/admin/records/export?format=" + format,
+      );
+      assert.equal(exported.status, 200, await exported.clone().text());
+      assert.ok((await exported.arrayBuffer()).byteLength > 50);
+    }
     console.log(
       "PASS: 登录/退出/恢复、跨账号隔离、重复提交、8轮问答、阶段门槛、前后测配对、后台同步、全部导出HTTP接口。AI仅使用本地替身。",
     );

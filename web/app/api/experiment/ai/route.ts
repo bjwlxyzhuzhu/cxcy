@@ -4,6 +4,7 @@ import { getApimart } from "@/lib/ai/apimart";
 import { query } from "@/lib/db";
 import { PROTOCOL, replies, type ExpEvent } from "@/lib/experiment-protocol";
 import { scenarioFor } from "@/lib/experiment-scenarios";
+import { syncExperimentSupervision, trySupervision } from "@/lib/supervision";
 export const runtime = "nodejs";
 export async function POST(req: Request) {
   const p = await getParticipant();
@@ -97,6 +98,7 @@ export async function POST(req: Request) {
           : "先说“我的想法是____”，再说“因为我观察到____”，最后说“还不确定____，我会通过____确认”。不必使用专业术语，也不需要编造数据。";
     }
     await recordEvent(p, "help", stage, { round, kind: b.kind, text, source });
+    await trySupervision(() => syncExperimentSupervision(p.id));
     return NextResponse.json({ text, source });
   } catch (e) {
     return NextResponse.json(

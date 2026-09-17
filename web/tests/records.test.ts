@@ -13,6 +13,153 @@ import * as XLSX from "xlsx";
 import mammoth from "mammoth";
 import { PDFParse } from "pdf-parse";
 import {
+  experimentReport,
+  beijingTime,
+  type ExportEvent,
+} from "../lib/experiment-report";
+import { experimentSignals } from "../lib/supervision-rules";
+test("实验导出分组、前后测、缺项、北京时间及阶段用时可核对", async () => {
+  const run = {
+    id: "run-1",
+    title: "测试课堂",
+    protocol_version: "guided-v2",
+    starts_at: "2026-09-17T00:00:00Z",
+  };
+  const people = [
+    {
+      id: "p1",
+      run_id: run.id,
+      participant_code: "A-1",
+      cohort: "single",
+      stage: "completed",
+      created_at: "2026-09-16T23:50:00Z",
+    },
+    {
+      id: "p2",
+      run_id: run.id,
+      participant_code: "B-1",
+      cohort: "panel",
+      stage: "t0",
+    },
+  ];
+  const core = {
+    instrument: "core-v2",
+    judgment: "有条件支持",
+    assumptions: "需求和成本",
+    risk: "隐私",
+    confidence: 3,
+  };
+  const events: ExportEvent[] = [
+    {
+      participant_id: "p1",
+      stage: "t0",
+      event_type: "assessment",
+      payload: core,
+      created_at: "2026-09-17T00:02:00Z",
+    },
+    {
+      participant_id: "p1",
+      stage: "t0",
+      event_type: "advance",
+      payload: { next: "orient" },
+      created_at: "2026-09-17T00:03:00Z",
+    },
+    {
+      participant_id: "p1",
+      stage: "t1",
+      event_type: "assessment",
+      payload: core,
+      created_at: "2026-09-17T00:30:00Z",
+    },
+    {
+      participant_id: "p1",
+      stage: "survey",
+      event_type: "advance",
+      payload: { next: "completed" },
+      created_at: "2026-09-17T00:40:00Z",
+    },
+  ];
+  const report = experimentReport({
+    title: "分组报告",
+    runs: [run],
+    participants: people,
+    events,
+  });
+  assert.equal(beijingTime(events[0].created_at), "2026-09-17 08:02:00");
+  const paired = report.sections!.find((s) => s.name === "前后测配对")!.rows;
+  assert.equal(paired[0].配对状态, "同量表已配对");
+  assert.equal(paired[1].配对状态, "前后测均缺失");
+  assert.equal(paired[1].后测_把握程度1至5, null);
+  assert.equal(
+    report.sections!.find((s) => s.name === "阶段用时")!.rows[0].阶段经过秒数,
+    180,
+  );
+  assert.equal(
+    report.sections!.find((s) => s.name === "参与者与缺项")!.rows[0]
+      .全程经过秒数,
+    2400,
+  );
+  const wb = XLSX.read((await renderReport(report, "xlsx")).data, {
+    type: "buffer",
+  });
+  for (const name of [
+    "分组汇总",
+    "前测",
+    "后测",
+    "前后测配对",
+    "阶段用时",
+    "过程记录",
+  ])
+    assert.ok(wb.Sheets[name]);
+  assert.match(
+    JSON.stringify(XLSX.utils.sheet_to_json(wb.Sheets["前测"])),
+    /A组（综合专家）/,
+  );
+  assert.match(
+    (await renderReport(report, "csv")).data.toString(),
+    /2026-09-17 08:02:00/,
+  );
+  assert.match(
+    (
+      await mammoth.extractRawText({
+        buffer: (await renderReport(report, "docx")).data,
+      })
+    ).value,
+    /【前后测配对】/,
+  );
+  const filtered = experimentReport({
+    title: "B组",
+    runs: [run],
+    participants: people,
+    events,
+    cohort: "panel",
+  });
+  assert.ok(!JSON.stringify(filtered.rows).includes("A-1"));
+});
+test("督导根据缺项和求助事实生成，不把正在进行当缺测或能力不足", () => {
+  const events: ExpEvent[] = [
+    { event_type: "assessment", stage: "t0", payload: {} },
+  ];
+  assert.equal(experimentSignals(events, false).length, 0);
+  assert.equal(experimentSignals(events, true)[0].rule, "experiment_missing");
+  events.push({
+    event_type: "reply",
+    stage: "expert",
+    payload: { responseStatus: "skipped" },
+  });
+  assert.equal(experimentSignals(events, false)[0].rule, "experiment_skipped");
+  events.push({
+    event_type: "advance",
+    stage: "survey",
+    payload: { next: "completed" },
+  });
+  assert.ok(
+    experimentSignals(events, false).some(
+      (s) => s.rule === "experiment_review",
+    ),
+  );
+});
+import {
   createScenario,
   SCENARIOS,
   scenarioFor,

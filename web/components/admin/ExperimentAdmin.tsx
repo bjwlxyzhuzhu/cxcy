@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import RecordExport from "@/components/RecordExport";
+import AllRecordsExport from "./AllRecordsExport";
 import { STAGE_LABELS } from "@/lib/experiment-protocol";
 import {
   SCENARIOS,
@@ -35,6 +36,7 @@ type Session = {
   updated_at: string;
 };
 export default function ExperimentAdmin() {
+  const [exportCohort, setExportCohort] = useState("");
   const [scenarioId, setScenarioId] = useState(SCENARIOS[0].id);
   const [customScenario, setCustomScenario] = useState({
     title: "",
@@ -93,6 +95,8 @@ export default function ExperimentAdmin() {
   }
   useEffect(() => {
     void load();
+    const runId = new URLSearchParams(window.location.search).get("run");
+    if (runId) void select(runId);
   }, []);
   useEffect(() => {
     if (!run) return;
@@ -142,6 +146,7 @@ export default function ExperimentAdmin() {
   return (
     <div style={{ lineHeight: 1.8 }}>
       <h2>课堂实验与测试记录</h2>
+      <AllRecordsExport />
       <p>
         ① 创建实验 → ② 把实验码和 /experiment 地址发给学生 → ③ 开放实验 → ④
         查看进度并导出。学生按完成情况前进，不强制限时。
@@ -286,8 +291,26 @@ export default function ExperimentAdmin() {
             {participants.filter((p) => p.paired).length}
             。这只是完成情况，不是能力提升统计。
           </p>
+          <p>
+            Excel按分组汇总、前测、后测、配对、阶段用时和过程记录分表；时间统一为北京时间。其他格式也带中文分组、阶段与时间字段。
+          </p>
+          <label>
+            导出分组{" "}
+            <select
+              aria-label="导出分组"
+              value={exportCohort}
+              onChange={(e) => setExportCohort(e.target.value)}
+              style={{ color: "#111", background: "white", padding: 8 }}
+            >
+              <option value="">全部分组</option>
+              <option value="single">A组·综合专家</option>
+              <option value="panel">B组·五位专家</option>
+            </select>
+          </label>
           <RecordExport
-            endpoint={"/api/admin/records?runId=" + run.id}
+            endpoint={
+              "/api/admin/records?runId=" + run.id + "&cohort=" + exportCohort
+            }
             label="导出本次实验"
           />
           <div style={{ overflowX: "auto" }}>
