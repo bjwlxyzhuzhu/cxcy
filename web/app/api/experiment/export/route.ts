@@ -1,6 +1,7 @@
 import { getParticipant } from "@/lib/experiment";
 import { query } from "@/lib/db";
 import { reportResponse } from "@/lib/report-export";
+import { scenarioFor } from "@/lib/experiment-scenarios";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
@@ -30,6 +31,7 @@ export async function GET(req: Request) {
           run_id: p.run_id,
           cohort: p.cohort,
           protocol: p.protocol_version,
+          scenario: scenarioFor(p.scenario),
           stage: p.stage,
           exported_at: new Date().toISOString(),
           note: "draft为未提交草稿；跳过/未完成不等于0分；AI帮助与学生作答分开记录",

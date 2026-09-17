@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/admin";
 import { query } from "@/lib/db";
 import { reportResponse } from "@/lib/report-export";
 import { summarize, type ExpEvent } from "@/lib/experiment-protocol";
+import { scenarioFor } from "@/lib/experiment-scenarios";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
@@ -118,6 +119,7 @@ export async function GET(req: Request) {
             metadata: {
               run_id: runId,
               protocol: run.protocol_version,
+              scenario: scenarioFor(run.scenario),
               exported_at: new Date().toISOString(),
               note: "稳定编号配对；未完成不记0分；完成率不代表能力提升；正文可能含学生自行输入的个人信息",
             },

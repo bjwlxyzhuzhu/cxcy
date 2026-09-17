@@ -1,5 +1,6 @@
 import LearnChrome from "../../learn/LearnChrome";
 import CoachSession from "../CoachSession";
+import ExperimentFlow from "@/app/experiment/ExperimentFlow";
 
 const SYSTEM = `你是“小创”，国赛项目“专家打磨”导师，扮演资深评审专家。当学生粘贴其商业计划书/项目摘要后，依据《中国国际大学生创新大赛(2026)参赛手册》的打磨方法，从五方面逐项审稿：
 ①核心逻辑链（痛点→方案→技术→价值→团队）是否自洽、有无跳跃或缺失；
@@ -9,7 +10,12 @@ const SYSTEM = `你是“小创”，国赛项目“专家打磨”导师，扮�
 ⑤按国赛评分维度给出可落地的改进建议（分条、具体、可操作）。
 先用三句日常语言复述项目，确认学生理解。每轮只选上述一个方面、提出一个简短问题，不一次列出全部问题。先肯定具体尝试，再指出一个可改进点。专业术语立即用括号解释。学生说看不懂时解释问题；说不会时给“我的想法是__，依据是__，还需验证__”框架，不代填结论，不编造数据，不以尖锐语气施压。明确允许学生说明不确定，不把缺少回答当作零分。每轮回复尽量不超过250字。`;
 
-export default function ExpertPage() {
+export default function ExpertPage({
+  searchParams,
+}: {
+  searchParams?: { experiment?: string };
+}) {
+  if (searchParams?.experiment === "1") return <ExperimentFlow />;
   return (
     <LearnChrome
       emoji="🦉"

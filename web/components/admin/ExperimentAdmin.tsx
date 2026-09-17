@@ -2,6 +2,11 @@
 import { useEffect, useState } from "react";
 import RecordExport from "@/components/RecordExport";
 import { STAGE_LABELS } from "@/lib/experiment-protocol";
+import {
+  SCENARIOS,
+  scenarioFor,
+  type Scenario,
+} from "@/lib/experiment-scenarios";
 type Run = {
   id: string;
   title: string;
@@ -9,6 +14,7 @@ type Run = {
   status: string;
   participants: number;
   protocol_version: string;
+  scenario: Scenario;
 };
 type Participant = {
   id: string;
@@ -29,6 +35,12 @@ type Session = {
   updated_at: string;
 };
 export default function ExperimentAdmin() {
+  const [scenarioId, setScenarioId] = useState(SCENARIOS[0].id);
+  const [customScenario, setCustomScenario] = useState({
+    title: "",
+    caseText: "",
+    plain: "",
+  });
   const [runs, setRuns] = useState<Run[]>([]),
     [sessions, setSessions] = useState<Session[]>([]),
     [run, setRun] = useState<Run | null>(null),
@@ -94,7 +106,13 @@ export default function ExperimentAdmin() {
       const r = await fetch("/api/experiment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, title, runId: run?.id }),
+        body: JSON.stringify({
+          action,
+          title,
+          runId: run?.id,
+          scenarioId,
+          customScenario,
+        }),
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
@@ -131,6 +149,77 @@ export default function ExperimentAdmin() {
       <p>
         A组为综合专家，B组为五位专家；按加入顺序交替分配，不宣称随机分组。两组问题数量一致。历史实验单独保留。
       </p>
+      <details>
+        <summary>教师操作指导与课堂检查清单</summary>
+        <ol>
+          <li>
+            选择本次实验题材并命名课堂。想让另一批同学做不同题材，另建一场实验，使用不同实验码。
+          </li>
+          <li>
+            点击创建，核对案例后点击“开放实验”。未开放时学生会停在等待页。
+          </li>
+          <li>
+            请学生先登录，再进入“课堂实验”并输入实验码。提醒学生不会时写明原因，不编造数据。
+          </li>
+          <li>
+            学生提交后自动跳到下一步或对应模块的课堂实验模式。V0、V1和回答共用一份记录，无需学生另行上传。
+          </li>
+          <li>
+            在下方查看缺项与进度，完成后导出；确认全班结束再关闭。不同题材的数据分别分析，不直接混算提升率。
+          </li>
+        </ol>
+      </details>
+      <label>
+        选择实验题材{" "}
+        <select
+          aria-label="实验题材"
+          value={scenarioId}
+          onChange={(e) => setScenarioId(e.target.value)}
+          style={{ color: "#111", padding: 10, maxWidth: "100%" }}
+        >
+          {SCENARIOS.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.title}
+            </option>
+          ))}
+          <option value="custom">自定义：使用自己的课堂项目</option>
+        </select>
+      </label>
+      {scenarioId === "custom" ? (
+        <div>
+          {(
+            [
+              ["title", "案例名称"],
+              ["caseText", "案例背景（至少30字）"],
+              ["plain", "面向初学者的通俗说明"],
+            ] as const
+          ).map(([key, label]) => (
+            <label key={key} style={{ display: "block" }}>
+              {label}
+              <textarea
+                value={customScenario[key]}
+                onChange={(e) =>
+                  setCustomScenario({
+                    ...customScenario,
+                    [key]: e.target.value,
+                  })
+                }
+                style={{
+                  display: "block",
+                  color: "#111",
+                  width: "100%",
+                  minHeight: 70,
+                }}
+              />
+            </label>
+          ))}
+          <p>
+            系统使用目标用户、替代方案、验证、付费和风险5个通用问题。创建后案例冻结；请不要在背景中填写学生隐私。
+          </p>
+        </div>
+      ) : (
+        <p>{SCENARIOS.find((s) => s.id === scenarioId)?.plain}</p>
+      )}
       <input
         aria-label="实验名称"
         value={title}
@@ -165,6 +254,10 @@ export default function ExperimentAdmin() {
           }}
         >
           <h3>{run.title}</h3>
+          <p>
+            <b>{scenarioFor(run.scenario).title}</b>：
+            {scenarioFor(run.scenario).plain}
+          </p>
           <p>
             实验码：<b style={{ fontSize: 26 }}>{run.join_code}</b>　状态：
             {run.status}　协议：{run.protocol_version}

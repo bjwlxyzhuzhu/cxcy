@@ -4,8 +4,20 @@ import LearnChrome from "../../learn/LearnChrome";
 import CoachSession from "../CoachSession";
 import RadarChart from "../RadarChart";
 import { TRACKS, RUBRICS, groupKey } from "@/lib/contest";
+import ExperimentFlow from "@/app/experiment/ExperimentFlow";
 
-export default function DefensePage() {
+export default function DefensePage({
+  searchParams,
+}: {
+  searchParams?: { experiment?: string };
+}) {
+  return searchParams?.experiment === "1" ? (
+    <ExperimentFlow />
+  ) : (
+    <RegularDefense />
+  );
+}
+function RegularDefense() {
   const [track, setTrack] = useState(TRACKS[0].track);
   const groups = useMemo(
     () => TRACKS.find((t) => t.track === track)?.groups || [],

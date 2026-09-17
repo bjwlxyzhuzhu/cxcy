@@ -2,7 +2,14 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
   if (req.cookies.get("cxcy_experiment_session")) {
-    if (req.nextUrl.pathname.startsWith("/apply/"))
+    if (
+      req.nextUrl.pathname.startsWith("/apply/") &&
+      !(
+        ["/apply/cockpit", "/apply/expert", "/apply/defense"].includes(
+          req.nextUrl.pathname,
+        ) && req.nextUrl.searchParams.get("experiment") === "1"
+      )
+    )
       return NextResponse.redirect(new URL("/experiment", req.url));
     if (
       req.nextUrl.pathname.startsWith("/api/ai/") &&

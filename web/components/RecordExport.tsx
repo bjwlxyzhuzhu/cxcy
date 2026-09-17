@@ -56,7 +56,7 @@ export default function RecordExport({
         aria-label="导出格式"
         value={format}
         onChange={(e) => setFormat(e.target.value)}
-        style={{ color: "#111", padding: 7, borderRadius: 6 }}
+        style={{ color: "#111", background: "#fff", padding: 7, borderRadius: 6 }}
       >
         {formats.map(([v, t]) => (
           <option key={v} value={v}>

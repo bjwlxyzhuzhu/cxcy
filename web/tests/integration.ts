@@ -21,6 +21,9 @@ async function main() {
     readFileSync("db/migrations/0012_learning_records.sql", "utf8"),
   );
   await db.exec(readFileSync("db/migrations/0013_presence.sql", "utf8"));
+  await db.exec(
+    readFileSync("db/migrations/0014_experiment_scenarios.sql", "utf8"),
+  );
   const pass = await bcrypt.hash("Fixture-only-2026", 4);
   for (const [studentNo, role] of [
     ["teacher-test", "admin"],
@@ -51,6 +54,7 @@ async function main() {
     maxConnections: 64,
   });
   await pg.start();
+  const aiPrompts: string[] = [];
   const ai = createServer(async (req, res) => {
     let input = "";
     for await (const chunk of req) input += chunk;
@@ -60,6 +64,7 @@ async function main() {
       return;
     }
     const body = JSON.parse(input || "{}");
+    aiPrompts.push(JSON.stringify(body.messages));
     const text = "可以先访谈几位同学，记录他们遇到的具体困难。";
     if (body.stream) {
       res.writeHead(200, { "Content-Type": "text/event-stream" });
@@ -360,11 +365,174 @@ async function main() {
     await post(teacher, { action: "teacher_close", runId: run.id });
     await post(student, { action: "leave" });
     const closedRestore = await post(student, {
-      action: "join", joinCode: run.join_code, consent: true,
+      action: "join",
+      joinCode: run.join_code,
+      consent: true,
     });
     assert.equal(closedRestore.participant.participant_code, pid);
-    assert.equal((await ok(await student("/api/experiment"))).stage.key, "closed");
-    assert.equal((await student("/api/experiment/export?stage=expert&format=json")).status, 200);
+    assert.equal(
+      (await ok(await student("/api/experiment"))).stage.key,
+      "closed",
+    );
+    assert.equal(
+      (await student("/api/experiment/export?stage=expert&format=json")).status,
+      200,
+    );
+    assert.equal(
+      (await other("/api/experiment", { action: "resume", runId: run.id }))
+        .status,
+      404,
+    );
+    const second = await post(teacher, {
+      action: "teacher_create",
+      title: "实验二自动衔接",
+      scenarioId: "campus-reuse-v1",
+    });
+    await post(teacher, { action: "teacher_start", runId: second.id });
+    await post(other, {
+      action: "join",
+      joinCode: second.join_code,
+      consent: true,
+    });
+    assert.match(
+      (await ok(await other("/api/experiment"))).caseText,
+      /闲置教材/,
+    );
+    const preBody = {
+      action: "assessment",
+      stage: "t0",
+      payload: core,
+      advance: true,
+      requestId: randomUUID(),
+    };
+    await ok(await other("/api/experiment", preBody));
+    await ok(await other("/api/experiment", preBody));
+    assert.equal(
+      (await ok(await other("/api/experiment"))).stage.key,
+      "orient",
+    );
+    const orient = await post(other, {
+      action: "orientation",
+      stage: "orient",
+      understood: true,
+      advance: true,
+    });
+    assert.equal(orient.nextPath, "/apply/cockpit?experiment=1");
+    const cockpitPage = await other(orient.nextPath);
+    assert.equal(cockpitPage.status, 200);
+    assert.ok(cockpitPage.url.includes("/apply/cockpit?experiment=1"));
+    const planText = "先为毕业同学回收教材，在一栋宿舍验证保管与取货服务。";
+    const toExpert = await post(other, {
+      action: "plan",
+      stage: "cockpit",
+      text: planText,
+      advance: true,
+    });
+    assert.equal(toExpert.nextPath, "/apply/expert?experiment=1");
+    assert.equal((await other(toExpert.nextPath)).status, 200);
+    let current = await ok(await other("/api/experiment"));
+    assert.equal(
+      current.events.find((e: any) => e.event_type === "plan").payload.text,
+      planText,
+    );
+    assert.equal(
+      current.events.filter((e: any) => e.event_type === "question").length,
+      1,
+    );
+    const aid = await ok(
+      await other("/api/experiment/ai", { stage: "expert", kind: "framework" }),
+    );
+    assert.equal(aid.source, "ai");
+    assert.ok(
+      aiPrompts.some((p) => p.includes("闲置教材") && p.includes(planText)),
+    );
+    for (let round = 1; round <= 5; round++) {
+      current = await ok(await other("/api/experiment"));
+      assert.ok(
+        current.events.some(
+          (e: any) => e.event_type === "question" && e.payload.round === round,
+        ),
+      );
+      await post(other, {
+        action: "reply",
+        stage: "expert",
+        round,
+        text: "先访谈，记录问题，再尝试少量服务。",
+        responseStatus: "answered",
+      });
+    }
+    const revision = "V1：只收教材，公开品相，约定取货时间和争议处理方式。";
+    const toDefense = await post(other, {
+      action: "revision",
+      stage: "expert",
+      text: revision,
+      advance: true,
+    });
+    assert.equal(toDefense.nextPath, "/apply/defense?experiment=1");
+    assert.equal((await other(toDefense.nextPath)).status, 200);
+    current = await ok(await other("/api/experiment"));
+    assert.equal(
+      current.events.find((e: any) => e.event_type === "revision").payload.text,
+      revision,
+    );
+    for (let round = 1; round <= 3; round++)
+      await post(other, {
+        action: "reply",
+        stage: "defense",
+        round,
+        text: "先尝试少量教材寄售，记录同学的反馈。",
+        responseStatus: "answered",
+        advance: round === 3,
+      });
+    current = await ok(await other("/api/experiment"));
+    assert.equal(current.stage.key, "t1");
+    assert.equal(current.nextPath, "/experiment");
+    await post(other, {
+      action: "assessment",
+      stage: "t1",
+      payload: core,
+      advance: true,
+    });
+    await post(other, {
+      action: "survey",
+      stage: "survey",
+      rating: 4,
+      advance: true,
+    });
+    current = await ok(await other("/api/experiment"));
+    assert.equal(current.stage.key, "completed");
+    assert.equal(
+      current.events.filter((e: any) => e.event_type === "advance").length,
+      7,
+    );
+    assert.equal(
+      current.events.filter((e: any) => e.event_type === "question").length,
+      8,
+    );
+    const secondExport = await ok(
+      await other("/api/experiment/export?format=json"),
+    );
+    assert.match(JSON.stringify(secondExport), /campus-reuse-v1/);
+    await post(other, { action: "leave" });
+    const list = await ok(await other("/api/experiment"));
+    assert.equal(list.myExperiments.length, 1);
+    await post(other, { action: "resume", runId: second.id });
+    assert.equal(
+      (await ok(await other("/api/experiment"))).stage.key,
+      "completed",
+    );
+    const custom = await post(teacher, {
+      action: "teacher_create",
+      title: "自定义案例验证",
+      scenarioId: "custom",
+      customScenario: {
+        title: "社区阅读空间",
+        caseText:
+          "社区团队希望让居民交流闲置图书，计划先在社区活动室尝试一次图书交换，需求与维护成本仍待验证。",
+        plain: "先尝试一次图书交换，问清大家是否需要。",
+      },
+    });
+    assert.equal(custom.scenario.id, "custom-v1");
     console.log(
       "PASS: 登录/退出/恢复、跨账号隔离、重复提交、8轮问答、阶段门槛、前后测配对、后台同步、全部导出HTTP接口。AI仅使用本地替身。",
     );

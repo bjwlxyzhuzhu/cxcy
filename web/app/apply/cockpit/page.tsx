@@ -28,6 +28,7 @@ import { createClient } from "@/lib/api-client";
 import { downloadWord, printPdf, downloadPptx } from "@/lib/download";
 import { logClientEvidence } from "@/lib/evidenceClient";
 import RecordExport from "@/components/RecordExport";
+import ExperimentFlow from "@/app/experiment/ExperimentFlow";
 
 const LS = "crew_project_v1";
 const THEME_LS = "cockpit_theme";
@@ -172,7 +173,18 @@ function Ball({
 
 type Mode = "setup" | "confirm" | "run";
 
-export default function CockpitPage() {
+export default function CockpitPage({
+  searchParams,
+}: {
+  searchParams?: { experiment?: string };
+}) {
+  return searchParams?.experiment === "1" ? (
+    <ExperimentFlow />
+  ) : (
+    <RegularCockpit />
+  );
+}
+function RegularCockpit() {
   const recordId = useRef("");
   const [savedRecord, setSavedRecord] = useState("");
   useEffect(() => {

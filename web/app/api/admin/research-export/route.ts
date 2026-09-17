@@ -97,6 +97,7 @@ export async function GET(req: Request) {
         id: r.id,
         title: r.title,
         protocol_version: r.protocol_version,
+        scenario: r.scenario,
         status: r.status,
         starts_at: r.starts_at,
       })),

@@ -6,7 +6,6 @@ import {
   makeCode,
   requireTeacher,
   nowStage,
-  CASE_TEXT,
   EXP_COOKIE,
 } from "@/lib/experiment";
 import { query, withTransaction } from "@/lib/db";
@@ -16,17 +15,33 @@ import {
   nextStage,
   validateCore,
   replies,
-  QUESTIONS,
   DEFENSE_QUESTIONS,
   EXPERT_ROLES,
   type ExpEvent,
 } from "@/lib/experiment-protocol";
+import {
+  createScenario,
+  scenarioFor,
+  experimentPath,
+} from "@/lib/experiment-scenarios";
+import { getSessionUser } from "@/lib/auth-local";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const p = await getParticipant();
-    if (!p) return NextResponse.json({ participant: null });
+    if (!p) {
+      const u = await getSessionUser();
+      const myExperiments = u
+        ? (
+            await query(
+              "select r.id,r.title,r.status,r.scenario,p.stage,p.participant_code from experiment_participants p join experiment_runs r on r.id=p.run_id where p.user_id=$1 order by r.created_at desc",
+              [u.id],
+            )
+          ).rows
+        : [];
+      return NextResponse.json({ participant: null, myExperiments });
+    }
     const events = (
       await query(
         "select id,event_type,stage,payload,created_at from experiment_events where participant_id=$1 order by id",
@@ -43,7 +58,9 @@ export async function GET() {
       {
         participant: p,
         stage: nowStage(p),
-        caseText: CASE_TEXT,
+        caseText: scenarioFor(p.scenario).caseText,
+        scenario: scenarioFor(p.scenario),
+        nextPath: experimentPath(nowStage(p).key),
         events,
         drafts,
       },
@@ -87,6 +104,30 @@ export async function POST(req: Request) {
       });
       return NextResponse.json({ ok: true });
     }
+    if (action === "resume") {
+      const u = await getSessionUser();
+      if (!u)
+        return NextResponse.json({ error: "请登录原账号" }, { status: 401 });
+      const found = (
+        await query(
+          "select recovery_code from experiment_participants where user_id=$1 and run_id=$2",
+          [u.id, b.runId],
+        )
+      ).rows[0];
+      if (!found)
+        return NextResponse.json(
+          { error: "找不到属于你的实验记录" },
+          { status: 404 },
+        );
+      cookies().set(EXP_COOKIE, found.recovery_code, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 2592000,
+      });
+      return NextResponse.json({ ok: true });
+    }
     if (action === "join") {
       const existing = await getParticipant();
       if (existing) return NextResponse.json({ participant: existing });
@@ -99,20 +140,23 @@ export async function POST(req: Request) {
     }
     if (action.startsWith("teacher_")) {
       const u = await requireTeacher();
-      if (action === "teacher_create")
+      if (action === "teacher_create") {
+        const scenario = createScenario(b.scenarioId, b.customScenario);
         return NextResponse.json(
           (
             await query(
-              "insert into experiment_runs(join_code,title,created_by,protocol_version) values($1,$2,$3,$4) returning *",
+              "insert into experiment_runs(join_code,title,created_by,protocol_version,scenario) values($1,$2,$3,$4,$5) returning *",
               [
                 makeCode(6),
                 String(b.title || "双创课堂练习").slice(0, 120),
                 u.id,
                 PROTOCOL,
+                scenario,
               ],
             )
           ).rows[0],
         );
+      }
       if (!["teacher_start", "teacher_close"].includes(action))
         throw new Error("未知教师操作");
       const result = await query(
@@ -260,7 +304,10 @@ export async function POST(req: Request) {
         ["expert", "defense"].includes(stage)
       ) {
         const round = replies(events, stage).length + 1;
-        const bank = stage === "expert" ? QUESTIONS : DEFENSE_QUESTIONS;
+        const bank =
+          stage === "expert"
+            ? scenarioFor(p.scenario).questions
+            : DEFENSE_QUESTIONS;
         if (round > bank.length) throw new Error("本模块的问题已全部处理");
         const old = events.find(
           (e) =>
@@ -298,8 +345,61 @@ export async function POST(req: Request) {
         "insert into experiment_events(run_id,participant_id,event_type,stage,payload,request_id) values($1,$2,$3,$4,$5,$6)",
         [p.run_id, p.id, action, stage, payload, requestId],
       );
+      let destination = action === "advance" ? String(payload.next) : stage;
+      if (b.advance === true && action !== "advance") {
+        const updated = [...events, { event_type: action, stage, payload }];
+        const problem = completionProblem(stage, updated);
+        if (problem) throw new Error(problem);
+        destination = nextStage(stage);
+        await c.query(
+          "update experiment_participants set stage=$1 where id=$2",
+          [destination, p.id],
+        );
+        await c.query(
+          "insert into experiment_events(run_id,participant_id,event_type,stage,payload,request_id) values($1,$2,'advance',$3,$4,$5)",
+          [
+            p.run_id,
+            p.id,
+            stage,
+            { next: destination },
+            requestId + ":advance",
+          ],
+        );
+      }
+      // Materialize the next question in the same transaction: no second click or lost transition.
+      const questionStage = destination;
+      if (
+        ["expert", "defense"].includes(questionStage) &&
+        (destination !== stage || action === "reply")
+      ) {
+        const round =
+          destination !== stage ? 1 : replies(events, stage).length + 2;
+        const bank =
+          questionStage === "expert"
+            ? scenarioFor(p.scenario).questions
+            : DEFENSE_QUESTIONS;
+        if (round <= bank.length) {
+          const question = {
+            round,
+            text: bank[round - 1],
+            role:
+              questionStage === "defense"
+                ? "答辩练习评委"
+                : p.cohort === "panel"
+                  ? EXPERT_ROLES[round - 1]
+                  : "综合创业专家",
+            source: "protocol",
+            protocol: PROTOCOL,
+          };
+          await c.query(
+            "insert into experiment_events(run_id,participant_id,event_type,stage,payload) values($1,$2,'question',$3,$4)",
+            [p.run_id, p.id, questionStage, question],
+          );
+        }
+      }
       return {
         ok: true,
+        nextPath: experimentPath(destination),
         ...(action === "question" ? { question: payload } : {}),
       };
     });

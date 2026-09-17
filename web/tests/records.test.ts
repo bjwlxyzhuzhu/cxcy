@@ -12,6 +12,23 @@ import {
 import * as XLSX from "xlsx";
 import mammoth from "mammoth";
 import { PDFParse } from "pdf-parse";
+import {
+  createScenario,
+  SCENARIOS,
+  scenarioFor,
+  experimentPath,
+} from "../lib/experiment-scenarios";
+test("题材快照、旧案例兼容与模块路径", () => {
+  assert.equal(scenarioFor(null).id, "ai-campus-v1");
+  for (const s of SCENARIOS) {
+    assert.equal(createScenario(s.id).questions.length, 5);
+    assert.deepEqual(scenarioFor(JSON.parse(JSON.stringify(s))), s);
+  }
+  assert.throws(() => createScenario("missing"));
+  assert.throws(() => createScenario("custom", { title: "不完整" }));
+  assert.equal(experimentPath("expert"), "/apply/expert?experiment=1");
+  assert.equal(experimentPath("t1"), "/experiment");
+});
 test("前后测量表拒绝空项、字符串和超范围评分", () => {
   const good = {
     judgment: "尚不确定",
@@ -55,6 +72,20 @@ test("数据库迁移保留历史并建立唯一编号、幂等和账号关联�
     const sql = readFileSync("db/migrations/0012_learning_records.sql", "utf8");
     await db.exec(sql);
     await db.exec(sql);
+    const scenariosSql = readFileSync(
+      "db/migrations/0014_experiment_scenarios.sql",
+      "utf8",
+    );
+    await db.exec(scenariosSql);
+    await db.exec(scenariosSql);
+    assert.equal(
+      (
+        await db.query<{ scenario: { id: string } }>(
+          "select scenario from experiment_runs",
+        )
+      ).rows[0].scenario.id,
+      "ai-campus-v1",
+    );
     const old = (
       await db.query<{ participant_code: string }>(
         "select participant_code from experiment_participants",

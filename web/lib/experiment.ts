@@ -3,10 +3,10 @@ import { cookies } from "next/headers";
 import { randomBytes } from "node:crypto";
 import { query, withTransaction } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth-local";
+import { SCENARIOS, type Scenario } from "@/lib/experiment-scenarios";
 
 export const EXP_COOKIE = "cxcy_experiment_session";
-export const CASE_TEXT =
-  "某大学生团队拟开发一款“AI学习与就业陪伴平台”，为大学生提供学习规划、职业方向分析、简历优化、模拟面试以及学习和情绪陪伴。团队认为学习压力和就业焦虑带来市场需求，准备采用会员订阅，并通过高校、自媒体和校园社群推广；系统会采集学习情况、求职信息及部分个人偏好数据。核心任务：形成初步商业方案，并判断是否值得进入正式创业验证阶段。";
+export const CASE_TEXT = SCENARIOS[0].caseText;
 export const EXPERT_ROLES = [
   "教育科研专家",
   "产业行业专家",
@@ -26,6 +26,7 @@ export type ExperimentParticipant = {
   run_id: string;
   participant_code: string;
   protocol_version: string;
+  scenario: Scenario;
   recovery_code: string;
   cohort: "single" | "panel";
   consent: boolean;
@@ -64,7 +65,7 @@ export async function getParticipant() {
   const token = cookies().get(EXP_COOKIE)?.value;
   if (!token) return null;
   const { rows } = await query<ExperimentParticipant>(
-    `select p.*, r.title as run_title, r.starts_at, r.status, r.duration_minutes, r.protocol_version from experiment_participants p join experiment_runs r on r.id=p.run_id where p.recovery_code=$1 limit 1`,
+    `select p.*, r.title as run_title, r.starts_at, r.status, r.duration_minutes, r.protocol_version, r.scenario from experiment_participants p join experiment_runs r on r.id=p.run_id where p.recovery_code=$1 limit 1`,
     [token],
   );
   return rows[0] || null;
