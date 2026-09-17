@@ -667,6 +667,10 @@ async function main() {
         403,
       );
     }
+    assert.ok(
+      pg.getStats().activeConnections <= 10,
+      `跨路由应复用一个最多10条连接的数据库连接池：${JSON.stringify(pg.getStats())}`,
+    );
     const allTeaching = await ok(
       await teacher("/api/admin/records/export?format=json"),
     );
@@ -693,6 +697,11 @@ async function main() {
       assert.equal(exported.status, 200, await exported.clone().text());
       assert.ok((await exported.arrayBuffer()).byteLength > 50);
     }
+    assert.ok(
+      pg.getStats().activeConnections <= 10,
+      `完成全部格式导出后连接池仍应有界：${JSON.stringify(pg.getStats())}`,
+    );
+    console.log("PASS: 跨路由及七种格式导出连接池复用", pg.getStats());
     console.log(
       "PASS: 登录/退出/恢复、跨账号隔离、重复提交、8轮问答、阶段门槛、前后测配对、后台同步、全部导出HTTP接口。AI仅使用本地替身。",
     );

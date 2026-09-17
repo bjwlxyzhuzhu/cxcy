@@ -83,6 +83,8 @@ Docker运行层增加 `font-noto-cjk`。非Docker Linux需要安装中文字体�
 
 ## 验证
 
+数据库连接池通过进程级缓存供各API路由及热更新复用，每进程最多10条连接。HTTP集成测试在跨模块操作后、全体七种格式导出后检查实际连接数不超过10，防止多份路由包重复建立连接池而耗尽数据库连接。测试数据库的64条连接上限不放宽，连接异常仍会使测试失败。
+
 Windows未开启符号链接权限时，可在PowerShell设置 `$env:NEXT_DISABLE_STANDALONE='1'` 后构建并运行本地生产测试。默认配置仍生成Docker所需的standalone产物，GitHub/Linux构建不要设置此变量。
 
 ```bash
