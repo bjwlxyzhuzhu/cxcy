@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import DailyBonus from "@/components/DailyBonus";
+import Presence from "@/components/Presence";
 
 export const metadata: Metadata = {
   title: "双创AI星际 · 创赛智能搭子",
@@ -18,6 +19,7 @@ export default function RootLayout({
         <Script src="/runtime-config.js" strategy="beforeInteractive" />
         {children}
         <DailyBonus />
+        <Presence />
       </body>
     </html>
   );

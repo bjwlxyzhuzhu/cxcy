@@ -22,6 +22,7 @@ RUN pnpm install --prod --frozen-lockfile --config.only-built-dependencies=unrs-
 
 FROM node:20-alpine AS runner
 WORKDIR /app
+RUN apk add --no-cache font-noto-cjk
 ENV NODE_ENV=production
 ENV PORT=3000
 # 服务端密钥（DATABASE_URL / SESSION_SECRET / AI keys）运行期由 Stack 注入，不打进镜像

@@ -1,4 +1,18 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-export function middleware(req:NextRequest){ if(req.nextUrl.pathname.startsWith("/api/ai/") && req.cookies.get("cxcy_experiment_session")) return NextResponse.json({error:"课堂实验进行中，已锁定其它 AI 入口，请在实验页面完成规定流程"},{status:423}); return NextResponse.next(); }
-export const config={matcher:["/api/ai/:path*"]};
+export function middleware(req: NextRequest) {
+  if (req.cookies.get("cxcy_experiment_session")) {
+    if (req.nextUrl.pathname.startsWith("/apply/"))
+      return NextResponse.redirect(new URL("/experiment", req.url));
+    if (
+      req.nextUrl.pathname.startsWith("/api/ai/") &&
+      !req.nextUrl.pathname.endsWith("/ask")
+    )
+      return NextResponse.json(
+        { error: "请在实验页面操作；完成后可点击退出实验，记录会保留" },
+        { status: 423 },
+      );
+  }
+  return NextResponse.next();
+}
+export const config = { matcher: ["/api/ai/:path*", "/apply/:path*"] };
