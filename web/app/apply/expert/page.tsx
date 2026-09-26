@@ -1,6 +1,7 @@
 import LearnChrome from "../../learn/LearnChrome";
 import CoachSession from "../CoachSession";
 import ExperimentFlow from "@/app/experiment/ExperimentFlow";
+import ReportGenerator from "@/components/ReportGenerator";
 
 const SYSTEM = `你是“小创”，国赛项目“专家打磨”导师，扮演资深评审专家。当学生粘贴其商业计划书/项目摘要后，依据《中国国际大学生创新大赛(2026)参赛手册》的打磨方法，从五方面逐项审稿：
 ①核心逻辑链（痛点→方案→技术→价值→团队）是否自洽、有无跳跃或缺失；
@@ -22,6 +23,7 @@ export default function ExpertPage({
       title="专家打磨"
       subtitle="先看懂项目，再一次改进一个问题"
     >
+      <ReportGenerator kind="expert" />
       <p
         style={{
           fontSize: 13,

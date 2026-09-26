@@ -32,8 +32,8 @@ export function parseRadar(reply: string, rubric?: { dim: string; w: number }[])
     if (mm) map[mm[1].trim()] = parseInt(mm[2], 10);
   }
   const dims = rubric?.length ? rubric : Object.keys(map).map((dim) => ({ dim, w: 100 }));
-  const axes = dims.map((d) => ({ dim: d.dim, score: Math.min(map[d.dim] ?? 0, d.w), max: d.w }));
-  if (!axes.some((a) => a.score > 0)) return null;
+  if (!dims.length || dims.some(d => map[d.dim] === undefined || !Number.isFinite(d.w) || d.w <= 0 || map[d.dim] > d.w)) return null;
+  const axes = dims.map((d) => ({ dim: d.dim, score: map[d.dim], max: d.w }));
   return { key: "", axes, total: axes.reduce((s, a) => s + a.score, 0) };
 }
 

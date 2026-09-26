@@ -28,6 +28,8 @@ export default function AccountButton({ accent = "#22d3ee" }: { accent?: string 
   useEffect(() => {
     try { setAv(localStorage.getItem("av_xj") || ""); } catch { /* ignore */ }
     loadAuth();
+    window.addEventListener("credits-updated", loadAuth);
+    return () => window.removeEventListener("credits-updated", loadAuth);
   }, []);
 
   if (authed === null) return <span style={{ width: 40, height: 34 }} />; // 占位防抖动

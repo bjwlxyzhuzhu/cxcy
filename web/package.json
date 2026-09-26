@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/records.test.ts",
+    "guide:generate": "tsx scripts/generate-guide.ts",
+    "test": "tsx --test tests/records.test.ts tests/experience.test.ts",
     "test:integration": "tsx tests/integration.ts",
     "migrate": "node scripts/migrate.mjs",
     "seed": "node scripts/seed.mjs"

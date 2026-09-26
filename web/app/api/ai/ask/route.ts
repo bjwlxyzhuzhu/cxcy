@@ -206,7 +206,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            "积分不足。可在右上头像→账户中心绑定你自己的 API Key（用自己的额度，不扣积分）。",
+            "积分不足。请到左下角积分中心领取每日登录奖励或提交学习反思；也可在账户中心使用个人 API Key。",
           remaining: credits,
         },
         { status: 402 },

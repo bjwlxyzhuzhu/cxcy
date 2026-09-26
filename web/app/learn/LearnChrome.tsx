@@ -56,10 +56,10 @@ export default function LearnChrome({
           >
             ← 返回星图
           </Link>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap", minWidth: 0 }}>
             <span style={{ fontSize: 26 }}>{emoji}</span>
             <h1
-              style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-.5px" }}
+              style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-.5px", whiteSpace: "nowrap" }}
             >
               {title}
             </h1>

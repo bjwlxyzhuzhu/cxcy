@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/api-client";
 import LearnChrome from "../LearnChrome";
 import CoachSession from "@/app/apply/CoachSession";
+import ResourceLibrary from "@/components/ResourceLibrary";
 
 type Case = {
   id: number; code: string; title: string; region: string; industry: string;
@@ -74,6 +75,8 @@ export default function CasesPage() {
 
   return (
     <LearnChrome emoji="🐹" title="案例宝库" subtitle="按产业类目筛选 · 选中案例就地提问、可导出问答">
+      <ResourceLibrary kind="cases" />
+      <h2 style={{ margin: "28px 0 16px", fontSize: 22 }}>区域产业案例与 AI 对话</h2>
       {authed === false ? (
         <Gate />
       ) : (

@@ -1,35 +1,29 @@
 "use client";
 // 每日登录积分：登录用户每天首次进站自动 +30 积分，弹一条祝贺浮条。未登录/已领过 → 后端静默返回，不打扰。
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function DailyBonus() {
   const router = useRouter();
+  const pathname = usePathname();
   const [toast, setToast] = useState<{ added: number; credits: number } | null>(null);
 
   useEffect(() => {
-    // 每个自然日每个会话只请求一次（在 fetch 前置位，规避 React StrictMode 双挂载重复发放）
-    let key = "";
-    try {
-      const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Shanghai" });
-      key = "daily_bonus_" + today;
-      if (sessionStorage.getItem(key)) return;
-      sessionStorage.setItem(key, "1");
-    } catch { /* 无 sessionStorage 也继续，后端仍按日去重 */ }
-
+    // 判重由服务端事务负责，匿名访问不会占用登录后的领取机会。
     let alive = true;
     fetch("/api/credits/daily", { method: "POST" })
       .then((r) => r.json())
       .then((d) => {
         if (!alive || !d?.granted) return;
         setToast({ added: d.added ?? 30, credits: d.credits ?? 0 });
+        window.dispatchEvent(new Event("credits-updated"));
         router.refresh(); // 刷新服务端渲染的积分显示
         setTimeout(() => alive && setToast(null), 5200);
       })
-      .catch(() => { try { sessionStorage.removeItem(key); } catch { /* ignore */ } }); // 失败允许下次重试
+      .catch(() => { /* 积分中心可重试 */ });
 
     return () => { alive = false; };
-  }, [router]);
+  }, [router, pathname]);
 
   if (!toast) return null;
   return (

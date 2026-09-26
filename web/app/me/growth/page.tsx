@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import LearnChrome from "../../learn/LearnChrome";
 import RadarChart from "../../apply/RadarChart";
+import { comparableGroups, dimensionSummary } from "@/lib/growth-summary";
 
 type Ev = {
   id: number; project_id: string | null; kind: string; title: string;
@@ -103,6 +104,7 @@ function OwlCards({ cards, readOnly, onRespond }: {
 }
 
 const KIND_META: Record<string, { icon: string; label: string; color: string }> = {
+  defense_preparation: { icon: "📋", label: "答辩准备稿", color: "#b6a4ff" },
   topic_match: { icon: "🧭", label: "选题结论", color: "#38bdf8" },
   bp_draft: { icon: "📄", label: "BP 成稿", color: "#f5a623" },
   expert_review: { icon: "🦉", label: "专家打磨", color: "#a78bfa" },
@@ -148,8 +150,8 @@ function TrackChart({ defenses }: { defenses: Ev[] }) {
             <text x={PL - 6} y={Y(p)} fontSize="10" fill="#9aa6c8" textAnchor="end" dominantBaseline="middle">{p}%</text>
           </g>
         ))}
-        {defenses.map((d, i) => (
-          <text key={d.id} x={X(i)} y={H - 10} fontSize="10" fill="#9aa6c8" textAnchor="middle">
+        {defenses.map((d, i) => (n <= 6 || i === n-1 || i % Math.ceil(n/5) === 0) && (
+          <text key={d.id} x={X(i)} y={H - 10} fontSize="10" fill="#c1cee7" textAnchor={i === 0 ? "start" : i === n-1 ? "end" : "middle"}>
             第{i + 1}次 · {fmtDate(d.created_at)}
           </text>
         ))}
@@ -182,6 +184,7 @@ function TrackChart({ defenses }: { defenses: Ev[] }) {
 }
 
 export default function GrowthPage() {
+  const [comparison,setComparison] = useState("");
   const [events, setEvents] = useState<Ev[] | null>(null);
   const [cards, setCards] = useState<ICard[]>([]);
   const [err, setErr] = useState("");
@@ -217,15 +220,17 @@ export default function GrowthPage() {
   };
 
   const defenses = useMemo(() => (events || []).filter((e) => e.kind === "defense_radar" && e.dims?.axes?.length), [events]);
+  const comparisonGroups = useMemo(() => comparableGroups(events || []),[events]);
+  const currentGroup = comparisonGroups.find(g=>g.id===comparison) || comparisonGroups[comparisonGroups.length-1];
+  const summary = dimensionSummary(currentGroup?.events || []);
   const sel = useMemo(() => (events || []).find((e) => e.id === selId) || null, [events, selId]);
 
   const stats = useMemo(() => {
     const ev = events || [];
     const cnt = (k: string) => ev.filter((e) => e.kind === k).length;
-    const firstT = defenses[0]?.dims?.total, lastT = defenses[defenses.length - 1]?.dims?.total;
     return [
       { label: "点亮星星", v: ev.length, unit: "颗", color: "#22d3ee" },
-      { label: "模拟答辩", v: defenses.length, unit: "场", color: "#ff6b35", extra: defenses.length > 1 && firstT != null && lastT != null ? `总分 ${firstT} → ${lastT}` : "" },
+      { label: "已评分答辩", v: defenses.length, unit: "场", color: "#ff6b35" },
       { label: "成稿/导出", v: cnt("bp_draft") + cnt("crew_final") + cnt("export_doc"), unit: "份", color: "#f5a623" },
       { label: "启用技能", v: cnt("skill_use"), unit: "个", color: "#a78bfa" },
     ];
@@ -235,6 +240,10 @@ export default function GrowthPage() {
 
   return (
     <LearnChrome emoji="🌌" title="成长星图" subtitle="人的故事 · 项目作证 —— 每一颗星都是服务端盖章的真实产出">
+      <section className="work-panel"><h2>我做了什么，下一步做什么？</h2><p>星星代表已保存的里程碑，不等于分数。问答全文、课堂前后测与未完成记录请在 <Link href="/me/records">我的测试记录</Link> 查看。此页展示最近500条里程碑，未评分不记作0分。</p>
+        <ol className="growth-steps">{[["topic_match","选题","/apply/topic"],["bp_draft","形成初稿","/apply/text"],["expert_review","专家打磨","/apply/expert"],["defense_radar","答辩练习","/apply/defense"]].map(([k,t,url])=><li key={k}><strong>{t}</strong><p>{events === null ? "读取中" : events.some(e=>e.kind===k) ? "已有产出" : "尚无里程碑"}</p><Link href={url}>去练习 →</Link></li>)}</ol>
+        <p>阅读方式：先看学习步骤，再看同类答辩的维度变化，最后点选下方记录回放。生成的答辩准备稿不会当作一次已评分答辩。</p>
+      </section>
       {viewUser && (
         <div style={{ ...card, marginBottom: 14, padding: "10px 16px", fontSize: 13, color: "#f5a623" }}>
           👩‍🏫 教师视角：正在查看指定学生的成长星图
@@ -267,7 +276,6 @@ export default function GrowthPage() {
               <div key={s.label} style={{ ...card, padding: "14px 16px" }}>
                 <div style={{ fontSize: 12, color: "var(--mut)" }}>{s.label}</div>
                 <div style={{ fontSize: 26, fontWeight: 800, color: s.color }}>{s.v}<span style={{ fontSize: 12, color: "var(--mut)", fontWeight: 400 }}> {s.unit}</span></div>
-                {"extra" in s && s.extra && <div style={{ fontSize: 11.5, color: "#34d399", fontWeight: 700 }}>{s.extra}</div>}
               </div>
             ))}
           </div>
@@ -282,7 +290,12 @@ export default function GrowthPage() {
               <p style={{ fontSize: 13, color: "var(--mut)", padding: "14px 0" }}>
                 还没有答辩雷达数据。<Link href="/apply/defense" style={{ color: "var(--cyan)" }}>去打一场模拟答辩</Link>，你的第一条能力星轨就会出现在这里。
               </p>
-            ) : <TrackChart defenses={defenses} />}
+            ) : <>
+              <label>对比范围 <select aria-label="答辩对比范围" value={currentGroup?.id || ""} onChange={e=>setComparison(e.target.value)} style={{background:"#182841",color:"var(--ink)",padding:10,maxWidth:"100%"}}>{comparisonGroups.map((g,i)=><option key={g.id} value={g.id}>{g.label} · 第{i+1}组 · {g.events.length}次</option>)}</select></label>
+              <p className="resource-note">仅连接同一赛道、同一项目标识和相同维度满分的记录。无项目标识时请自行确认是否同一项目；不同项目不宜解释为能力提升。单次记录只展示现状，AI评分不代表课程成绩。</p>
+              {currentGroup && <TrackChart defenses={currentGroup.events} />}
+              <div className="work-panel" style={{overflowX:"auto",marginTop:16}}><table><thead><tr><th>评价维度</th><th>最近得分</th><th>得分率</th><th>较首次变化</th></tr></thead><tbody>{summary.map(s=><tr key={s.name}><td>{s.name}</td><td>{s.score} / {s.max}</td><td>{s.percent}%</td><td>{s.delta===null ? "仅1次，暂不比较" : `${s.delta>0?"+":""}${s.delta}个百分点`}</td></tr>)}</tbody></table><p>优先练习：{summary.length ? [...summary].sort((a,b)=>a.percent-b.percent)[0].name : "尚无有效评分"}。回看该维度的依据，再补充事实与回答。</p></div>
+            </>}
           </div>
 
           {/* 星链时间线 */}
@@ -298,7 +311,7 @@ export default function GrowthPage() {
                 return (
                   <button key={e.id} onClick={() => setSelId(active ? null : e.id)} title={`${m.label} · ${fmtTime(e.created_at)}`}
                     style={{
-                      flex: "0 0 auto", width: 54, background: "transparent", border: "none", cursor: "pointer",
+                      flex: "0 0 auto", width: 112, background: "transparent", border: "none", cursor: "pointer",
                       display: "flex", flexDirection: "column", alignItems: "center", gap: 4, fontFamily: "inherit",
                       transform: `translateY(${i % 2 ? 0 : -10}px)`,
                     }}>
@@ -306,7 +319,7 @@ export default function GrowthPage() {
                       fontSize: active ? 26 : 20, lineHeight: 1, filter: active ? `drop-shadow(0 0 8px ${m.color})` : "none",
                       transition: "font-size .15s",
                     }}>{m.icon}</span>
-                    <span style={{ fontSize: 9.5, color: active ? m.color : "var(--mut)", fontWeight: active ? 800 : 400, whiteSpace: "nowrap" }}>{fmtDate(e.created_at)}</span>
+                    <span style={{ fontSize: 14, color: active ? m.color : "var(--mut)", fontWeight: active ? 800 : 400 }}>{m.label}</span><span style={{fontSize:13,color:"var(--mut)"}}>{fmtDate(e.created_at)}</span>
                   </button>
                 );
               })}
@@ -322,7 +335,7 @@ export default function GrowthPage() {
                     <span style={{ fontSize: 11.5, color: m.color, border: `1px solid ${m.color}66`, borderRadius: 999, padding: "2px 9px" }}>{m.label}</span>
                     <span style={{ fontSize: 12, color: "var(--mut)", marginLeft: "auto" }}>🕐 {fmtTime(sel.created_at)} · 服务端存证</span>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: sel.dims?.axes?.length ? "1fr 280px" : "1fr", gap: 14, alignItems: "start" }}>
+                  <div className="growth-detail-grid" style={{ display: "grid", gridTemplateColumns: sel.dims?.axes?.length ? "1fr 280px" : "1fr", gap: 14, alignItems: "start" }}>
                     <div>
                       {typeof sel.payload?.q === "string" && sel.payload.q && (
                         <p style={{ fontSize: 12.5, color: "var(--mut)", marginBottom: 8, whiteSpace: "pre-wrap" }}><b style={{ color: "var(--ink)" }}>🙋 当时的输入：</b>{sel.payload.q}</p>

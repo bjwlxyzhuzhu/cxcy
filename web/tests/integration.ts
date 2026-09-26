@@ -7,16 +7,21 @@ import { spawn } from "node:child_process";
 import { PGlite } from "@electric-sql/pglite";
 import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 import bcrypt from "bcryptjs";
+import { PostgresFixture } from "./postgres-fixture";
 
 async function main() {
-  const db = new PGlite();
+  const realDb = process.env.TEST_DATABASE_URL ? new PostgresFixture(process.env.TEST_DATABASE_URL) : null;
+  const db = realDb || new PGlite();
   await db.exec(`create table users(id uuid primary key default gen_random_uuid(),student_no text unique,password_hash text,name text,role text);
  create table profiles(id uuid primary key,name text,student_no text,role text,credits int,research_consent boolean,class text,country text,native_lang text,hsk_level int,research_pid text,created_at timestamptz default now());
  create table sessions(user_id uuid,token_hash text,expires_at timestamptz);
  create table user_api_keys(user_id uuid,purpose text,base_url text,api_key text,model text);
- create table evidence_events(id serial,user_id uuid,project_id uuid,kind text,title text,dims jsonb,payload jsonb);
+ create table evidence_events(id serial,user_id uuid,project_id uuid,kind text,title text,dims jsonb,payload jsonb,created_at timestamptz default now());
  create table challenge_sessions(id uuid,user_id uuid);create table dialogue_turns(id uuid,user_id uuid);create table plan_versions(id uuid,user_id uuid);create table ct_ratings(id uuid,user_id uuid);create table peer_feedback(id uuid,user_id uuid);create table usage_logs(id uuid,user_id uuid);create table projects(id uuid,user_id uuid);`);
   await db.exec(readFileSync("db/migrations/0010_experiment.sql", "utf8"));
+  await db.exec("alter table usage_logs add column action text, add column cost int, add column meta jsonb, add column created_at timestamptz default now()");
+  await db.exec(readFileSync("db/migrations/0016_competition_experience.sql", "utf8"));
+  await db.exec(readFileSync("db/migrations/0016_competition_experience.sql", "utf8"));
   await db.exec(
     readFileSync("db/migrations/0012_learning_records.sql", "utf8"),
   );
@@ -57,14 +62,15 @@ async function main() {
       [id],
     );
   }
-  const pg = new PGLiteSocketServer({
-    db,
+  const pg = realDb ? {start:async()=>{},stop:async()=>{},getStats:()=>realDb.getStats()} : new PGLiteSocketServer({
+    db: db as PGlite,
     port: 55439,
     host: "127.0.0.1",
     maxConnections: 64,
   });
   await pg.start();
   const aiPrompts: string[] = [];
+  let failReport = false;
   const ai = createServer(async (req, res) => {
     let input = "";
     for await (const chunk of req) input += chunk;
@@ -75,6 +81,7 @@ async function main() {
     }
     const body = JSON.parse(input || "{}");
     aiPrompts.push(JSON.stringify(body.messages));
+    if (failReport) { res.writeHead(500,{"Content-Type":"application/json"}); res.end(JSON.stringify({error:{message:"fixture failure"}})); return; }
     const text = "可以先访谈几位同学，记录他们遇到的具体困难。";
     if (body.stream) {
       res.writeHead(200, { "Content-Type": "text/event-stream" });
@@ -103,7 +110,7 @@ async function main() {
       windowsHide: true,
       env: {
         ...process.env,
-        DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:55439/postgres",
+        DATABASE_URL: realDb?.appUrl || "postgresql://postgres:postgres@127.0.0.1:55439/postgres",
         APIMART_API_KEY: "fixture-key",
         APIMART_BASE_URL: "http://127.0.0.1:3319/v1",
         NEXT_TELEMETRY_DISABLED: "1",
@@ -668,8 +675,8 @@ async function main() {
       );
     }
     assert.ok(
-      pg.getStats().activeConnections <= 10,
-      `跨路由应复用一个最多10条连接的数据库连接池：${JSON.stringify(pg.getStats())}`,
+      (await pg.getStats()).activeConnections <= 10,
+      `跨路由应复用一个最多10条连接的数据库连接池：${JSON.stringify(await pg.getStats())}`,
     );
     const allTeaching = await ok(
       await teacher("/api/admin/records/export?format=json"),
@@ -698,13 +705,68 @@ async function main() {
       assert.ok((await exported.arrayBuffer()).byteLength > 50);
     }
     assert.ok(
-      pg.getStats().activeConnections <= 10,
-      `完成全部格式导出后连接池仍应有界：${JSON.stringify(pg.getStats())}`,
+      (await pg.getStats()).activeConnections <= 10,
+      `完成全部格式导出后连接池仍应有界：${JSON.stringify(await pg.getStats())}`,
     );
-    console.log("PASS: 跨路由及七种格式导出连接池复用", pg.getStats());
+    console.log("PASS: 跨路由及七种格式导出连接池复用", await pg.getStats());
     console.log(
       "PASS: 登录/退出/恢复、跨账号隔离、重复提交、8轮问答、阶段门槛、前后测配对、后台同步、全部导出HTTP接口。AI仅使用本地替身。",
     );
+    // 比赛体验：奖励并发、收费报告缓存/隔离/失败退分，使用真实HTTP与隔离数据库。
+    const reportUser = (await db.query<{id:string}>("select id from users where student_no='teacher-test'")).rows[0].id;
+    await db.query("delete from user_api_keys where user_id=$1",[reportUser]);
+    await db.query("delete from credit_rewards where user_id=$1",[reportUser]);
+    await db.query("update profiles set credits=0,last_bonus_at=null where id=$1",[reportUser]);
+    assert.equal((await makeClient()("/api/credits/daily",{})).status,401);
+    assert.equal((await makeClient()("/api/ai/report",{})).status,401);
+    const rewards = await Promise.all(Array.from({length:8},()=>teacher("/api/credits/daily",{}).then(ok)));
+    assert.equal(rewards.filter(r=>r.granted).length,1);
+    assert.equal((await ok(await teacher("/api/credits/history"))).credits,30);
+    const reflection = "今天我学习了如何从真实用户需求出发完善商业计划书。我发现原方案只有产品功能，没有访谈证据，因此计划明天访谈五位同学，记录他们在使用过程中遇到的困难，并把实际结果与原来的假设逐一对照，优先修改最影响使用体验的一点。";
+    const reflections = await Promise.all(Array.from({length:4},()=>teacher("/api/credits/rewards",{content:reflection}).then(ok)));
+    assert.equal(reflections.filter(r=>r.granted).length,1);
+    assert.equal((await teacher("/api/credits/rewards",{content:"太短"})).status,400);
+    const request = {requestId:randomUUID(),kind:"expert",project:"我们的项目帮助大学生整理闲置教材，目前完成了五位同学的访谈，准备开发一个按课程检索教材的小程序，希望验证供需匹配是否有效。"};
+    const generated = await ok(await teacher("/api/ai/report",request));
+    assert.ok(generated.text); assert.equal(generated.remaining,35);
+    const calls = aiPrompts.length;
+    const cached = await ok(await teacher("/api/ai/report",request));
+    assert.equal(cached.text,generated.text); assert.equal(aiPrompts.length,calls);
+    assert.equal((await teacher("/api/ai/report",{...request,project:request.project+"不同材料"})).status,409);
+    assert.equal((await other("/api/ai/report",request)).status,423); // 课堂实验仍受保护
+    assert.equal((await ordinaryTeacher("/api/ai/report",request)).status,409);
+    assert.equal((await ok(await teacher("/api/records?sessionId="+request.requestId))).records.length,2);
+    failReport = true;
+    const failed = {...request,requestId:randomUUID()};
+    assert.equal((await teacher("/api/ai/report",failed)).status,502);
+    assert.equal((await ok(await teacher("/api/credits/history"))).credits,35);
+    assert.equal((await teacher("/api/ai/report",failed)).status,409);
+    failReport = false;
+    await ok(await teacher("/api/ai/report",{...request,kind:"defense",requestId:randomUUID()}));
+    assert.equal((await db.query("select * from evidence_events where user_id=$1 and kind='defense_preparation'",[reportUser])).rows.length,1);
+    await db.query("update profiles set credits=0 where id=$1",[reportUser]);
+    const beforeNoCredits=aiPrompts.length;
+    assert.equal((await teacher("/api/ai/report",{...request,requestId:randomUUID()})).status,402);
+    assert.equal(aiPrompts.length,beforeNoCredits);
+    await db.query("update profiles set credits=30 where id=$1",[reportUser]);
+    const parallelRequest={...request,requestId:randomUUID()};
+    const parallelBefore=aiPrompts.length;
+    // PGlite socket的多连接扩展协议存在34000 portal错误；真正的并发验收在PostgreSQL上运行。
+    // 内存模式仅验证顺序幂等，CI与发布前必须提供TEST_DATABASE_URL。
+    const parallel:Response[]=[];
+    if(realDb) parallel.push(...await Promise.all(Array.from({length:4},()=>teacher("/api/ai/report",parallelRequest))));
+    else for(let i=0;i<4;i++) parallel.push(await teacher("/api/ai/report",parallelRequest));
+    assert.ok(parallel.every(r=>[200,409].includes(r.status)),JSON.stringify(await Promise.all(parallel.map(async r=>({status:r.status,body:await r.text()})))));
+    assert.equal(aiPrompts.length,parallelBefore+1);
+    assert.equal((await ok(await teacher("/api/credits/history"))).credits,25);
+    // 模拟进程中断导致的陈旧预扣，访问积分中心只退一次。
+    await db.query("insert into generated_reports(id,user_id,kind,fingerprint,input,cost,status,created_at) values($1,$2,'expert','fixture','fixture',5,'pending',now()-interval '20 minutes')",[randomUUID(),reportUser]);
+    assert.equal((await ok(await teacher("/api/credits/history"))).credits,30);
+    assert.equal((await ok(await teacher("/api/credits/history"))).credits,30);
+    const privateHistory=await ok(await ordinaryTeacher("/api/credits/history"));
+    assert.ok(!privateHistory.entries.some((e:{content:string})=>e.content===reflection));
+    console.log(`PASS: 同一报告${realDb ? "并发" : "顺序幂等（并发需真实PostgreSQL）"}只调用一次AI、进程中断延迟退分、反思记录账号隔离、迁移可重放`);
+    console.log("PASS: 并发每日/反思奖励、报告扣费与缓存、跨账号隔离、失败退分、零余额拦截、准备稿与成绩分离");
     if (process.env.KEEP_TEST_SERVER) {
       console.log("QA server: " + base + " (fixture accounts only)");
       await new Promise(() => {});

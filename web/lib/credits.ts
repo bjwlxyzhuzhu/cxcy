@@ -18,6 +18,7 @@ export async function deductCredits(
   cost: number,
   meta: Record<string, unknown> = {}
 ): Promise<{ ok: boolean; remaining: number }> {
+  if (!Number.isSafeInteger(cost) || cost < 0) throw new Error("积分消耗必须为非负整数");
   return withTransaction(async (client) => {
     const { rows } = await client.query<{ credits: number }>(
       "UPDATE profiles SET credits = credits - $1 WHERE id = $2 AND credits >= $1 RETURNING credits",

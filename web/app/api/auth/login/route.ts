@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { createSession, verifyPassword } from "@/lib/auth-local";
+import { grantReward } from "@/lib/rewards";
 
 export const runtime = "nodejs";
 
@@ -18,5 +19,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "学号或密码错误" }, { status: 401 });
   }
   await createSession(rows[0].id);
+  await grantReward(rows[0].id, "daily").catch(() => null);
   return NextResponse.json({ ok: true });
 }

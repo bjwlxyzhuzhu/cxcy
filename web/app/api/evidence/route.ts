@@ -55,10 +55,10 @@ export async function GET(req: Request) {
   let q = admin.from("evidence_events")
     .select("id, project_id, kind, title, dims, payload, created_at")
     .eq("user_id", uid)
-    .order("created_at", { ascending: true })
+    .order("created_at", { ascending: false })
     .limit(limit);
   if (kind) q = q.eq("kind", kind);
   const { data, error } = await q;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ events: data || [] });
+  return NextResponse.json({ events: (data || []).reverse() });
 }

@@ -5,6 +5,7 @@ import CoachSession from "../CoachSession";
 import RadarChart from "../RadarChart";
 import { TRACKS, RUBRICS, groupKey } from "@/lib/contest";
 import ExperimentFlow from "@/app/experiment/ExperimentFlow";
+import ReportGenerator from "@/components/ReportGenerator";
 
 export default function DefensePage({
   searchParams,
@@ -51,6 +52,7 @@ function RegularDefense() {
       const mm = p.match(/(.+?)\s*[=＝:：]\s*(\d+)/);
       if (mm) map[mm[1].trim()] = parseInt(mm[2], 10);
     }
+    if (!rubric.length || rubric.some(d => map[d.dim] === undefined || map[d.dim] > d.w)) return;
     const axes = rubric.map((d) => ({
       label: d.dim,
       score: Math.min(map[d.dim] ?? 0, d.w),
@@ -76,6 +78,7 @@ function RegularDefense() {
       title="模拟路演答辩"
       subtitle="一次练习一题 · 不会可以求助 · 记录自动保留"
     >
+      <ReportGenerator key={key} kind="defense" track={key} />
       <div
         style={{
           display: "flex",
@@ -122,7 +125,7 @@ function RegularDefense() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: scored ? "1fr 320px" : "1fr",
+          gridTemplateColumns: scored ? "repeat(auto-fit,minmax(min(100%,320px),1fr))" : "1fr",
           gap: 18,
           alignItems: "start",
         }}

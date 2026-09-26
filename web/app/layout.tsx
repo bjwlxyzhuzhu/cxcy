@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
+import "./reading.css";
+import ReadingControls from "@/components/ReadingControls";
 import DailyBonus from "@/components/DailyBonus";
 import Presence from "@/components/Presence";
 
@@ -14,10 +16,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="zh-CN" data-reading="on" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <Script src="/runtime-config.js" strategy="beforeInteractive" />
         {children}
+        <ReadingControls />
         <DailyBonus />
         <Presence />
       </body>
