@@ -271,6 +271,8 @@ export async function POST(req: Request) {
     let t = "";
     for await (const chunk of stream)
       t += chunk.choices[0]?.delta?.content ?? "";
+    if (!t.trim())
+      throw new Error("模型未返回正文，请检查模型思考模式与输出额度，或改用较短的问题重试");
     return t;
   };
   // 用户可选模型：优先用所选模型，失败则回退平台默认模型（选错不致命）

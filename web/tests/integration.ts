@@ -70,7 +70,10 @@ async function main() {
   });
   await pg.start();
   const aiPrompts: string[] = [];
+  const aiRequests: Record<string, unknown>[] = [];
   let failReport = false;
+  let reportOutput: "normal" | "empty" | "length" = "normal";
+  let emptyChat = false;
   const ai = createServer(async (req, res) => {
     let input = "";
     for await (const chunk of req) input += chunk;
@@ -81,18 +84,27 @@ async function main() {
     }
     const body = JSON.parse(input || "{}");
     aiPrompts.push(JSON.stringify(body.messages));
+    aiRequests.push(body);
     if (failReport) { res.writeHead(500,{"Content-Type":"application/json"}); res.end(JSON.stringify({error:{message:"fixture failure"}})); return; }
     const text = "可以先访谈几位同学，记录他们遇到的具体困难。";
     if (body.stream) {
       res.writeHead(200, { "Content-Type": "text/event-stream" });
       res.end(
         "data: " +
-          JSON.stringify({ choices: [{ delta: { content: text } }] }) +
+          JSON.stringify({ choices: [{ delta: { content: emptyChat ? "" : text } }] }) +
           "\n\ndata: [DONE]\n\n",
       );
     } else {
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ choices: [{ message: { content: text } }] }));
+      const isReport = JSON.stringify(body.messages).includes("不输出SCORES，不给未发生的答辩打分");
+      // Reproduce the real provider's reasoning-only response when the document
+      // request does not disable default thinking / reserve an answer budget.
+      const exhausted = isReport && body.model === "deepseek-flash" &&
+        (body.thinking?.type !== "disabled" || body.max_tokens < 8192);
+      res.end(JSON.stringify({ choices: [{
+        finish_reason: exhausted || (isReport && reportOutput === "length") ? "length" : "stop",
+        message: { content: exhausted || (isReport && reportOutput === "empty") ? "" : text },
+      }] }));
     }
   });
   await new Promise<void>((resolve) => ai.listen(3319, "127.0.0.1", resolve));
@@ -113,6 +125,9 @@ async function main() {
         DATABASE_URL: realDb?.appUrl || "postgresql://postgres:postgres@127.0.0.1:55439/postgres",
         APIMART_API_KEY: "fixture-key",
         APIMART_BASE_URL: "http://127.0.0.1:3319/v1",
+        CHAT_MODEL: "deepseek-flash",
+        CHAT_BASE_URL: "http://127.0.0.1:3319/v1",
+        CHAT_API_KEY: "fixture-key",
         NEXT_TELEMETRY_DISABLED: "1",
       },
       stdio: ["ignore", "pipe", "pipe"],
@@ -729,6 +744,8 @@ async function main() {
     const request = {requestId:randomUUID(),kind:"expert",project:"我们的项目帮助大学生整理闲置教材，目前完成了五位同学的访谈，准备开发一个按课程检索教材的小程序，希望验证供需匹配是否有效。"};
     const generated = await ok(await teacher("/api/ai/report",request));
     assert.ok(generated.text); assert.equal(generated.remaining,35);
+    assert.equal(aiRequests.at(-1)?.model,"deepseek-flash");
+    assert.deepEqual(aiRequests.at(-1)?.thinking,{type:"disabled"});
     const calls = aiPrompts.length;
     const cached = await ok(await teacher("/api/ai/report",request));
     assert.equal(cached.text,generated.text); assert.equal(aiPrompts.length,calls);
@@ -742,6 +759,23 @@ async function main() {
     assert.equal((await ok(await teacher("/api/credits/history"))).credits,35);
     assert.equal((await teacher("/api/ai/report",failed)).status,409);
     failReport = false;
+    for (const mode of ["empty", "length"] as const) {
+      reportOutput = mode;
+      const invalid = {...request,requestId:randomUUID()};
+      const bad = await teacher("/api/ai/report",invalid);
+      assert.equal(bad.status,502);
+      assert.equal((await bad.json()).code,mode === "empty" ? "AI_EMPTY_OUTPUT" : "AI_OUTPUT_LIMIT");
+      assert.equal((await ok(await teacher("/api/credits/history"))).credits,35);
+      assert.equal((await db.query("select * from learning_sessions where id=$1",[invalid.requestId])).rows.length,0);
+      assert.equal((await teacher("/api/ai/report",invalid)).status,409);
+      assert.equal((await db.query("select * from usage_logs where action='report_refund' and meta->>'requestId'=$1",[invalid.requestId])).rows.length,1);
+    }
+    reportOutput = "normal";
+    emptyChat = true;
+    const emptyAnswer=await teacher("/api/ai/ask",{messages:[{role:"user",content:"空正文回归测试"}]});
+    assert.equal(emptyAnswer.status,502);
+    assert.equal((await ok(await teacher("/api/credits/history"))).credits,35);
+    emptyChat = false;
     await ok(await teacher("/api/ai/report",{...request,kind:"defense",requestId:randomUUID()}));
     assert.equal((await db.query("select * from evidence_events where user_id=$1 and kind='defense_preparation'",[reportUser])).rows.length,1);
     await db.query("update profiles set credits=0 where id=$1",[reportUser]);

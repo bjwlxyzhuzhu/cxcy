@@ -6,7 +6,7 @@ import { getParticipant, nowStage } from "@/lib/experiment";
 import { resolveAIClient } from "@/lib/ai/resolve";
 import { withTransaction } from "@/lib/db";
 import { REPORT_COST } from "@/lib/reward-policy";
-import { reportPrompt } from "@/lib/report-prompts";
+import { generateReportText, reportFailure } from "@/lib/ai/report-completion";
 import { recoverReports } from "@/lib/report-recovery";
 export const runtime = "nodejs";
 const schema = z.object({
@@ -38,6 +38,7 @@ export async function POST(req: Request) {
     .update(JSON.stringify({ kind, project, track }))
     .digest("hex");
   let reserved = false;
+  let phase: "setup" | "generate" | "save" = "setup";
   try {
     await recoverReports(user.id);
     const { client, model, usingOwnKey } = await resolveAIClient(
@@ -102,21 +103,10 @@ export async function POST(req: Request) {
     if (state.status !== 201)
       return NextResponse.json(state, { status: state.status });
     reserved = true;
-    const response = await client.chat.completions.create(
-      {
-        model,
-        messages: [
-          { role: "system", content: reportPrompt(kind, track) },
-          { role: "user", content: project },
-        ],
-        max_tokens: 4000,
-      },
-      { timeout: 90000, maxRetries: 0 },
-    );
-    const text = response.choices[0]?.message?.content?.trim();
-    if (!text || response.choices[0]?.finish_reason === "length")
-      throw new Error("empty or truncated response");
+    phase = "generate";
+    const text = await generateReportText(client, model, kind, project, track);
     const title = kind === "expert" ? "专家打磨完整报告" : "模拟答辩准备稿";
+    phase = "save";
     const remaining = await withTransaction(async (c) => {
       const job = (
         await c.query(
@@ -167,10 +157,10 @@ export async function POST(req: Request) {
       ownKey: usingOwnKey,
     });
   } catch (error) {
-    const failure = error as { name?: string; code?: string };
+    const failure = reportFailure(error, phase);
     console.error("report_request_failed", {
-      name: failure?.name,
-      code: failure?.code,
+      phase,
+      code: failure.code,
       requestId,
     });
     if (reserved) {
@@ -201,6 +191,7 @@ export async function POST(req: Request) {
         return NextResponse.json(
           {
             error: "生成中断，退分状态待核对。请保留请求编号并联系管理员",
+            code: "REPORT_REFUND_PENDING",
             requestId,
           },
           { status: 503 },
@@ -210,8 +201,9 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error: reserved
-          ? "生成失败，预扣积分已退还。请新建请求后重试。"
-          : "服务暂不可用，尚未扣分，请稍后重试。",
+          ? `${failure.message}。预扣积分已退还，请点击“新建请求 / 修改材料”后重试。`
+          : `${failure.message}。尚未扣分。`,
+        code: failure.code,
         requestId,
       },
       { status: 502 },
