@@ -267,7 +267,7 @@ export default function GalaxyHome({
       <LiveWall />
 
       <div className="wrap">
-        <nav>
+        <nav className="home-nav" aria-label="首页导航">
           <div className="logo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="双创AI星际" onError={(e) => e.currentTarget.remove()} />
@@ -278,6 +278,9 @@ export default function GalaxyHome({
             <small>DOUBLE INNOVATION AI COSMOS</small>
           </div>
           <div className="spacer" />
+          <a href="/guide" className="chip home-guide-button">
+            <span aria-hidden="true">📖</span> 用户使用说明
+          </a>
           <a href="/me/growth" className="chip" title="成长星图 · 你的能力成长证据链" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 700 }}>🌌 成长星图</a>
           <a href="/apply/skills" className="chip" title="技能商店 · 浏览 / 安装 / 沉淀技能" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 700 }}>🛒 技能商店</a>
           <a href="/experiment" className="chip" title="进入课堂实验" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 700 }}>🛰️ 课堂实验</a>

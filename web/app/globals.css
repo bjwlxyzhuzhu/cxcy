@@ -24,6 +24,12 @@ nav{display:flex;align-items:center;gap:14px;padding:18px 0}
 .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.05);backdrop-filter:blur(12px)}
 .langbtn{cursor:pointer;font-family:inherit;color:var(--ink);transition:.2s}
 .langbtn:hover{border-color:rgba(124,92,255,.6);background:rgba(124,92,255,.14)}
+.home-nav{flex-wrap:wrap}
+.home-nav>.logo,.home-nav>.av,.home-nav>.chip{flex-shrink:0}
+.home-nav .chip{white-space:nowrap}
+.home-guide-button{min-height:44px;font-size:16px;font-weight:700;text-decoration:none;color:var(--ink);border-color:rgba(34,211,238,.65);background:rgba(34,211,238,.16)}
+.home-guide-button:hover{background:rgba(34,211,238,.28);border-color:var(--cyan)}
+.home-guide-button:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
 .dot{width:7px;height:7px;border-radius:50%;background:#f5a623;box-shadow:0 0 10px #f5a623;animation:blink 1.6s ease-in-out infinite}@keyframes blink{50%{opacity:.4}}
 .av{position:relative;overflow:hidden;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#34507a,#22d3ee);display:grid;place-items:center;font-size:21px;cursor:pointer;border:1px solid var(--line);box-shadow:0 0 14px rgba(34,211,238,.35);transition:.2s}
 .av:hover{transform:scale(1.08);box-shadow:0 0 22px rgba(34,211,238,.6)}

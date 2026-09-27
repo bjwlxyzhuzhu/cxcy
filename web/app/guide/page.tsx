@@ -6,7 +6,7 @@ export default function GuidePage() {
   return (
     <LearnChrome
       emoji="📖"
-      title="用户使用手册"
+      title="用户使用说明"
       subtitle="按实际页面编写 · 从入门到复盘"
     >
       <section className="work-panel">
