@@ -1,7 +1,4 @@
-// 浏览器端「Markdown → Word(.doc)」导出，零依赖：用 HTML blob + Word MIME，
-// Word/WPS 均可正常打开并继续编辑。P5 排版升级：封面页 + 中文公文级版式（黑体标题/宋体正文/
-// 首行缩进/1.5 倍行距/A4 页边距）+ Markdown 表格，导出即像一份能直接上交的文档。
-
+// 浏览器端导出：Word 使用真正的 DOCX，PDF 打印使用 HTML。
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -75,35 +72,14 @@ const DOC_CSS =
   "th,td{border:1px solid #666;padding:4pt 6pt;text-align:left;}th{background:#f0f0f0;font-family:SimHei,'黑体',sans-serif;}" +
   "strong{font-family:SimHei,'黑体',sans-serif;}";
 
-/** 封面页 HTML（标题 + 副题 + 日期），Word 里独占一页 */
-function coverHtml(title: string, subtitle: string): string {
-  const date = new Date().toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" });
-  return (
-    `<div style="text-align:center;">` +
-    `<p style="text-indent:0;margin-top:140pt;">&nbsp;</p>` +
-    `<p style="text-indent:0;font-family:SimHei,'黑体',sans-serif;font-size:26pt;font-weight:bold;line-height:1.5;">${esc(title)}</p>` +
-    (subtitle ? `<p style="text-indent:0;font-size:14pt;color:#333;margin-top:18pt;">${esc(subtitle)}</p>` : "") +
-    `<p style="text-indent:0;font-size:12pt;color:#555;margin-top:160pt;">${date}</p>` +
-    `<p style="text-indent:0;font-size:10.5pt;color:#888;margin-top:8pt;">双创AI星际 · AI 辅助生成初稿，请核验数据并替换占位后使用</p>` +
-    `</div><br clear="all" style="page-break-before:always;mso-break-type:page-break" />`
-  );
-}
-
-/** 触发浏览器下载一个 .doc 文件（Word/WPS 可打开）。body 接收 Markdown 文本。 */
-export function downloadWord(filename: string, title: string, body: string, subtitle = "") {
-  const pageCss =
-    "@page WordSection1{size:595.3pt 841.9pt;margin:72pt 90pt 72pt 90pt;mso-header-margin:35.4pt;mso-footer-margin:35.4pt;}" +
-    "div.WordSection1{page:WordSection1;}";
-  const html =
-    `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">` +
-    `<head><meta charset="utf-8"><title>${esc(title)}</title>` +
-    `<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->` +
-    `<style>${pageCss}${DOC_CSS}</style></head>` +
-    `<body><div class="WordSection1">` +
-    (title ? coverHtml(title, subtitle) : "") +
-    mdToHtml(body) +
-    `</div></body></html>`;
-  triggerDownload(new Blob(["﻿", html], { type: "application/msword" }), filename.endsWith(".doc") ? filename : filename + ".doc");
+/** 导出真正的 DOCX，可重新上传解析。 */
+export async function downloadWord(filename: string, title: string, body: string, subtitle = "") {
+  try {
+    const { wordBlob } = await import("./word-document");
+    triggerDownload(await wordBlob(title, body, subtitle), filename.replace(/\.docx?$/i, "") + ".docx");
+  } catch {
+    window.alert("Word导出失败，请重试或先下载Markdown保存内容。");
+  }
 }
 
 function triggerDownload(blob: Blob, filename: string) {

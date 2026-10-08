@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   if (!ALLOWED.includes(ext)) return NextResponse.json({ error: "不支持的格式：" + ext }, { status: 415 });
 
   const buf = Buffer.from(await file.arrayBuffer());
-  const r = await extractFile(buf, file.name, file.type || "");
+  const r = await extractFile(buf, file.name);
   if (r.kind === "error") return NextResponse.json({ error: r.error }, { status: 422 });
   if (r.kind !== "text" || !r.text) return NextResponse.json({ error: "没解析出文本（可能是扫描件/空文件）" }, { status: 422 });
   return NextResponse.json({ name: file.name, kind: "text", text: r.text, chars: r.text.length });
