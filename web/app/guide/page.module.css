@@ -1,0 +1,15 @@
+.guide { font-size: 17px; line-height: 1.8; overflow-wrap: anywhere; }
+.guide h2 { font-size: 23px; line-height: 1.45; }
+.guide li { margin: 10px 0; padding-left: 5px; }
+.guide ol { padding-left: 25px; list-style: decimal outside; }
+.contents { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px 20px; margin-top: 20px; }
+.contents a,.links a { padding: 6px 0; text-underline-offset: 4px; }
+.section { scroll-margin-top: 24px; }
+.figure { margin: 24px 0; }
+.figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 10px; }
+.figure figcaption,.note { font-size: 15px; line-height: 1.7; }
+.figure figcaption { margin-top: 10px; }
+.example { box-sizing: border-box; width: 100%; min-height: 165px; padding: 16px; font: inherit; line-height: 1.7; background: #fff; color: #182337; border: 1px solid #8d9ab1; border-radius: 8px; resize: vertical; }
+.links { display: flex; flex-wrap: wrap; gap: 12px 32px; }
+.guide a:focus-visible,.guide button:focus-visible,.example:focus-visible { outline: 3px solid #edb83b; outline-offset: 4px; }
+@media(max-width:600px) { .contents { grid-template-columns: 1fr; } .guide { font-size: 16px; } .guide h2 { font-size: 21px; } }
