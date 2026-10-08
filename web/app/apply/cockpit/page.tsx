@@ -58,7 +58,7 @@ const COCKPIT_STEPS: TourStep[] = [
     sel: "#ck-deck",
     badge: "①",
     title: "专家智能体集群",
-    body: "这是作战甲板——一队专家 AI 搭子（战略 / 产品 / 技术 / 商业 / 产业 / 育人 / 材料…）在各自工位协同，由功夫熊猫总负责统筹调度。",
+    body: "这是作战甲板——一队专家 AI 搭子（战略 / 产品 / 技术 / 商业 / 产业 / 育人 / 材料…）在各自工位协同，由熊猫主席总负责统筹调度。",
   },
   {
     sel: "#ck-fan",
@@ -70,7 +70,7 @@ const COCKPIT_STEPS: TourStep[] = [
     sel: "#ck-goal",
     badge: "③",
     title: "说出你的目标",
-    body: "在这里写项目名和目标，把活交给功夫熊猫。例：帮我打磨成一份能参赛的完整商业计划书，重点写清商业模式和技术壁垒。",
+    body: "在这里写项目名和目标，把活交给熊猫主席。例：帮我打磨成一份能参赛的完整商业计划书，重点写清商业模式和技术壁垒。",
   },
   {
     sel: "#ck-tools",
@@ -773,7 +773,7 @@ function RegularCockpit() {
     setExp("");
   }
 
-  // 成稿后继续打磨：把整改意见交给总负责（功夫熊猫），输出修改后的完整 BP。
+  // 成稿后继续打磨：把整改意见交给总负责（熊猫主席），输出修改后的完整 BP。
   async function doRevise() {
     const ins = revise.trim();
     if (!ins || revising || !draft.trim()) return;
@@ -1058,7 +1058,7 @@ function RegularCockpit() {
               textShadow: dark ? "0 1px 8px #000" : "none",
             }}
           >
-            功夫熊猫统筹 · AI 搭子协同作战
+            熊猫主席统筹 · AI 搭子协同作战
           </span>
           <div
             style={{
@@ -1406,7 +1406,7 @@ function RegularCockpit() {
                   minWidth: 200,
                 }}
               >
-                <b>功夫熊猫 · 总负责</b>
+                <b>熊猫主席 · 总负责</b>
                 ：把项目名和目标交给我，我带这支队伍一起干，评审、打磨，一次产出可参赛的商业计划书。
               </div>
               <input
@@ -1421,7 +1421,7 @@ function RegularCockpit() {
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
               rows={4}
-              placeholder="对功夫熊猫说：例「帮我把项目打磨成一份能参赛的完整商业计划书，重点写清商业模式和技术壁垒」"
+              placeholder="对熊猫主席说：例「帮我把项目打磨成一份能参赛的完整商业计划书，重点写清商业模式和技术壁垒」"
               style={{
                 ...inp,
                 width: "100%",
@@ -1546,7 +1546,7 @@ function RegularCockpit() {
                   onText={(t) => setGoal((g) => (g ? g + " " : "") + t)}
                   accent="#7aa8ff"
                   size={36}
-                  title="语音输入：点麦克风对功夫熊猫说话，自动转文字"
+                  title="语音输入：点麦克风对熊猫主席说话，自动转文字"
                 />
               </label>
             </div>
@@ -1776,7 +1776,7 @@ function RegularCockpit() {
                 lineHeight: 1.75,
               }}
             />
-            {/* 继续打磨：把整改意见交给功夫熊猫，原稿基础上改 */}
+            {/* 继续打磨：把整改意见交给熊猫主席，原稿基础上改 */}
             <div
               style={{
                 display: "flex",
@@ -1794,7 +1794,7 @@ function RegularCockpit() {
                   if (e.key === "Enter") doRevise();
                 }}
                 disabled={revising}
-                placeholder="让功夫熊猫继续改：例「把商业模式和财务测算写得更具体」"
+                placeholder="让熊猫主席继续改：例「把商业模式和财务测算写得更具体」"
                 style={{ ...inp, flex: 1, minWidth: 220 }}
               />
               <button
