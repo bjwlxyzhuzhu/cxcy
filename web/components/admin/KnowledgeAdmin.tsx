@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/api-client";
 
 type Stats = { knowledge: number; sources: { source: string; n: number }[]; cases: number; templates: number };
 type CaseRow = { id: number; code: string; title: string; region: string | null; industry: string | null };
@@ -20,12 +19,17 @@ export default function KnowledgeAdmin() {
     if (res.ok) setStats(data); else setMsg("✗ 统计失败：" + (data.error || res.status));
   }
   async function loadTables() {
-    const api = createClient();
-    const [{ data: c }, { data: t }] = await Promise.all([
-      api.from("cases").select("id,code,title,region,industry").order("code").limit(500),
-      api.from("templates").select("id,name,category,ext,size_kb,file").order("sort").limit(500),
-    ]);
-    setCases((c as CaseRow[]) || []); setTpls((t as TplRow[]) || []);
+    const res = await fetch("/api/admin/library", { cache: "no-store" });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { setMsg("✗ 列表加载失败：" + (data.error || res.status)); return; }
+    setCases((data.cases as CaseRow[]) || []); setTpls((data.templates as TplRow[]) || []);
+  }
+  /** 调管理端资料库接口，成功返回 null，失败返回错误文字 */
+  async function libOp(body: Record<string, unknown>): Promise<string | null> {
+    const res = await fetch("/api/admin/library", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    if (res.ok) return null;
+    const data = await res.json().catch(() => ({}));
+    return data.error || String(res.status);
   }
   async function loadAll() { setLoading(true); await Promise.all([loadStats(), loadTables()]); setLoading(false); }
   // 仅挂载时加载一次（loadAll 只触发 fetch+setState，无需进依赖）
@@ -39,18 +43,19 @@ export default function KnowledgeAdmin() {
   }
   async function delCase(c: CaseRow) {
     if (!window.confirm(`删除案例《${c.title}》？`)) return;
-    const { error } = await createClient().from("cases").delete().eq("id", c.id);
-    if (error) setMsg("✗ " + error.message); else { setCases((l) => l.filter((x) => x.id !== c.id)); setMsg("✓ 已删除案例"); loadStats(); }
+    const error = await libOp({ op: "delete-case", id: c.id });
+    if (error) setMsg("✗ " + error); else { setCases((l) => l.filter((x) => x.id !== c.id)); setMsg("✓ 已删除案例"); loadStats(); }
   }
   async function delTpl(t: TplRow) {
     if (!window.confirm(`删除模板《${t.name}》？`)) return;
-    const { error } = await createClient().from("templates").delete().eq("id", t.id);
-    if (error) setMsg("✗ " + error.message); else { setTpls((l) => l.filter((x) => x.id !== t.id)); setMsg("✓ 已删除模板"); loadStats(); }
+    const error = await libOp({ op: "delete-template", id: t.id });
+    if (error) setMsg("✗ " + error); else { setTpls((l) => l.filter((x) => x.id !== t.id)); setMsg("✓ 已删除模板"); loadStats(); }
   }
   async function addTpl() {
     if (!nt.name.trim()) { setMsg("✗ 模板名必填"); return; }
-    const { data, error } = await createClient().from("templates").insert({ name: nt.name.trim(), category: nt.category, ext: nt.ext, file: nt.file || null }).select().single();
-    if (error) setMsg("✗ " + error.message); else { setTpls((l) => [...l, data as TplRow]); setNt({ name: "", category: "计划书", ext: "docx", file: "" }); setMsg("✓ 已新增模板"); loadStats(); }
+    const res = await fetch("/api/admin/library", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ op: "add-template", name: nt.name.trim(), category: nt.category, ext: nt.ext, file: nt.file || "" }) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) setMsg("✗ " + (data.error || res.status)); else { setTpls((l) => [...l, data.template as TplRow]); setNt({ name: "", category: "计划书", ext: "docx", file: "" }); setMsg("✓ 已新增模板"); loadStats(); }
   }
 
   const card: React.CSSProperties = { flex: 1, minWidth: 140, border: "1px solid var(--line)", borderRadius: 14, background: "rgba(255,255,255,.04)", padding: "14px 16px" };

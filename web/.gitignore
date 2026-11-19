@@ -8,7 +8,6 @@
 
 # testing
 /coverage
-/.test-output/
 
 # next.js
 /.next/
@@ -38,3 +37,9 @@ next-env.d.ts
 
 # 本地环境备份（含密钥，勿提交）
 .env.local.bak.*
+
+# 本地数据库文件（含账号与课堂数据，勿提交）
+/data/
+
+# 本机临时公网入口地址（每次启动都会变，不提交）
+当前公网临时入口.md

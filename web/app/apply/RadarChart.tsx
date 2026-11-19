@@ -2,8 +2,8 @@
 
 /** 纯 SVG 雷达图：每轴 score/max 归一化绘制。无第三方依赖。 */
 export default function RadarChart({
-  axes, size = 320, accent = "#ff6b35",
-}: { axes: { label: string; score: number; max: number }[]; size?: number; accent?: string }) {
+  axes, size = 320, accent = "#ff6b35", valueText,
+}: { axes: { label: string; score: number; max: number }[]; size?: number; accent?: string; valueText?: (i: number) => string }) {
   const cx = size / 2, cy = size / 2, R = size * 0.3;
   const N = Math.max(axes.length, 3);
   const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / N;
@@ -24,7 +24,7 @@ export default function RadarChart({
           <g key={i}>
             <line x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(255,255,255,.12)" />
             <text x={lx} y={ly} fontSize="11" fill="#9aa6c8" textAnchor="middle" dominantBaseline="middle">{a.label}</text>
-            <text x={lx} y={ly + 13} fontSize="10" fontWeight="700" fill={accent} textAnchor="middle">{a.score}/{a.max}</text>
+            <text x={lx} y={ly + 13} fontSize="10" fontWeight="700" fill={accent} textAnchor="middle">{valueText ? valueText(i) : `${a.score}/${a.max}`}</text>
           </g>
         );
       })}

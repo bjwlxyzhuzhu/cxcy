@@ -1,7 +1,7 @@
 import "server-only";
 import OpenAI from "openai";
-import { query } from "@/lib/db";
-import { getApimart } from "./apimart";
+import { db } from "@/lib/db";
+import { apimart } from "./apimart";
 import { MODELS } from "./models";
 import type { Purpose } from "./providers";
 
@@ -11,11 +11,13 @@ import type { Purpose } from "./providers";
  * - 否则 → 平台默认（APIMart），usingOwnKey=false，调用方按积分规则扣分。
  */
 export async function resolveAIClient(userId: string, purpose: Purpose) {
-  const { rows } = await query<{ base_url: string; api_key: string; model: string }>(
-    "SELECT base_url, api_key, model FROM user_api_keys WHERE user_id = $1 AND purpose = $2 LIMIT 1",
-    [userId, purpose]
-  );
-  const data = rows[0];
+  const admin = db();
+  const { data } = await admin
+    .from("user_api_keys")
+    .select("base_url, api_key, model")
+    .eq("user_id", userId)
+    .eq("purpose", purpose)
+    .maybeSingle();
 
   if (data?.api_key && data?.base_url) {
     return {
@@ -27,7 +29,7 @@ export async function resolveAIClient(userId: string, purpose: Purpose) {
 
   // 配图固定走 APIMart（gpt-image-2）
   if (purpose === "image") {
-    return { client: getApimart(), model: MODELS.image, usingOwnKey: false as const };
+    return { client: apimart, model: MODELS.image, usingOwnKey: false as const };
   }
 
   // 平台默认「思考/对话」模型：优先用专配的对话提供方（如 DeepSeek），否则回退 APIMart
@@ -35,5 +37,5 @@ export async function resolveAIClient(userId: string, purpose: Purpose) {
   if (chatBase && chatKey) {
     return { client: new OpenAI({ baseURL: chatBase, apiKey: chatKey }), model: MODELS.chat, usingOwnKey: false as const };
   }
-  return { client: getApimart(), model: MODELS.chat, usingOwnKey: false as const };
+  return { client: apimart, model: MODELS.chat, usingOwnKey: false as const };
 }

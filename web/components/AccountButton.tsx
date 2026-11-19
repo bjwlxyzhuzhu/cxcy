@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/api-client";
 import AccountPanel from "./AccountPanel";
 import LoginModal from "./LoginModal";
 
@@ -16,20 +15,19 @@ export default function AccountButton({ accent = "#22d3ee" }: { accent?: string 
   const [loginOpen, setLoginOpen] = useState(false);
 
   function loadAuth() {
-    const api = createClient();
-    api.auth.getSession().then(({ data }) => {
-      const u = data.user;
-      if (!u) { setAuthed(false); return; }
-      setAuthed(true);
-      api.from<Prof & { student_no?: string | null }>("profiles").select("name,student_no,role,credits").eq("id", u.id).single()
-        .then(({ data: p }) => setProf({ name: p?.name ?? null, studentNo: p?.student_no ?? null, role: p?.role ?? null, credits: p?.credits ?? null }));
-    });
+    // 由服务端读 httpOnly 会话 cookie 判断登录态，并一并返回档案
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((r) => r.json())
+      .then(({ user, profile: p }) => {
+        if (!user) { setAuthed(false); return; }
+        setAuthed(true);
+        setProf({ name: p?.name ?? null, studentNo: p?.student_no ?? null, role: p?.role ?? null, credits: p?.credits ?? null });
+      })
+      .catch(() => setAuthed(false));
   }
   useEffect(() => {
     try { setAv(localStorage.getItem("av_xj") || ""); } catch { /* ignore */ }
     loadAuth();
-    window.addEventListener("credits-updated", loadAuth);
-    return () => window.removeEventListener("credits-updated", loadAuth);
   }, []);
 
   if (authed === null) return <span style={{ width: 40, height: 34 }} />; // 占位防抖动

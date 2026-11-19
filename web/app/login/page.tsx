@@ -18,22 +18,21 @@ export default function LoginPage() {
     setErr("");
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({ studentNo: no.trim(), password: pwd }),
+        body: JSON.stringify({ account: no.trim(), password: pwd }),
       });
-      const body = await response.json();
-      if (!response.ok) {
-        setErr("登录失败：" + (body.error || "学号或密码错误"));
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setErr("登录失败：" + (data.error || "学号或密码错误"));
         setLoading(false);
         return;
       }
       router.push("/");
       router.refresh();
     } catch {
-      setErr("网络错误，请稍后重试");
+      setErr("网络错误，请检查与平台服务器的连接");
       setLoading(false);
     }
   }
@@ -101,7 +100,7 @@ export default function LoginPage() {
             style={{ ...input, margin: "6px 0 14px" }}
             value={no}
             onChange={(e) => setNo(e.target.value)}
-            placeholder="请输入学号或管理员账号"
+            placeholder="如 202596057038 或 admin"
             autoComplete="username"
           />
           <label style={{ fontSize: 12, color: "var(--mut)" }}>密码</label>
@@ -139,10 +138,18 @@ export default function LoginPage() {
             {loading ? "登录中…" : "登录 →"}
           </button>
 
-          <a href="/register" style={{ display: "block", textAlign: "center", marginTop: 14, fontSize: 13, color: "var(--cyan)" }}>
-            还没有账号？立即注册
-          </a>
-
+          <div
+            style={{
+              marginTop: 16,
+              fontSize: 12,
+              color: "var(--mut)",
+              lineHeight: 1.7,
+              borderTop: "1px solid var(--line)",
+              paddingTop: 12,
+            }}
+          >
+            请使用管理员单独发放的学号和密码登录。首次登录后请立即修改临时密码。
+          </div>
           <a href="/" style={{ display: "inline-block", marginTop: 14, fontSize: 13, color: "var(--cyan)" }}>
             ← 返回首页
           </a>

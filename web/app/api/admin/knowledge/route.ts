@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
-import { createAdminClient } from "@/lib/db-client";
+import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 export async function GET() {
   const me = await requireAdmin();
   if (!me) return NextResponse.json({ error: "无管理员权限" }, { status: 403 });
-  const admin = createAdminClient();
+  const admin = db();
 
   // 分页拉 source 列做分组计数（不受单次 1000 行上限影响）
   const bySource = new Map<string, number>();
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   let body: { op?: string; source?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: "请求格式错误" }, { status: 400 }); }
   if (body.op !== "delete-source" || !body.source) return NextResponse.json({ error: "参数错误" }, { status: 400 });
-  const admin = createAdminClient();
+  const admin = db();
   const { error, count } = await admin.from("knowledge").delete({ count: "exact" }).eq("source", body.source);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true, deleted: count || 0 });

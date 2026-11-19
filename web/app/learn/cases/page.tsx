@@ -1,10 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/api-client";
 import LearnChrome from "../LearnChrome";
 import CoachSession from "@/app/apply/CoachSession";
-import ResourceLibrary from "@/components/ResourceLibrary";
 
 type Case = {
   id: number; code: string; title: string; region: string; industry: string;
@@ -39,13 +37,14 @@ export default function CasesPage() {
   const [active, setActive] = useState<Case | null>(null);
 
   useEffect(() => {
-    const api = createClient();
-    api.auth.getUser().then(({ data }) => {
-      if (!data.user) { setAuthed(false); return; }
-      setAuthed(true);
-      api.from("cases").select("id,code,title,region,industry,points,situation,task,questions,image,doc")
-        .order("code").then(({ data }) => setCases((data as Case[]) || []));
-    });
+    fetch("/api/learn/cases", { cache: "no-store" })
+      .then(async (r) => {
+        if (r.status === 401) { setAuthed(false); return; }
+        setAuthed(true);
+        const { items } = await r.json();
+        setCases((items as Case[]) || []);
+      })
+      .catch(() => setAuthed(false));
   }, []);
 
   const cats = useMemo(() => {
@@ -75,8 +74,6 @@ export default function CasesPage() {
 
   return (
     <LearnChrome emoji="🐹" title="案例宝库" subtitle="按产业类目筛选 · 选中案例就地提问、可导出问答">
-      <ResourceLibrary kind="cases" />
-      <h2 style={{ margin: "28px 0 16px", fontSize: 22 }}>区域产业案例与 AI 对话</h2>
       {authed === false ? (
         <Gate />
       ) : (

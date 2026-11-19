@@ -6,3 +6,5 @@ npm-debug.log
 README.md
 Dockerfile
 .dockerignore
+# 本地数据库与凭据表不进镜像（运行时用数据卷挂载）
+data

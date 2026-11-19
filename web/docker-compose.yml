@@ -1,39 +1,16 @@
-# 本地完整环境请在仓库根目录使用 docker-compose.postgres.yml。
+# 启动：docker compose up -d --build
+# 首个教师账号：docker compose exec web node scripts/create-user.mjs <账号> <密码> teacher
+# 数据库在 ./data/app.db（宿主机目录），备份/迁移服务器时拷走整个 data 目录即可
 services:
-  postgres:
-    image: pgvector/pgvector:pg16
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-cxcy}
-      POSTGRES_USER: ${POSTGRES_USER:-cxcy}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
-    volumes:
-      - cxcy_postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
   web:
     build:
       context: .
-    depends_on:
-      postgres:
-        condition: service_healthy
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env.local
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-cxcy}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-cxcy}
-      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET}
-      APIMART_BASE_URL: ${APIMART_BASE_URL}
-      APIMART_API_KEY: ${APIMART_API_KEY}
-      CHAT_MODEL: ${CHAT_MODEL}
-      IMAGE_MODEL: ${IMAGE_MODEL}
-      EMBED_MODEL: ${EMBED_MODEL}
-      CHAT_BASE_URL: ${CHAT_BASE_URL}
-      CHAT_API_KEY: ${CHAT_API_KEY}
-      PPTGEN_BASE_URL: ${PPTGEN_BASE_URL}
-      PPTGEN_PUBLIC_URL: ${PPTGEN_PUBLIC_URL}
-      PPTGEN_AUTH: ${PPTGEN_AUTH}
+      DATABASE_URL: file:/app/data/app.db
+    volumes:
+      - ./data:/app/data
     restart: unless-stopped
-volumes:
-  cxcy_postgres_data:

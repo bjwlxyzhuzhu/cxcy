@@ -1,6 +1,7 @@
 "use client";
 // 技能商店：浏览内置 / 商店技能并安装(启用)、沉淀自己的技能、管理演示插件。技能存本地浏览器（localStorage，免登录·免迁移）。
 import { useEffect, useState } from "react";
+import ProjectBar from "@/components/ProjectBar";
 import Link from "next/link";
 import AccountButton from "@/components/AccountButton";
 import ModelSelect from "@/components/ModelSelect";
@@ -71,6 +72,7 @@ export default function SkillsPage() {
           <div style={{ marginLeft: "auto" }}><AccountButton accent="#7aa8ff" /></div>
         </div>
 
+        <div style={{ marginBottom: 12 }}><ProjectBar /></div>
         <div style={{ fontSize: 12.5, color: "#9fb6e0", background: "rgba(120,200,255,.06)", border: "1px solid rgba(120,200,255,.18)", borderRadius: 10, padding: "9px 13px", marginBottom: 12 }}>技能保存在<b style={{ color: "#cfe0ff" }}>本机浏览器</b>（无需登录、无需配置）。换设备 / 清浏览器缓存会丢失，重要技能记得另存。</div>
 
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>

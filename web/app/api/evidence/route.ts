@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
-import { createAdminClient } from "@/lib/db-client";
+import { db } from "@/lib/db";
 import { CLIENT_KINDS, logEvidence } from "@/lib/evidence";
 
 export const runtime = "nodejs";
@@ -42,7 +42,7 @@ export async function GET(req: Request) {
   const kind = url.searchParams.get("kind");
   const limit = Math.min(500, Math.max(1, Number(url.searchParams.get("limit")) || 200));
 
-  const admin = createAdminClient();
+  const admin = db();
   let uid = user.id;
   if (targetUser && targetUser !== user.id) {
     // 查他人证据链需要教师/管理员身份
@@ -55,10 +55,10 @@ export async function GET(req: Request) {
   let q = admin.from("evidence_events")
     .select("id, project_id, kind, title, dims, payload, created_at")
     .eq("user_id", uid)
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending: true })
     .limit(limit);
   if (kind) q = q.eq("kind", kind);
   const { data, error } = await q;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ events: (data || []).reverse() });
+  return NextResponse.json({ events: data || [] });
 }

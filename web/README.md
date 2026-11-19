@@ -1,20 +1,6 @@
 # 双创AI星际 · web（M1 骨架）
 
-## 2026-09 比赛体验优化
-
-新增获奖案例与基础教学模板、可恢复阅读模式、用户手册、成长维度对比、专家报告/答辩准备稿以及积分中心。登录每天30分，学习反思每天10分；完整报告每份5分，失败退还。原课堂实验、知识图谱与学科辅导入口保留。
-
-部署前需应用 `db/migrations/0016_competition_experience.sql`（根目录Compose包含迁移服务；单独启动容器需先手动执行迁移）。详情见 [部署与回滚说明](../docs/比赛体验优化部署说明.md) 和 [用户手册](../docs/用户使用手册.md)。
-
-新增命令：`pnpm guide:generate` 检查手册路由并更新文档；`pnpm test`、`pnpm test:integration` 包含成长分组、奖励并发、报告扣费与退分回归。
-
-首页顶部的“用户使用说明”按钮直接打开 `/guide`，无需登录或积分，支持查看操作步骤、跳转功能页面和下载完整手册。窄屏导航自动换行。
-
 面向大学生创新创业竞赛的智能体集群网站。本目录是 Next.js 14 应用。
-
-## 测试记录与课堂实验更新
-
-已加入账号历史记录与继续对话、各测试模块七种格式导出、后台个人记录与在线状态、新版逐步课堂实验。更新数据库后使用，完整操作和验证说明见 [TESTING_AND_RECORDS.md](TESTING_AND_RECORDS.md)。
 
 ## 本地运行
 
@@ -24,24 +10,23 @@ pnpm dev              # http://localhost:3000
 pnpm build            # 生产构建（已验证通过）
 ```
 
-## 首次激活（本地 PostgreSQL）
+## 首次激活（让登录/积分真正可用）
 
-登录、积分和知识库都直接访问本地 PostgreSQL。使用仓库根目录的 `docker-compose.postgres.yml` 时，`migrate` 服务会自动执行迁移；演示账号可执行：
+数据库是 SQLite 单文件（`data/app.db`，Node 内置 `node:sqlite`，需 Node 24+），首次启动自动建表，不再使用 Supabase。
 
-```bash
-docker compose -f docker-compose.postgres.yml run --rm migrate node scripts/seed.mjs
-```
+1. `cp .env.example .env.local`，填 `SESSION_SECRET`（≥32 位随机串）与模型密钥。
+2. **建教师账号**：
+   ```bash
+   node --env-file-if-exists=.env.local scripts/create-user.mjs <账号> <密码> teacher
+   ```
+   想要一组本机演示账号可运行 `scripts/seed.mjs`（密码随机生成，只在终端打印一次）。
 
-### 演示账号（登录页用「学号 + 密码」）
-| 角色 | 学号 | 密码 |
-|---|---|---|
-| 学生 | `202596057038` | `Student@2026` |
-| 管理员 | `admin` | `Admin@2026` |
+完整说明见 `部署说明.md`。
 
 登录后右上角显示真实积分；点右下角**宇航员小航**打开对话，发消息会走 `/api/ai/chat`（APIMart）并**每次扣 1 积分**（数据库 `deduct_credits` 原子扣分 + 写 `usage_logs`）。
 
 ## 环境变量（`.env.local`，不提交）
-见 `.env.example`。`DATABASE_URL` 和 `SESSION_SECRET` 仅服务端使用；浏览器只通过内部 `/api` 路由访问数据。
+见 `.env.example`。全部只在服务端读取；浏览器不直接连数据库，所有读写经 `/api/*` 接口并在接口里鉴权。
 
 ## 目录
 ```
@@ -55,41 +40,27 @@ components/
   GalaxyHome.tsx      首页 React 外壳 + 小航对话
   galaxyEngine.js     银河动效引擎（机器抽取自原型，勿手改）
 lib/
-  db.ts · db-client.ts · auth-local.ts  PostgreSQL 与本地 Session
-  ai/{apimart,models}.ts · credits.ts · auth.ts
-db/migrations/0001_init.sql             建表、索引、pgvector 与积分函数
-scripts/migrate.mjs · scripts/seed.mjs  迁移与演示账号
-Dockerfile · docker-compose.yml        部署骨架（9 月底阿里云上线用）
+  db.ts               数据访问层（SQLite，兼容原 supabase-js 链式写法的薄封装）
+  auth.ts · session.ts  自建账号与签名会话 cookie
+  ai/{apimart,models}.ts · credits.ts
+db/migrations/        SQLite 迁移（0001_baseline 合并了原 0001–0013）
+db/migrate.mjs · db/password.mjs   迁移执行器、密码哈希（网站与脚本共用）
+scripts/create-user.mjs · import120.mjs · seed.mjs · db-migrate.mjs · test-db.mts
+supabase/migrations/  原 Postgres 迁移，仅作历史参考，不再执行
+middleware.ts          会话续期
+Dockerfile · docker-compose.yml        部署（数据库挂载在 ./data）
 ```
 
-## Docker（部署用）
+## Docker
 ```bash
-docker compose -f docker-compose.postgres.yml --env-file .env.local up -d
+docker compose up -d --build   # → http://服务器:3000，详见 部署说明.md
 ```
-
-## GitHub Actions 镜像
-
-仓库内的 `.github/workflows/docker-image.yml` 会在 `main` 分支推送或手动触发时，
-构建 `linux/amd64` 与 `linux/arm64` 镜像并发布到 GitHub Container Registry；Pull Request
-只执行构建检查，不会发布镜像。
-
-镜像不依赖任何 Supabase 变量。Portainer 只需向 Stack 注入 PostgreSQL 密码、`DATABASE_URL` 组成参数、`SESSION_SECRET` 及可选 AI 配置。
-
-发布成功后可在服务器上运行（将运行期密钥写入服务器上的 `.env.local`）：
-
-```bash
-docker pull ghcr.io/bjwlxyzhuzhu/cxcy:latest
-docker run --env-file .env.local -p 3000:3000 ghcr.io/bjwlxyzhuzhu/cxcy:latest
-```
-
-首次拉取私有镜像时，需要使用具有 `read:packages` 权限的 GitHub Personal Access Token
-登录 `ghcr.io`。如需公开镜像，可在仓库的 **Packages** 页面将可见性改为 Public。
 
 ## 设计来源
 所有动效定稿在 `../设计风格预览/风格A_银河探索.html`；`galaxyEngine.js` 由它机器生成。改设计请改原型再重新抽取，不要直接改引擎。
 
 ## 进度
-- ✅ M1：脚手架 · 设计系统/首页移植 · PostgreSQL 登录 · profiles/credits · 扣积分 API · Docker 骨架
+- ✅ M1：脚手架 · 设计系统/首页移植 · Supabase 登录 · profiles/credits · 扣积分 API · Docker 骨架
 - ⏭ M2 起：学习中心 6 模块 + AI 客服 RAG（知识库在 `../RAG/`）；应用中心各功能；管理端（名单导入、知识库上传带标签）
 
 ## 生产运行与开机自启（本机常驻）

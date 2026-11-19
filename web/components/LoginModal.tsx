@@ -3,43 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-
 export default function LoginModal({ open, onClose, onSuccess, accent = "#22d3ee" }: { open: boolean; onClose: () => void; onSuccess?: () => void; accent?: string }) {
   const [no, setNo] = useState("");
   const [pwd, setPwd] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sso, setSso] = useState(""); // 学习通演示登录步骤："" | "auth" | "login"
   const router = useRouter();
   if (!open) return null;
-
-  // 演示「用学习通登录」：模拟跳转超星授权 → 回调 → 以演示学生账号登录（不真实对接超星）
-  async function ssoLogin() {
-    if (sso || loading) return;
-    setErr(""); setSso("auth");
-    await new Promise((r) => setTimeout(r, 1100)); // 模拟跳转学习通授权
-    setSso("login");
-    await new Promise((r) => setTimeout(r, 700));  // 模拟授权回调
-    try {
-      const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ studentNo: "202596057038", password: "Student@2026" }) });
-      const body = await response.json();
-      if (!response.ok) { setErr("学习通登录失败（演示）：" + (body.error || "")); setSso(""); return; }
-      router.refresh(); onSuccess?.(); onClose();
-    } catch { setErr("网络错误，请稍后重试"); setSso(""); }
-  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!no.trim() || !pwd) { setErr("请输入学号和密码"); return; }
     setErr(""); setLoading(true);
     try {
-      const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ studentNo: no.trim(), password: pwd }) });
-      const body = await response.json();
-      if (!response.ok) { setErr("登录失败：" + (body.error || "学号或密码错误")); setLoading(false); return; }
+      const res = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ account: no.trim(), password: pwd }) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { setErr("登录失败：" + (data.error || "学号或密码错误")); setLoading(false); return; }
       router.refresh();      // 刷新当前页服务端内容，URL 不变、不跳首页
       onSuccess?.();
       onClose();
-    } catch { setErr("网络错误，请稍后重试"); setLoading(false); }
+    } catch { setErr("网络错误，请检查与平台服务器的连接"); setLoading(false); }
   }
 
   const input: React.CSSProperties = { width: "100%", padding: "11px 13px", borderRadius: 11, border: "1px solid rgba(120,200,255,.25)", background: "rgba(255,255,255,.05)", color: "var(--ink)", fontSize: 15, outline: "none", fontFamily: "inherit", boxSizing: "border-box" };
@@ -59,7 +42,7 @@ export default function LoginModal({ open, onClose, onSuccess, accent = "#22d3ee
         <p style={{ color: "var(--mut)", fontSize: 13, margin: "10px 0 16px" }}>用学号登录，登录后停留在当前页面</p>
 
         <label style={{ fontSize: 12, color: "var(--mut)" }}>学号</label>
-        <input style={{ ...input, margin: "6px 0 13px" }} value={no} onChange={(e) => setNo(e.target.value)} placeholder="请输入学号或管理员账号" autoComplete="username" />
+        <input style={{ ...input, margin: "6px 0 13px" }} value={no} onChange={(e) => setNo(e.target.value)} placeholder="如 202596057038 或 admin" autoComplete="username" />
         <label style={{ fontSize: 12, color: "var(--mut)" }}>密码</label>
         <input style={{ ...input, margin: "6px 0 4px" }} type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="密码" autoComplete="current-password" />
 
@@ -69,21 +52,9 @@ export default function LoginModal({ open, onClose, onSuccess, accent = "#22d3ee
           {loading ? "登录中…" : "登录 →"}
         </button>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "14px 0 10px" }}>
-          <span style={{ flex: 1, height: 1, background: "rgba(120,200,255,.18)" }} />
-          <span style={{ fontSize: 11.5, color: "var(--mut)" }}>或</span>
-          <span style={{ flex: 1, height: 1, background: "rgba(120,200,255,.18)" }} />
+        <div style={{ marginTop: 14, fontSize: 12, color: "var(--mut)", lineHeight: 1.7, borderTop: "1px solid rgba(120,200,255,.18)", paddingTop: 11 }}>
+          请使用管理员单独发放的账号登录。首次登录后请立即修改临时密码。
         </div>
-        <button type="button" onClick={ssoLogin} disabled={!!sso || loading}
-          style={{ width: "100%", padding: "11px 0", borderRadius: 11, border: "1px solid rgba(52,211,153,.5)", cursor: (sso || loading) ? "default" : "pointer", fontWeight: 700, fontSize: 14, color: "#bdf3dc", background: "rgba(52,211,153,.12)", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          🎓 {sso === "auth" ? "正在跳转学习通授权…" : sso === "login" ? "授权成功，登录中…" : "用学习通登录"}
-          <span style={{ fontSize: 10.5, color: "#ffd9a0", border: "1px solid rgba(255,180,80,.4)", padding: "1px 6px", borderRadius: 999 }}>演示</span>
-        </button>
-
-        <a href="/register" style={{ display: "block", textAlign: "center", marginTop: 14, color: accent, fontSize: 13, textDecoration: "none" }}>
-          还没有账号？立即注册学生账号 →
-        </a>
-
       </form>
     </div>
   );

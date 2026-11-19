@@ -1,5 +1,5 @@
 import "server-only";
-import { readDocxText } from "./docx-text";
+import mammoth from "mammoth";
 import * as XLSX from "xlsx";
 import JSZip from "jszip";
 
@@ -11,14 +11,15 @@ export type Extracted =
   | { kind: "error"; error: string };
 
 /** 服务端把上传文件解析成文本（图片在前端直接转 base64，不走这里）。 */
-export async function extractFile(buf: Buffer, name: string): Promise<Extracted> {
+export async function extractFile(buf: Buffer, name: string, mime: string): Promise<Extracted> {
   const ext = (name.split(".").pop() || "").toLowerCase();
   try {
-    if (ext === "txt") {
+    if (ext === "txt" || (mime || "").startsWith("text/")) {
       return { kind: "text", text: buf.toString("utf8").slice(0, MAX_TEXT) };
     }
     if (ext === "docx") {
-      return { kind: "text", text: (await readDocxText(buf)).slice(0, MAX_TEXT) };
+      const { value } = await mammoth.extractRawText({ buffer: buf });
+      return { kind: "text", text: (value || "").trim().slice(0, MAX_TEXT) };
     }
     if (ext === "pdf") {
       // pdf-parse 2.x 为 class API：new PDFParse({data}).getText()

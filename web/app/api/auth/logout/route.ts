@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { clearSession } from "@/lib/auth-local";
-import { cookies } from "next/headers";
+import { SESSION_COOKIE, cookieOptions, requestIsHttps } from "@/lib/session";
 
 export const runtime = "nodejs";
 
-export async function POST() {
-  await clearSession();
-  // 退出仅清除凭据，不删除账号历史或实验记录，避免共用电脑串号。
-  cookies().delete("cxcy_experiment_session");
-  return NextResponse.json({ ok: true });
+/** 退出登录：清除会话 cookie */
+export async function POST(req: Request) {
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(SESSION_COOKIE, "", cookieOptions(requestIsHttps(req), 0));
+  return res;
 }

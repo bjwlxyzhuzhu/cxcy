@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - sqlite-mainline   # SQLite 版（课程主线、授课工作台）分支，镜像标签 :sqlite-mainline
     tags:
       - 'v*'
   pull_request:

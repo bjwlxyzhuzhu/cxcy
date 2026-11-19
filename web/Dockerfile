@@ -1,40 +1,38 @@
-# 双创AI星际 · Next.js standalone 多阶段镜像（为 9 月底阿里云上线备好）
-# 构建：docker compose --env-file .env.local up --build
+# 双创AI星际 · Next.js standalone 多阶段镜像
+# 构建并启动：docker compose up -d --build
+# 数据库是 SQLite 单文件，用 Node 内置 node:sqlite，所以基础镜像必须是 Node 24 及以上
 
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
-COPY package.json pnpm-lock.yaml .npmrc ./
-RUN pnpm install --frozen-lockfile --config.only-built-dependencies=unrs-resolver
+RUN corepack enable
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+RUN pnpm install --frozen-lockfile
 
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
+RUN corepack enable
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Linux 下 next.config.mjs 默认产出 standalone
 RUN pnpm build
 
-FROM node:20-alpine AS prod-deps
+FROM node:24-alpine AS runner
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
-COPY package.json pnpm-lock.yaml .npmrc ./
-RUN pnpm install --prod --frozen-lockfile --config.only-built-dependencies=unrs-resolver
-
-FROM node:20-alpine AS runner
-WORKDIR /app
-RUN apk add --no-cache font-noto-cjk
 ENV NODE_ENV=production
 ENV PORT=3000
-# 服务端密钥（DATABASE_URL / SESSION_SECRET / AI keys）运行期由 Stack 注入，不打进镜像
+ENV HOSTNAME=0.0.0.0
+# 数据库文件放在数据卷里（见 docker-compose.yml），重建镜像不丢数据
+ENV DATABASE_URL=file:/app/data/app.db
+# 密钥（SESSION_SECRET / CHAT_API_KEY 等）运行时由 env_file 注入，不打进镜像
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/scripts/start-container.sh ./scripts/start-container.sh
-COPY --from=builder /app/scripts/migrate.mjs ./scripts/migrate.mjs
-COPY --from=builder /app/scripts/seed.mjs ./scripts/seed.mjs
-COPY --from=builder /app/db/migrations ./db/migrations
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-# The standalone trace bundles dependencies used by Next routes, but does not
-# expose every package to standalone maintenance scripts such as seed.mjs.
-COPY --from=prod-deps /app/node_modules ./node_modules
+# 迁移文件：网站启动时自动执行未执行的迁移
+COPY --from=builder /app/db ./db
+# 命令行运维脚本（建号、名册导入、迁移）
+COPY --from=builder /app/scripts/create-user.mjs /app/scripts/import120.mjs /app/scripts/db-migrate.mjs /app/scripts/seed.mjs ./scripts/
+RUN mkdir -p /app/data && chown -R node:node /app/data
+USER node
+VOLUME ["/app/data"]
 EXPOSE 3000
-CMD ["./scripts/start-container.sh", "node", "server.js"]
+CMD ["node", "server.js"]

@@ -1,4 +1,4 @@
-/** AI 用途 = 可分别绑定的智能体（含数字人语音 TTS） */
+/** AI 用途 = 可分别绑定的智能体（含数字人语音 TTS）。"image" 仅为兼容旧绑定保留类型，平台已不提供 PPT / 配图功能 */
 export type Purpose = "chat" | "reason" | "text" | "image" | "tts";
 
 export const PURPOSES: {
@@ -7,7 +7,6 @@ export const PURPOSES: {
   { key: "chat",   icon: "💬", label: "通用对话智能体", agent: "小航 AI 客服 · 老师 · 选题搭子", desc: "日常问答 · 创赛咨询 · 政策答疑 · 选题建议" },
   { key: "reason", icon: "🧠", label: "思考分析智能体", agent: "深度推理 · 答辩评委 · 可行性评估", desc: "复杂推理 · 方案论证 · 答辩模拟 · 商业分析" },
   { key: "text",   icon: "✍️", label: "文本生成智能体", agent: "写作搭子 · BP / 专利 / 合同", desc: "商业计划书 · 专利交底 · 合同 · 申报材料长文" },
-  { key: "image",  icon: "🖼️", label: "PPT 配图智能体", agent: "PPT 搭子 · 文生图", desc: "路演配图 · 封面 · 示意图（文字生成图片）" },
   { key: "tts",    icon: "🔊", label: "数字人语音 · TTS", agent: "小航发声 · 语音合成", desc: "把小航的回答转成语音播报（数字人只发声、不做视频）" },
 ];
 
@@ -34,9 +33,9 @@ export const PROVIDERS: Provider[] = [
     models: { chat: "gpt-4o", reason: "o1", text: "gpt-4o", image: "gpt-image-2", tts: "" } },
 
   // —— 国内大模型 ——
-  { id: "deepseek", name: "DeepSeek 深度求索 · V4", short: "DeepSeek V4", region: "cn",
+  { id: "deepseek", name: "DeepSeek 深度求索 · V4.1", short: "DeepSeek V4.1", region: "cn",
     baseUrl: "https://api.deepseek.com",
-    models: { chat: "deepseek-v4", reason: "deepseek-reasoner", text: "deepseek-v4", image: "", tts: "" } },
+    models: { chat: "deepseek-flash", reason: "deepseek-flash", text: "deepseek-flash", image: "", tts: "" } },
   { id: "zhipu", name: "智谱 GLM · 5.2", short: "智谱GLM 5.2", region: "cn",
     baseUrl: "https://open.bigmodel.cn/api/paas/v4",
     models: { chat: "glm-5.2", reason: "glm-5.2", text: "glm-5.2", image: "cogview-4", tts: "" } },

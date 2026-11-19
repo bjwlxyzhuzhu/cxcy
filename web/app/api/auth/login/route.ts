@@ -1,24 +1,29 @@
 import { NextResponse } from "next/server";
-import { query } from "@/lib/db";
-import { createSession, verifyPassword } from "@/lib/auth-local";
-import { grantReward } from "@/lib/rewards";
+import { checkLogin, loginLocked } from "@/lib/auth";
+import { SESSION_COOKIE, signSession, cookieOptions, requestIsHttps } from "@/lib/session";
 
 export const runtime = "nodejs";
 
+/** 登录：账号（学号）+ 密码 → 设置 httpOnly 会话 cookie */
 export async function POST(req: Request) {
-  let body: { studentNo?: string; password?: string };
+  let body: { account?: string; password?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: "请求格式错误" }, { status: 400 }); }
-  const studentNo = (body.studentNo || "").trim();
-  const password = body.password || "";
-  if (!studentNo || !password) return NextResponse.json({ error: "请输入学号和密码" }, { status: 400 });
+  const account = String(body.account || "").trim().slice(0, 64);
+  const password = String(body.password || "");
+  if (!account || !password) return NextResponse.json({ error: "请输入账号和密码" }, { status: 400 });
 
-  const { rows } = await query<{ id: string; password_hash: string }>(
-    "SELECT id, password_hash FROM users WHERE student_no = $1 LIMIT 1", [studentNo]
-  );
-  if (!rows[0] || !(await verifyPassword(password, rows[0].password_hash))) {
-    return NextResponse.json({ error: "学号或密码错误" }, { status: 401 });
-  }
-  await createSession(rows[0].id);
-  await grantReward(rows[0].id, "daily").catch(() => null);
-  return NextResponse.json({ ok: true });
+  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "local";
+  const key = `${account.toLowerCase()}|${ip}`;
+  const wait = loginLocked(key);
+  if (wait) return NextResponse.json({ error: `尝试次数过多，请 ${Math.ceil(wait / 60)} 分钟后再试` }, { status: 429 });
+
+  const ok = checkLogin(account, password, key);
+  if (!ok) return NextResponse.json({ error: "账号或密码错误" }, { status: 401 });
+
+  let token: string;
+  try { token = await signSession(ok.id, ok.version); }
+  catch (e) { return NextResponse.json({ error: e instanceof Error ? e.message : "会话签发失败" }, { status: 500 }); }
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(SESSION_COOKIE, token, cookieOptions(requestIsHttps(req)));
+  return res;
 }

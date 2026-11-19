@@ -3,6 +3,8 @@ import { getUser } from "@/lib/auth";
 import { resolveAIClient } from "@/lib/ai/resolve";
 import { getCredits, deductCredits } from "@/lib/credits";
 import { COST } from "@/lib/ai/models";
+import { sqlite } from "@/lib/db";
+import { ontologyContext, checkCitations } from "@/lib/ontology/context";
 
 export const runtime = "nodejs";
 
@@ -14,7 +16,7 @@ export async function POST(req: Request) {
   const user = await getUser();
   if (!user) return NextResponse.json({ error: "未登录，请先登录" }, { status: 401 });
 
-  let body: { messages?: unknown };
+  let body: { messages?: unknown; project_id?: string };
   try {
     body = await req.json();
   } catch {
@@ -51,12 +53,17 @@ export async function POST(req: Request) {
     }
   }
 
+  // 统一 AI 上下文层：先查本体（口径 + 已认证对象 + 出处规则）
+  const msgs = messages as { role: string; content: unknown }[];
+  const lastUser = [...msgs].reverse().find((m) => m.role === "user")?.content;
+  const onto = ontologyContext(sqlite(), user.id, typeof body?.project_id === "string" ? body.project_id : null, typeof lastUser === "string" ? lastUser : "");
+
   // 调用（默认流式 SSE，聚合为完整文本）
   let text = "";
   try {
     const stream = await client.chat.completions.create({
       model,
-      messages: messages as never,
+      messages: [{ role: "system", content: onto.block }, ...msgs] as never,
       stream: true,
     });
     for await (const chunk of stream) {
@@ -69,10 +76,14 @@ export async function POST(req: Request) {
     );
   }
 
+  const cc = checkCitations(text, onto.refs);
+  text = cc.text;
+  const citations = cc.cited;
+
   // 平台 key 才扣分 + 记账
   if (usingOwnKey) {
-    return NextResponse.json({ text, remaining: null, ownKey: true });
+    return NextResponse.json({ text, remaining: null, ownKey: true, citations });
   }
   const r = await deductCredits(user.id, "chat", COST.chat, { model });
-  return NextResponse.json({ text, remaining: r.ok ? r.remaining : credits, ownKey: false });
+  return NextResponse.json({ text, remaining: r.ok ? r.remaining : credits, ownKey: false, citations });
 }

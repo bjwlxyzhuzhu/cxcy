@@ -24,12 +24,6 @@ nav{display:flex;align-items:center;gap:14px;padding:18px 0}
 .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.05);backdrop-filter:blur(12px)}
 .langbtn{cursor:pointer;font-family:inherit;color:var(--ink);transition:.2s}
 .langbtn:hover{border-color:rgba(124,92,255,.6);background:rgba(124,92,255,.14)}
-.home-nav{flex-wrap:wrap}
-.home-nav>.logo,.home-nav>.av,.home-nav>.chip{flex-shrink:0}
-.home-nav .chip{white-space:nowrap}
-.home-guide-button{min-height:44px;font-size:16px;font-weight:700;text-decoration:none;color:var(--ink);border-color:rgba(34,211,238,.65);background:rgba(34,211,238,.16)}
-.home-guide-button:hover{background:rgba(34,211,238,.28);border-color:var(--cyan)}
-.home-guide-button:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
 .dot{width:7px;height:7px;border-radius:50%;background:#f5a623;box-shadow:0 0 10px #f5a623;animation:blink 1.6s ease-in-out infinite}@keyframes blink{50%{opacity:.4}}
 .av{position:relative;overflow:hidden;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#34507a,#22d3ee);display:grid;place-items:center;font-size:21px;cursor:pointer;border:1px solid var(--line);box-shadow:0 0 14px rgba(34,211,238,.35);transition:.2s}
 .av:hover{transform:scale(1.08);box-shadow:0 0 22px rgba(34,211,238,.6)}
@@ -124,3 +118,45 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:24px 0;border-t
 .avrow label:hover{border-color:rgba(34,211,238,.6);background:rgba(34,211,238,.12)}
 .avrow .close{background:linear-gradient(120deg,var(--cyan),var(--violet));border:none;color:#0a0e1f}
 @media(max-width:860px){.avgrid{grid-template-columns:repeat(4,1fr)}}
+
+/* ===== 虚实对局 · 对战画面动效（bt-*） ===== */
+@keyframes bt-fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes bt-sp{to{transform:rotate(360deg)}}
+@keyframes bt-wv{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@keyframes bt-tw{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes bt-pop{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes bt-gl{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 34px 2px var(--g,#38D6EE)}}
+@keyframes bt-cap{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes bt-slam{0%{opacity:0;transform:scale(2.4) skewX(-8deg)}60%{opacity:1;transform:scale(.94) skewX(-8deg)}100%{opacity:1;transform:scale(1) skewX(-8deg)}}
+@keyframes bt-lgl{0%,100%{transform:translateX(0)}35%{transform:translateX(34px) rotate(3deg)}}
+@keyframes bt-lgr{0%,100%{transform:translateX(0)}35%{transform:translateX(-34px) rotate(-3deg)}}
+@keyframes bt-grid{to{background-position:0 80px,0 0}}
+@keyframes bt-talk{0%,100%{transform:scale(1)}50%{transform:scale(1.02,1.04)}}
+.bt-slam{transform:skewX(-8deg)}
+.bt-talk{transform-origin:50% 100%}
+.bt-wave{display:inline-flex;gap:4px;align-items:center}
+.bt-wave i{display:block;width:5px;border-radius:3px}
+@media (prefers-reduced-motion: no-preference){
+.bt-float{animation:bt-fl 3.6s ease-in-out infinite}
+.bt-float2{animation:bt-fl 3.6s ease-in-out -1.8s infinite}
+.bt-spin{animation:bt-sp 16s linear infinite}
+.bt-wave i{animation:bt-wv .8s ease-in-out infinite}
+.bt-wave i:nth-child(2){animation-delay:-.15s}.bt-wave i:nth-child(3){animation-delay:-.3s}.bt-wave i:nth-child(4){animation-delay:-.45s}.bt-wave i:nth-child(5){animation-delay:-.6s}
+.bt-tw{animation:bt-tw 2.4s ease-in-out infinite}
+.bt-pop{animation:bt-pop 2.4s ease-in-out infinite}
+.bt-glow{animation:bt-gl 2.4s ease-in-out infinite}
+.bt-cap{animation:bt-cap .45s ease-out both}
+.bt-slam{animation:bt-slam .5s cubic-bezier(.2,1.4,.4,1) both}
+.bt-lgl{animation:bt-lgl 1.6s ease-in-out infinite}
+.bt-lgr{animation:bt-lgr 1.6s ease-in-out infinite}
+.bt-grid{animation:bt-grid 1.6s linear infinite}
+.bt-talk{animation:bt-talk .32s ease-in-out infinite}
+}
+.bt-layout{display:grid;grid-template-columns:232px minmax(0,1fr) 320px;gap:14px;align-items:start}
+.bt-roster{display:flex;flex-direction:column;gap:6px}
+@media (max-width: 980px){
+.bt-layout{grid-template-columns:minmax(0,1fr)}
+.bt-roster{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+.bt-roster>*{flex-shrink:0}
+.bt-roster .bt-rhead{display:none}
+}

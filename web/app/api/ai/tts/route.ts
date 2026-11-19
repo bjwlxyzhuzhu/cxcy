@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getUser } from "@/lib/auth";
-import { createAdminClient } from "@/lib/db-client";
-import { getApimart } from "@/lib/ai/apimart";
+import { db } from "@/lib/db";
+import { apimart } from "@/lib/ai/apimart";
 import { getCredits, deductCredits } from "@/lib/credits";
 import { COST, MODELS } from "@/lib/ai/models";
 
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
   if (!text) return NextResponse.json({ error: "空文本" }, { status: 400 });
 
   // 解析 TTS 客户端：用户绑定的千问 key 优先，否则平台默认
-  const admin = createAdminClient();
+  const admin = db();
   const { data } = await admin
     .from("user_api_keys")
     .select("base_url, api_key, model")
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     baseUrl = data.base_url;
     usingOwnKey = true;
   } else {
-    client = getApimart();
+    client = apimart;
     model = MODELS.tts;
     baseUrl = process.env.APIMART_BASE_URL || "";
     usingOwnKey = false;

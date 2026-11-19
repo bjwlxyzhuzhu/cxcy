@@ -54,16 +54,17 @@ if (await portBusy()) {
   log(`端口 ${PORT} 已在服务中，本次不重复启动。`);
   process.exit(0);
 }
-if (!existsSync(join(SA, "server.js"))) {
-  log("✗ 未找到生产构建（.next/standalone/server.js）。请先在 web/ 执行：");
+const standalone = existsSync(join(SA, "server.js"));
+if (!standalone && !existsSync(join(WEB, ".next", "BUILD_ID"))) {
+  log("✗ 未找到生产构建。请先在 web/ 执行：");
   log("    node node_modules/next/dist/bin/next build");
   process.exit(1);
 }
 
 // standalone 不带静态资源，同步进去（等价于 Dockerfile 的两条 COPY）
-cpSync(join(WEB, ".next", "static"), join(SA, ".next", "static"), { recursive: true, force: true });
-if (existsSync(join(WEB, "public"))) {
-  cpSync(join(WEB, "public"), join(SA, "public"), { recursive: true, force: true });
+if (standalone) {
+  cpSync(join(WEB, ".next", "static"), join(SA, ".next", "static"), { recursive: true, force: true });
+  if (existsSync(join(WEB, "public"))) cpSync(join(WEB, "public"), join(SA, "public"), { recursive: true, force: true });
 }
 
 // standalone server.js 不读 .env.local（Docker 里靠 env_file 注入），这里手动喂给它
@@ -97,9 +98,10 @@ process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
 
 while (!stopping) {
-  log(`▶ 启动 standalone server  http://${HOST}:${PORT} …`);
+  log(`▶ 启动生产服务器  http://${HOST}:${PORT} …`);
   const how = await new Promise((res) => {
-    child = spawn(process.execPath, ["server.js"], { cwd: SA, stdio: ["ignore", "pipe", "pipe"], env });
+    const args = standalone ? ["server.js"] : [join(WEB, "node_modules", "next", "dist", "bin", "next"), "start"];
+    child = spawn(process.execPath, args, { cwd: standalone ? SA : WEB, stdio: ["ignore", "pipe", "pipe"], env });
     child.stdout.on("data", (d) => { logStream.write(d); process.stdout.write(d); });
     child.stderr.on("data", (d) => { logStream.write(d); process.stderr.write(d); });
     child.on("exit", (c, sig) => { child = null; res(`code=${c} signal=${sig}`); });

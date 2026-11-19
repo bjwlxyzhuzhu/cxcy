@@ -1,12 +1,22 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
-import { createAdminClient } from "@/lib/db-client";
-import { hashPassword } from "@/lib/auth-local";
-import { query } from "@/lib/db";
+import { db } from "@/lib/db";
+import { setPassword } from "@/lib/auth";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-/** 学生管理操作（service-role）：op=credits 设积分 / op=role 改角色 / op=password 重置密码。 */
+/** 学生列表（仅教师/管理员） */
+export async function GET() {
+  const me = await requireAdmin();
+  if (!me) return NextResponse.json({ error: "无管理员权限" }, { status: 403 });
+  const { data, error } = await db().from("profiles").select("id,student_no,name,class,role,credits,created_at")
+    .order("created_at", { ascending: true }).limit(2000);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ items: data || [] });
+}
+
+/** 学生管理操作（仅教师/管理员）：op=credits 设积分 / op=role 改角色 / op=password 重置密码。 */
 export async function POST(req: Request) {
   const me = await requireAdmin();
   if (!me) return NextResponse.json({ error: "无管理员权限" }, { status: 403 });
@@ -15,7 +25,7 @@ export async function POST(req: Request) {
   try { body = await req.json(); } catch { return NextResponse.json({ error: "请求格式错误" }, { status: 400 }); }
   const { op, user_id } = body;
   if (!user_id) return NextResponse.json({ error: "缺 user_id" }, { status: 400 });
-  const admin = createAdminClient();
+  const admin = db();
 
   try {
     if (op === "credits") {
@@ -36,8 +46,7 @@ export async function POST(req: Request) {
     if (op === "password") {
       const v = String(body.value || "");
       if (v.length < 6) return NextResponse.json({ error: "密码至少 6 位" }, { status: 400 });
-      await query("UPDATE users SET password_hash = $1 WHERE id = $2", [await hashPassword(v), user_id]);
-      await query("DELETE FROM sessions WHERE user_id = $1", [user_id]);
+      setPassword(user_id, v); // 同时让该学生的旧会话失效
       return NextResponse.json({ ok: true });
     }
     return NextResponse.json({ error: "未知操作" }, { status: 400 });

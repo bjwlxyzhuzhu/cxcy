@@ -1,4 +1,5 @@
 "use client";
+import { getCurrentProject } from "@/lib/ontology/pipeline";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { initGalaxy } from "./galaxyEngine";
@@ -12,7 +13,6 @@ import MicButton from "./MicButton";
 import SkillPicker, { resolveActiveSkills, pluginNote } from "./SkillPicker";
 import RichMsg from "./ChartBlock";
 import LiveWall from "./LiveWall";
-import { createClient } from "@/lib/api-client";
 import { PROVIDERS } from "@/lib/ai/providers";
 import { loadToolbox, type Toolbox } from "@/lib/skillsClient";
 import { skillInstrAll } from "@/lib/skills";
@@ -20,6 +20,8 @@ import type { Att } from "@/lib/attach";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Zone = "learn" | "apply";
+/** 知识星球里路由在 /apply 下的模块（其余在 /learn 下） */
+const APPLY_KEYS = new Set(["topic", "defense", "expert", "cockpit"]);
 
 /** 两个数字人向导：水系=小闯（蓝/男/冷静），火系=小创（橙/女/热情）。随当前星系切换。 */
 const HUMANS: Record<Zone, {
@@ -31,8 +33,8 @@ const HUMANS: Record<Zone, {
     ring: "rgba(34,211,238,.55)", border: "rgba(180,230,255,.65)",
     glow: "0 0 26px rgba(34,211,238,.6),inset 0 0 18px rgba(255,255,255,.25)",
     hover: "我是小闯 💧 冷静如水，点我聊闯关",
-    greet: "我是小闯 🚀💧 闯关中心的向导，冷静如水。创赛的政策、流程、选题，问我就好。",
-    system: "你叫“小闯”，是“双创AI星际·闯关中心”的向导。性格冷静如水、沉稳理性、条理清晰、惜字如金。请用简洁、冷静、有条理的语气回答大学生创新创业竞赛（创赛）相关问题，少用感叹号。",
+    greet: "我是小闯 🚀💧 知识星球的向导，冷静如水。课程、政策、选题、比赛流程，问我就好；写商业计划书去黑洞里的创业星舰找小创。",
+    system: "你叫“小闯”，是“双创AI星际·知识星球”的向导。性格冷静如水、沉稳理性、条理清晰、惜字如金。请用简洁、冷静、有条理的语气回答大学生创新创业竞赛（创赛）相关问题，少用感叹号。",
   },
   apply: {
     name: "小创", role: "创新向导", emoji: "🔥", gender: "female", img: "/human-fire.jpg",
@@ -44,12 +46,25 @@ const HUMANS: Record<Zone, {
   },
 };
 
+/** 首页主线入口：学生 = 课程 → 项目 → 成长；教师 = 授课 → 引导 → 参赛材料。其余模块从课程单元与工作台进入 */
+const STUDENT_NAV = [
+  { href: "/course", label: "📘 我的课程", title: "8 次课贯穿一个项目：课前学 → 课中做 → 课后验" },
+  { href: "/studio", label: "🛰️ 项目工作台", title: "8 步产品线，从 V0.1 迭代到 V0.2" },
+  { href: "/me/growth", label: "🌌 成长星图", title: "你的能力成长证据链" },
+];
+const TEACHER_NAV = [
+  { href: "/teacher/live", label: "🏫 授课工作台", title: "上课投屏：虚拟教室席位、实时学情、课堂打点" },
+  { href: "/teacher", label: "🧑‍🏫 教师工作台", title: "引导师面板、待确认的现实验证、干预卡" },
+  { href: "/teacher/contest", label: "🏆 参赛材料", title: "人工智能+ 赛道：教学设计、课堂实录时间轴、成果报告数据" },
+];
+const GUEST_NAV = [{ href: "/course", label: "📘 课程主线", title: "登录后查看你的课程进度" }];
+
 const HOME_STEPS: TourStep[] = [
   { badge: "🚀", title: "欢迎来到双创AI星际", body: "30 秒带你看懂怎么玩——跟着 ①②③④⑤ 点下去就行。" },
-  { sel: "#starLearn", badge: "①", title: "水系 · 闯关中心 💧", body: "「学创赛」的地方：政策解读、选题诊断、案例 & 模板宝库、理论知识、模拟答辩。点这颗蓝色星球进入。" },
-  { sel: "#starApply", badge: "②", title: "火系 · 创新中心 🔥", body: "「搞项目」的地方：组队、打磨创意、找资源。点这颗橙色星球切换 / 进入。" },
-  { sel: "#blackhole", badge: "③", title: "宇宙黑洞 · 创业星舰 🕳️", body: "两区都能看到的黑洞——平台王牌！点进去就是「驾驶舱」：一队专家 AI 搭子（智能体集群）协同作战，帮你从 0 完成一整套商业计划书 + 路演 PPT。" },
-  { sel: "#human", badge: "④", title: "AI 向导随时问", body: "点右下角数字人对话——水系是小闯、火系是小创，随星球切换。创赛任何问题都能问，还能传附件、语音输入。" },
+  { sel: "#starLearn", badge: "①", title: "知识星球 🪐", body: "理论知识、政策解读、案例宝库、模板宝库、选题匹配、模拟答辩、专家打磨——每颗星球一个知识与练习模块，点击进入。" },
+  { sel: ".chip", badge: "②", title: "课程主线", body: "学生从「我的课程」开始：8 次课贯穿一个项目，每次课 课前 → 课中 → 课后；教师从「授课工作台」上课投屏。" },
+  { sel: "#blackhole", badge: "③", title: "宇宙黑洞 · 创业星舰 🕳️", body: "两区都能看到的黑洞——平台王牌！点进去就是「驾驶舱」：数字人小创和一队专家 AI 搭子（智能体集群）协同作战，帮你从 0 完成商业计划书。" },
+  { sel: "#human", badge: "④", title: "AI 向导随时问", body: "点右下角数字人小闯对话（星舰里还有小创）。创赛任何问题都能问，还能传附件、语音输入。" },
   { sel: "#avBtn", badge: "⑤", title: "登录 · 账户中心", body: "登录后有积分、可绑定自己的大模型 Key、进技能商店；每天登录还送 30 积分。" },
 ];
 
@@ -145,11 +160,9 @@ export default function GalaxyHome({
     if (!loggedIn) { setOwnChat(null); return; }
     (async () => {
       try {
-        const api = createClient();
-        const { data: u } = await api.auth.getSession();
-        const uId = u.user?.id;
-        if (!uId) return;
-        const { data } = await api.from<{ provider?: string; model?: string }>("user_api_keys").select("provider, model").eq("user_id", uId).eq("purpose", "chat").maybeSingle();
+        const res = await fetch("/api/me/api-keys?purpose=chat", { cache: "no-store" });
+        if (!res.ok) return; // 未登录
+        const { key: data } = (await res.json()) as { key: { provider: string; model: string } | null };
         if (data) setOwnChat({ short: PROVIDERS.find((p) => p.id === data.provider)?.short || data.model || "我的模型" });
       } catch { /* 无绑定 → 用平台默认 */ }
     })();
@@ -233,7 +246,7 @@ export default function GalaxyHome({
       const res = await fetch("/api/ai/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next.slice(-8), system: persona.system + skillInstrAll(resolveActiveSkills(toolbox, activeSkillIds)) + pluginNote(activePluginIds), attachments: sentAtts, plugins: activePluginIds }),
+        body: JSON.stringify({ messages: next.slice(-8), project_id: getCurrentProject() || undefined, system: persona.system + skillInstrAll(resolveActiveSkills(toolbox, activeSkillIds)) + pluginNote(activePluginIds), attachments: sentAtts, plugins: activePluginIds }),
       });
       const data = await res.json().catch(() => ({}));
       let reply: string;
@@ -267,7 +280,7 @@ export default function GalaxyHome({
       <LiveWall />
 
       <div className="wrap">
-        <nav className="home-nav" aria-label="首页导航">
+        <nav>
           <div className="logo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="双创AI星际" onError={(e) => e.currentTarget.remove()} />
@@ -278,12 +291,12 @@ export default function GalaxyHome({
             <small>DOUBLE INNOVATION AI COSMOS</small>
           </div>
           <div className="spacer" />
-          <a href="/guide" className="chip home-guide-button">
-            <span aria-hidden="true">📖</span> 用户使用说明
-          </a>
-          <a href="/me/growth" className="chip" title="成长星图 · 你的能力成长证据链" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 700 }}>🌌 成长星图</a>
-          <a href="/apply/skills" className="chip" title="技能商店 · 浏览 / 安装 / 沉淀技能" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 700 }}>🛒 技能商店</a>
-          <a href="/experiment" className="chip" title="进入课堂实验" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 700 }}>🛰️ 课堂实验</a>
+          {(loggedIn ? (role === "teacher" || role === "admin" ? TEACHER_NAV : STUDENT_NAV) : GUEST_NAV).map((n, i) => (
+            <a key={n.href} href={n.href} className="chip" title={n.title}
+              style={{ textDecoration: "none", fontWeight: 800, ...(i === 0 ? { color: "#04030f", background: "linear-gradient(120deg,var(--cyan),var(--violet))", border: "none" } : { color: "var(--ink)" }) }}>
+              {n.label}
+            </a>
+          ))}
           <button className="chip langbtn" id="langBtn" title="切换语言 / Switch language">
             🌐 <span id="langTxt">EN</span>
           </button>
@@ -328,7 +341,7 @@ export default function GalaxyHome({
               <span className="bsanim">🐼</span>
             </div>
           </div>
-          <div className="starwrap" id="starApply">
+          <div className="starwrap" id="starApply" style={{ display: "none" }} aria-hidden>
             <div className="btip" />
             <div className="bigsphere" id="sphereApply">
               <div className="bsurf" />
@@ -529,7 +542,7 @@ export default function GalaxyHome({
             onClick={() => {
               const m = (window as unknown as { __module?: { key: string; name: string; live: boolean; zone?: number } }).__module;
               if (!m) return;
-              if (m.live && m.key) router.push((m.zone === 1 ? "/apply/" : "/learn/") + m.key);
+              if (m.live && m.key) router.push((APPLY_KEYS.has(m.key) ? "/apply/" : "/learn/") + m.key);
               else alert(`「${m.name}」即将上线，敬请期待 🚧`);
             }}
             style={{

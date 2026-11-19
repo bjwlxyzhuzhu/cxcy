@@ -1,50 +1,29 @@
-import pg from "pg";
-import bcrypt from "bcryptjs";
+// 创建本机演示账号（管理员 + 1 名学生），密码随机生成并只在终端打印一次。
+// 用法：node --env-file-if-exists=.env.local scripts/seed.mjs
+// 可重复运行：账号已存在时重置为新的随机密码。
+import { openDatabase, migrate } from "../db/migrate.mjs";
+import { hashPassword, makeTempPassword } from "../db/password.mjs";
 
-const { Pool } = pg;
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) {
-  console.error("缺少 DATABASE_URL。请先在环境变量或 Portainer Stack 中配置 PostgreSQL 连接串。");
-  process.exit(1);
-}
-const pool = new Pool({ connectionString: databaseUrl });
+const db = openDatabase();
+migrate(db);
 
-async function ensureUser({ studentNo, name, role, password, credits }) {
-  const passwordHash = await bcrypt.hash(password, 12);
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    const result = await client.query(
-      `INSERT INTO public.users (student_no, password_hash, name, role)
-       VALUES ($1, $2, $3, $4::public.user_role)
-       ON CONFLICT (student_no) DO UPDATE SET password_hash = EXCLUDED.password_hash,
-         name = EXCLUDED.name, role = EXCLUDED.role RETURNING id`,
-      [studentNo, passwordHash, name, role],
-    );
-    const userId = result.rows[0].id;
-    await client.query(
-      `INSERT INTO public.profiles (id, student_no, name, role, credits)
-       VALUES ($1, $2, $3, $4::public.user_role, $5)
-       ON CONFLICT (id) DO UPDATE SET student_no = EXCLUDED.student_no,
-         name = EXCLUDED.name, role = EXCLUDED.role, credits = EXCLUDED.credits`,
-      [userId, studentNo, name, role, credits],
-    );
-    await client.query("DELETE FROM public.sessions WHERE user_id = $1", [userId]);
-    await client.query("COMMIT");
-    console.log(`✓ ${role.padEnd(7)} 学号:${studentNo}  密码:${password}  (${name})`);
-  } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
-  } finally {
-    client.release();
+function ensure(account, name, role, credits) {
+  const pwd = makeTempPassword();
+  const found = db.prepare("select id from users where account = ?").get(account);
+  let id = found?.id;
+  if (id) {
+    db.prepare("update users set password_hash = ?, session_version = session_version + 1 where id = ?").run(hashPassword(pwd), id);
+  } else {
+    id = db.prepare("insert into users (account, password_hash) values (?, ?) returning id").get(account, hashPassword(pwd)).id;
+    db.prepare("insert into profiles (id) values (?)").run(id);
   }
+  db.prepare("update profiles set student_no = ?, name = ?, role = ?, credits = ? where id = ?")
+    .run(role === "student" ? account : null, name, role, credits, id);
+  console.log(`✓ ${role.padEnd(7)} 账号:${account}  密码:${pwd}`);
 }
 
-try {
-  console.log("== 创建演示账号（本地 PostgreSQL） ==");
-  await ensureUser({ studentNo: "admin", name: "课程管理员", role: "admin", password: "Admin@2026", credits: 9999 });
-  await ensureUser({ studentNo: "202596057038", name: "演示学生", role: "student", password: "Student@2026", credits: 120 });
-  console.log("== 完成。登录页使用学号 + 密码登录 ==");
-} finally {
-  await pool.end();
-}
+console.log("== 创建演示账号 ==");
+ensure("admin", "课程管理员", "admin", 9999);
+ensure("demo001", "演示学生", "student", 120);
+console.log("== 完成。登录页用「账号 + 密码」登录 ==");
+db.close();

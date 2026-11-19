@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/db-client";
-import { query } from "@/lib/db";
+import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
 
 /**
  * P4 · 首页实时动态墙（公开，无需登录）。
  * GET：平台累计数字 + 最近里程碑动态（学生姓名脱敏为"某同学"，不含学号）。
- *   数据全部来自真实表（site_visit_events / profiles / usage_logs / evidence_events）。
+ *   数据全部来自真实表（site_visits / profiles / usage_logs / evidence_events）。
  *   若平台尚无真实动态且设置了 WALL_DEMO=1，返回带 demo:true 标记的示例条目
  *  （前端会明确标注"演示数据"，正式评审前置空该变量即可）。
- * POST：记录一次真实访问会话（每天同一会话只计一次，服务端写入）。
+ * POST：访问计数 +1（按天，服务端写入）。
  */
 
 const KIND_TEXT: Record<string, (t: string, total?: number) => string> = {
@@ -30,10 +29,8 @@ const DEMO_FEED = [
   "孙同学 回应了夜枭督导的挑战", "周同学 完成一场模拟答辩 · 得分 82",
 ];
 
-function mask(name: string | null): string {
-  const n = (name || "").trim();
-  return n ? n[0] + "同学" : "某同学";
-}
+/** 公开页面一律匿名：不显示姓名或姓氏（匿名约束） */
+const ANON = "一位同学";
 
 function ago(iso: string): string {
   const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
@@ -48,46 +45,34 @@ let cache: { ts: number; body: unknown } | null = null;
 
 export async function GET() {
   if (cache && Date.now() - cache.ts < 30000) return NextResponse.json(cache.body);
-  const admin = createAdminClient();
+  const admin = db();
 
   const safeCount = async (q: PromiseLike<{ count: number | null; error: unknown }>) => {
     try { const { count } = await q; return count || 0; } catch { return 0; }
   };
 
   const [visits, students, chats, docs, events] = await Promise.all([
-    (async () => {
-      try { const result = await query<{ count: string }>("select count(*)::text as count from public.site_visit_events"); return Number(result.rows[0]?.count || 0); }
-      catch {
-        try { const result = await query<{ count: string }>("select coalesce(sum(count),0)::text as count from public.site_visits"); return Number(result.rows[0]?.count || 0); }
-        catch { return 0; }
-      }
-    })(),
+    (async () => { try { const { data } = await admin.from("site_visits").select("count"); return (data || []).reduce((s, r) => s + (r.count || 0), 0); } catch { return 0; } })(),
     safeCount(admin.from("profiles").select("id", { count: "exact", head: true }).eq("role", "student")),
     safeCount(admin.from("usage_logs").select("id", { count: "exact", head: true })),
     safeCount(admin.from("evidence_events").select("id", { count: "exact", head: true }).in("kind", ["export_doc", "bp_draft", "crew_final"])),
     (async () => {
       try {
         const { data } = await admin.from("evidence_events")
-          .select("user_id, kind, dims, created_at")
+          .select("kind, dims, created_at")
           .order("created_at", { ascending: false }).limit(24);
         return data || [];
       } catch { return []; }
     })(),
   ]);
 
-  // 姓名脱敏拼动态
+  // 公开动态一律匿名（不查、不显示姓名）
   let feed: { text: string; time: string }[] = [];
   if (events.length) {
-    const ids = [...new Set(events.map((e: { user_id: string }) => e.user_id))];
-    let names: Record<string, string | null> = {};
-    try {
-      const { data: profs } = await admin.from("profiles").select("id, name").in("id", ids);
-      names = Object.fromEntries((profs || []).map((p: { id: string; name: string | null }) => [p.id, p.name]));
-    } catch { /* 名字取不到就全用"某同学" */ }
     feed = events
-      .filter((e: { kind: string }) => KIND_TEXT[e.kind])
-      .map((e: { user_id: string; kind: string; dims: unknown; created_at: string }) => ({
-        text: `${mask(names[e.user_id])} ${KIND_TEXT[e.kind](e.kind, (e.dims as { total?: number } | null)?.total)}`,
+      .filter((e) => KIND_TEXT[e.kind])
+      .map((e) => ({
+        text: `${ANON} ${KIND_TEXT[e.kind](e.kind, (e.dims as { total?: number } | null)?.total)}`,
         time: ago(e.created_at),
       }));
   }
@@ -103,18 +88,13 @@ export async function GET() {
   return NextResponse.json(body);
 }
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
+    const admin = db();
     const day = new Date().toISOString().slice(0, 10);
-    const visitorId = req.headers.get("x-visitor-id")?.trim().slice(0, 128);
-    if (!visitorId) return NextResponse.json({ ok: false, error: "缺少访问会话标识" }, { status: 400 });
-    try {
-      await query("insert into public.site_visit_events(day, visitor_id) values($1,$2) on conflict (day, visitor_id) do nothing", [day, visitorId]);
-    } catch {
-      // 兼容尚未执行 0011 迁移的旧部署：仍写入原有按日访问表。
-      await query("insert into public.site_visits(day, count) values($1,1) on conflict (day) do update set count=public.site_visits.count+1", [day]);
-    }
-    cache = null;
+    const { data } = await admin.from("site_visits").select("count").eq("day", day).maybeSingle();
+    if (data) await admin.from("site_visits").update({ count: (data.count || 0) + 1 }).eq("day", day);
+    else await admin.from("site_visits").insert({ day, count: 1 });
   } catch { /* 表未建或写失败：静默 */ }
   return NextResponse.json({ ok: true });
 }

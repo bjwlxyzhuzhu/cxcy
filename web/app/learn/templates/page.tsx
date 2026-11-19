@@ -1,10 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/api-client";
 import LearnChrome from "../LearnChrome";
 import CoachSession from "@/app/apply/CoachSession";
-import ResourceLibrary from "@/components/ResourceLibrary";
 
 type Tpl = { id: number; name: string; category: string; file: string; ext: string; size_kb: number; sort: number };
 
@@ -16,12 +14,14 @@ export default function TemplatesPage() {
   const [active, setActive] = useState<Tpl | null>(null);
 
   useEffect(() => {
-    const api = createClient();
-    api.auth.getUser().then(({ data }) => {
-      if (!data.user) { setAuthed(false); return; }
-      setAuthed(true);
-      api.from("templates").select("id,name,category,file,ext,size_kb,sort").order("sort").then(({ data }) => setTpls((data as Tpl[]) || []));
-    });
+    fetch("/api/learn/templates", { cache: "no-store" })
+      .then(async (r) => {
+        if (r.status === 401) { setAuthed(false); return; }
+        setAuthed(true);
+        const { items } = await r.json();
+        setTpls((items as Tpl[]) || []);
+      })
+      .catch(() => setAuthed(false));
   }, []);
 
   const cats = useMemo(() => [...new Set(tpls.map((t) => t.category || "其他").filter(Boolean))], [tpls]);
@@ -35,8 +35,6 @@ export default function TemplatesPage() {
 
   return (
     <LearnChrome emoji="🐨" title="模板宝库" subtitle="按类别选模板 · 下载之外，还能就地问「怎么用 / 按我的项目怎么填」">
-      <ResourceLibrary kind="templates" />
-      <h2 style={{ margin: "28px 0 16px", fontSize: 22 }}>课程扩展模板与 AI 指导</h2>
       {authed === false ? (
         <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: "40px 24px", textAlign: "center" }}>
           <div style={{ fontSize: 15, marginBottom: 14 }}>登录后即可使用模板宝库 🐨</div>

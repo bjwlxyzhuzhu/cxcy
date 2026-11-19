@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
-import { createAdminClient } from "@/lib/db-client";
+import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -15,7 +15,7 @@ const DEFAULTS: Config = { enabled: false, schoolId: "", baseUrl: "https://api.c
 export async function GET() {
   const me = await requireAdmin();
   if (!me) return NextResponse.json({ error: "无管理员权限" }, { status: 403 });
-  const admin = createAdminClient();
+  const admin = db();
   const { data, error } = await admin.from("app_config").select("value").eq("key", KEY).maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ config: { ...DEFAULTS, ...(data?.value || {}) } });
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   let body: { action?: string; config?: Partial<Config> };
   try { body = await req.json(); } catch { return NextResponse.json({ error: "请求格式错误" }, { status: 400 }); }
   const action = body?.action || "save";
-  const admin = createAdminClient();
+  const admin = db();
 
   if (action === "save") {
     const cfg = { ...DEFAULTS, ...(body.config || {}) };
