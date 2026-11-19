@@ -46,7 +46,7 @@ const HUMANS: Record<Zone, {
   },
 };
 
-/** 首页主线入口：学生 = 课程 → 项目 → 成长；教师 = 授课 → 引导 → 参赛材料。其余模块从课程单元与工作台进入 */
+/** 首页主线入口：学生 = 课程 → 项目 → 成长；教师 = 授课 → 引导 → 学生成长。其余模块从课程单元与工作台进入 */
 const STUDENT_NAV = [
   { href: "/course", label: "📘 我的课程", title: "8 次课贯穿一个项目：课前学 → 课中做 → 课后验" },
   { href: "/studio", label: "🛰️ 项目工作台", title: "8 步产品线，从 V0.1 迭代到 V0.2" },
@@ -55,7 +55,7 @@ const STUDENT_NAV = [
 const TEACHER_NAV = [
   { href: "/teacher/live", label: "🏫 授课工作台", title: "上课投屏：虚拟教室席位、实时学情、课堂打点" },
   { href: "/teacher", label: "🧑‍🏫 教师工作台", title: "引导师面板、待确认的现实验证、干预卡" },
-  { href: "/teacher/contest", label: "🏆 参赛材料", title: "人工智能+ 赛道：教学设计、课堂实录时间轴、成果报告数据" },
+  { href: "/admin?tab=growth", label: "📊 学生成长", title: "学生成长报告：过程性、增值性、终结性评价" },
 ];
 const GUEST_NAV = [{ href: "/course", label: "📘 课程主线", title: "登录后查看你的课程进度" }];
 

@@ -20,7 +20,7 @@ const CARDS = [
   { icon: "🏫", title: "授课工作台", sub: "上课投屏 · 席位 · 课堂打点", href: "/teacher/live" },
   { icon: "⚔️", title: "虚实对局", sub: "开局 · 大屏 · 确认 +5", href: "/arena/screen" },
   { icon: "🧩", title: "本体拼图", sub: "分组游戏 · 计时 · 计分投屏", href: "/teacher/ontology-game" },
-  { icon: "🏆", title: "参赛材料", sub: "AI+ 赛道 · 设计 · 实录 · 报告数据", href: "/teacher/contest" },
+  { icon: "📊", title: "学生成长报告", sub: "过程性 · 增值性 · 终结性评价", href: "/admin?tab=growth" },
   { icon: "📖", title: "课堂口径", sub: "全班统一定义", href: "/apply/ontology?tab=glossary" },
   { icon: "👥", title: "名单与后台", sub: "导入名单 · 用量 · 导出", href: "/admin" },
 ];

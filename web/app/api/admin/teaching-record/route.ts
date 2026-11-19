@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 const pct = (a: number, b: number) => (b ? Math.round((a / b) * 1000) / 10 : null);
 
 /**
- * 参赛材料（人工智能+ 赛道）的数据证据：只做统计，全部来自数据库真实记录，不生成任何结论文字。
+ * 课程教学记录（管理端）：教学成效统计与授课打点时间轴，只做统计，全部来自数据库真实记录，不生成任何结论文字。
  * 范围 = 本教师认领的班级（管理员或未认领班级的教师 = 全部）。不返回任何学生个人信息。
  */
 export async function GET() {
