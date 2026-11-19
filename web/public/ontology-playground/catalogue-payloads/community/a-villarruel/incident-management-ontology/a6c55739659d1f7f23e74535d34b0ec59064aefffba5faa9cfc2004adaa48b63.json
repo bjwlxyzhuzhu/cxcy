@@ -1,0 +1,311 @@
+{
+  "schemaVersion": 1,
+  "id": "community/a-villarruel/incident-management-ontology",
+  "ontology": {
+    "name": "Incident Management",
+    "description": "Incident Management domain. It aligns with ITIL 4 best practices.",
+    "entityTypes": [
+      {
+        "id": "new-entity-4",
+        "name": "Problem",
+        "description": "Known error or root cause for linking recurring incidents",
+        "icon": "⚡",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "problemId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "rootCauseDescription",
+            "type": "string"
+          },
+          {
+            "name": "workaround",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "knownError",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-3",
+        "name": "ConfigurationItem",
+        "description": "Underlying asset or component causing or affected by the incident – ITIL CMDB concept",
+        "icon": "⚡",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "ciId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-2",
+        "name": "Assignee",
+        "description": "Support Analyst, Team, or Group responsible for resolution",
+        "icon": "👤",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "assigneeId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "team",
+            "type": "string"
+          },
+          {
+            "name": "timeZone",
+            "type": "string"
+          },
+          {
+            "name": "availabilityStatus",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "device",
+        "name": "Incident",
+        "description": "Central concept. Unplanned interruption or reduction in service quality",
+        "icon": "⚡",
+        "color": "#34495E",
+        "properties": [
+          {
+            "name": "incidentID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "reportedDateTime",
+            "type": "date"
+          },
+          {
+            "name": "priority",
+            "type": "string"
+          },
+          {
+            "name": "severity",
+            "type": "string"
+          },
+          {
+            "name": "impact",
+            "type": "string"
+          },
+          {
+            "name": "urgency",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "resolutionTime",
+            "type": "string"
+          },
+          {
+            "name": "slaCompliance",
+            "type": "boolean"
+          },
+          {
+            "name": "closureCode",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "sensor",
+        "name": "Service",
+        "description": "Business or IT Service being disrupted",
+        "icon": "⚡",
+        "color": "#E74C3C",
+        "properties": [
+          {
+            "name": "serviceId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "values": [
+              "Temperature",
+              "Humidity",
+              "Pressure",
+              "Motion"
+            ]
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "SLA",
+            "type": "string"
+          },
+          {
+            "name": "businessCriticality",
+            "type": "string"
+          },
+          {
+            "name": "serviceOwner",
+            "type": "string"
+          },
+          {
+            "name": "availabilityTarget",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "reading",
+        "name": "User",
+        "description": "Employee / Reporter. The person raising the incident",
+        "icon": "👤",
+        "color": "#3498DB",
+        "properties": [
+          {
+            "name": "userId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "fullName",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "department",
+            "type": "string"
+          },
+          {
+            "name": "businessUnit",
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "name": "role",
+            "type": "string"
+          },
+          {
+            "name": "contactNumber",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-relates-to-11",
+        "name": "is supported by",
+        "from": "sensor",
+        "to": "new-entity-3",
+        "cardinality": "one-to-many",
+        "description": "Service is supported by Configuration Item"
+      },
+      {
+        "id": "rel-relates-to-10",
+        "name": "relates to",
+        "from": "device",
+        "to": "new-entity-4",
+        "cardinality": "many-to-one",
+        "description": "Incident is related to Problem"
+      },
+      {
+        "id": "rel-relates-to-8",
+        "name": "is assigned to",
+        "from": "device",
+        "to": "new-entity-2",
+        "cardinality": "one-to-many",
+        "description": "Incident is assigned to Assignee"
+      },
+      {
+        "id": "rel-relates-to-7",
+        "name": "impacts",
+        "from": "device",
+        "to": "new-entity-3",
+        "cardinality": "one-to-many",
+        "description": "Incident impacts Configuration Item"
+      },
+      {
+        "id": "rel-relates-to-6",
+        "name": "affects ",
+        "from": "device",
+        "to": "sensor",
+        "cardinality": "many-to-many",
+        "description": "Incident affects Service"
+      },
+      {
+        "id": "rel-relates-to-4",
+        "name": "reports",
+        "from": "reading",
+        "to": "device",
+        "cardinality": "one-to-many"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/incident-management-ontology/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

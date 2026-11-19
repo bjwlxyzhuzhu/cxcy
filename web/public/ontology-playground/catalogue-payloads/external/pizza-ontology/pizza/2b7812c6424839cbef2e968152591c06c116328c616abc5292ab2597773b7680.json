@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "id": "external/pizza-ontology/pizza",
+  "ontology": {
+    "name": "Pizza Ontology",
+    "description": "The classic OWL teaching ontology — pizza types, toppings, and bases. Adapted from the University of Manchester's Pizza tutorial.",
+    "entityTypes": [
+      {
+        "id": "pizza",
+        "name": "Pizza",
+        "description": "A pizza with a base and one or more toppings",
+        "icon": "🍕",
+        "color": "#E74C3C",
+        "properties": [
+          {
+            "name": "pizzaName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "calorieCount",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "pizzaBase",
+        "name": "PizzaBase",
+        "description": "The base of a pizza — thin crust, deep pan, or stuffed crust",
+        "icon": "🫓",
+        "color": "#F39C12",
+        "properties": [
+          {
+            "name": "baseType",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "thickness",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "pizzaTopping",
+        "name": "PizzaTopping",
+        "description": "An ingredient placed on top of a pizza",
+        "icon": "🧀",
+        "color": "#27AE60",
+        "properties": [
+          {
+            "name": "toppingName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "isVegetarian",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "country",
+        "name": "Country",
+        "description": "The country of origin for a named pizza style",
+        "icon": "🌍",
+        "color": "#3498DB",
+        "properties": [
+          {
+            "name": "countryName",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "spicinessLevel",
+        "name": "SpicinessLevel",
+        "description": "The spiciness classification of a topping (mild, medium, hot)",
+        "icon": "🌶️",
+        "color": "#E67E22",
+        "properties": [
+          {
+            "name": "level",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "hasBase",
+        "name": "hasBase",
+        "from": "pizza",
+        "to": "pizzaBase",
+        "cardinality": "many-to-one",
+        "description": "A pizza has exactly one base"
+      },
+      {
+        "id": "hasTopping",
+        "name": "hasTopping",
+        "from": "pizza",
+        "to": "pizzaTopping",
+        "cardinality": "many-to-many",
+        "description": "A pizza has one or more toppings"
+      },
+      {
+        "id": "hasCountryOfOrigin",
+        "name": "hasCountryOfOrigin",
+        "from": "pizza",
+        "to": "country",
+        "cardinality": "many-to-one",
+        "description": "The country a named pizza originates from"
+      },
+      {
+        "id": "hasSpiciness",
+        "name": "hasSpiciness",
+        "from": "pizzaTopping",
+        "to": "spicinessLevel",
+        "cardinality": "many-to-one",
+        "description": "The spiciness classification of a topping"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://www.co-ode.org/ontologies/pizza/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

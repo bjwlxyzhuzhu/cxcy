@@ -1,0 +1,282 @@
+{
+  "schemaVersion": 1,
+  "id": "official/zava-grove-to-shelf-step-3",
+  "ontology": {
+    "name": "Zava Grove-to-Shelf — Step 3: Cold-Chain Logistics",
+    "description": "Add Shipment and ColdChainSensor for perishable logistics and live temperature telemetry.",
+    "entityTypes": [
+      {
+        "id": "grower",
+        "name": "Grower",
+        "description": "A partner producer of fresh fruit and vegetables",
+        "icon": "👨‍🌾",
+        "color": "#498205",
+        "properties": [
+          {
+            "name": "growerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "farm",
+        "name": "Farm",
+        "description": "A geographic site owned or contracted by a grower",
+        "icon": "🌾",
+        "color": "#6EAA1F",
+        "properties": [
+          {
+            "name": "farmId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "type": "string"
+          },
+          {
+            "name": "region",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "plot",
+        "name": "Plot",
+        "description": "A managed parcel within a farm planted with one variety",
+        "icon": "🌱",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "plotId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "hectares",
+            "type": "decimal",
+            "unit": "ha"
+          }
+        ]
+      },
+      {
+        "id": "fruitvariety",
+        "name": "FruitVariety",
+        "description": "A commercial fruit or vegetable variety",
+        "icon": "🍊",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "varietyId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "commercialName",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "minStorageTempC",
+            "type": "decimal",
+            "unit": "°C"
+          },
+          {
+            "name": "maxStorageTempC",
+            "type": "decimal",
+            "unit": "°C"
+          }
+        ]
+      },
+      {
+        "id": "harvestlot",
+        "name": "HarvestLot",
+        "description": "A traceable harvest event from a single plot on a given date",
+        "icon": "📦",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "lotId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "harvestDate",
+            "type": "date"
+          },
+          {
+            "name": "kilograms",
+            "type": "decimal",
+            "unit": "kg"
+          },
+          {
+            "name": "qcGrade",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "qualitycheck",
+        "name": "QualityCheck",
+        "description": "One of the four-stage quality inspections",
+        "icon": "🔍",
+        "color": "#C239B3",
+        "properties": [
+          {
+            "name": "checkId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "stage",
+            "type": "integer"
+          },
+          {
+            "name": "passed",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "shipment",
+        "name": "Shipment",
+        "description": "A reefer container or truck moving harvest lots to a retail DC",
+        "icon": "🚛",
+        "color": "#0099BC",
+        "properties": [
+          {
+            "name": "shipmentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "departureDate",
+            "type": "datetime"
+          },
+          {
+            "name": "etaDate",
+            "type": "datetime"
+          },
+          {
+            "name": "modality",
+            "type": "string"
+          },
+          {
+            "name": "containerId",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "coldchainsensor",
+        "name": "ColdChainSensor",
+        "description": "A temperature and humidity sensor attached to a shipment, streaming telemetry",
+        "icon": "🌡️",
+        "color": "#005A9E",
+        "properties": [
+          {
+            "name": "sensorId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "sensorModel",
+            "type": "string"
+          },
+          {
+            "name": "temperatureC",
+            "type": "decimal",
+            "unit": "°C"
+          },
+          {
+            "name": "humidityPct",
+            "type": "decimal",
+            "unit": "%"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "grower-owns-farm",
+        "name": "GrowerOwnsFarm",
+        "from": "grower",
+        "to": "farm",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "farm-contains-plot",
+        "name": "FarmContainsPlot",
+        "from": "farm",
+        "to": "plot",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "plot-grows-fruitvariety",
+        "name": "PlotGrowsFruitVariety",
+        "from": "plot",
+        "to": "fruitvariety",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "harvestlot-fromplot-plot",
+        "name": "HarvestLotFromPlot",
+        "from": "harvestlot",
+        "to": "plot",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "harvestlot-ofvariety-fruitvariety",
+        "name": "HarvestLotOfVariety",
+        "from": "harvestlot",
+        "to": "fruitvariety",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "qualitycheck-checks-harvestlot",
+        "name": "QualityCheckChecksHarvestLot",
+        "from": "qualitycheck",
+        "to": "harvestlot",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "shipment-carries-harvestlot",
+        "name": "ShipmentCarriesHarvestLot",
+        "from": "shipment",
+        "to": "harvestlot",
+        "cardinality": "one-to-many",
+        "description": "A shipment carries one or more harvest lots"
+      },
+      {
+        "id": "shipment-monitoredby-coldchainsensor",
+        "name": "ShipmentMonitoredBySensor",
+        "from": "shipment",
+        "to": "coldchainsensor",
+        "cardinality": "one-to-many",
+        "description": "A shipment is monitored by one or more cold-chain sensors"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/zava-grove-to-shelf-step-3/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

@@ -1,0 +1,346 @@
+{
+  "schemaVersion": 1,
+  "id": "community/aala-ali/telecom-customer-insights",
+  "ontology": {
+    "name": "Understanding Telecom Customers Through Ontology",
+    "description": "",
+    "entityTypes": [
+      {
+        "id": "new-entity-8",
+        "name": "Device",
+        "description": "",
+        "icon": "🔧",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "device_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "device_type",
+            "type": "string"
+          },
+          {
+            "name": "network_capability",
+            "type": "string"
+          },
+          {
+            "name": "smartphone_flag",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-7",
+        "name": "Revenue",
+        "description": "",
+        "icon": "📊",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "revenue_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "revenue_amount",
+            "type": "decimal"
+          },
+          {
+            "name": "revenue_trend",
+            "type": "string"
+          },
+          {
+            "name": "revenue_period",
+            "type": "string"
+          },
+          {
+            "name": "revenue_source",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-6",
+        "name": "ChurnRisk",
+        "description": "",
+        "icon": "💳",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "risk_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "risk_level",
+            "type": "string"
+          },
+          {
+            "name": "risk_reason",
+            "type": "string"
+          },
+          {
+            "name": "risk_score",
+            "type": "decimal"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-5",
+        "name": "Campaign",
+        "description": "",
+        "icon": "🛒",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "campaign_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "campaign_name",
+            "type": "string"
+          },
+          {
+            "name": "campaign_goal",
+            "type": "string"
+          },
+          {
+            "name": "campaign_channel",
+            "type": "string"
+          },
+          {
+            "name": "start_date",
+            "type": "date"
+          },
+          {
+            "name": "end_date",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-4",
+        "name": "Usage_Pattern",
+        "description": "",
+        "icon": "📋",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "usage_pattern_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "pattern_name",
+            "type": "string"
+          },
+          {
+            "name": "data_usage_level",
+            "type": "string"
+          },
+          {
+            "name": "voice_usage_level",
+            "type": "string"
+          },
+          {
+            "name": "usage_frequency",
+            "type": "string"
+          },
+          {
+            "name": "usage_trend",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-3",
+        "name": "Offer",
+        "description": "",
+        "icon": "🏢",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "offer_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "offer_name",
+            "type": "string"
+          },
+          {
+            "name": "offer_type",
+            "type": "string"
+          },
+          {
+            "name": "validity_days",
+            "type": "integer"
+          },
+          {
+            "name": "price",
+            "type": "decimal"
+          },
+          {
+            "name": "eligibility_rule",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-2",
+        "name": "Segment",
+        "description": "",
+        "icon": "👤",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "segment_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "segment_name",
+            "type": "string"
+          },
+          {
+            "name": "segment_description",
+            "type": "string"
+          },
+          {
+            "name": "spending_level",
+            "type": "string"
+          },
+          {
+            "name": "priority_level",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-1",
+        "name": "Customer",
+        "description": "",
+        "icon": "📦",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "customer_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "customer_type",
+            "type": "string"
+          },
+          {
+            "name": "tenure_months",
+            "type": "integer"
+          },
+          {
+            "name": "lifecycle_stage",
+            "type": "string"
+          },
+          {
+            "name": "loyalty_status",
+            "type": "boolean"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-relates-to-14",
+        "name": "relates_to",
+        "from": "new-entity-4",
+        "to": "new-entity-7",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-12",
+        "name": "affects",
+        "from": "new-entity-8",
+        "to": "new-entity-4",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-11",
+        "name": "influences",
+        "from": "new-entity-3",
+        "to": "new-entity-7",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-10",
+        "name": "targets",
+        "from": "new-entity-3",
+        "to": "new-entity-2",
+        "cardinality": "many-to-many"
+      },
+      {
+        "id": "rel-relates-to-9",
+        "name": "targets",
+        "from": "new-entity-5",
+        "to": "new-entity-2",
+        "cardinality": "many-to-many"
+      },
+      {
+        "id": "rel-relates-to-8",
+        "name": "promotes",
+        "from": "new-entity-5",
+        "to": "new-entity-3",
+        "cardinality": "many-to-many"
+      },
+      {
+        "id": "rel-relates-to-7",
+        "name": "triggers",
+        "from": "new-entity-6",
+        "to": "new-entity-5",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-6",
+        "name": "indicates",
+        "from": "new-entity-4",
+        "to": "new-entity-6",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-relates-to-5",
+        "name": "generates",
+        "from": "new-entity-1",
+        "to": "new-entity-7",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-4",
+        "name": "subscribes_to",
+        "from": "new-entity-1",
+        "to": "new-entity-3",
+        "cardinality": "many-to-many"
+      },
+      {
+        "id": "rel-relates-to-3",
+        "name": "exhibits",
+        "from": "new-entity-1",
+        "to": "new-entity-4",
+        "cardinality": "many-to-many"
+      },
+      {
+        "id": "rel-relates-to-1",
+        "name": "belongs to",
+        "from": "new-entity-1",
+        "to": "new-entity-2",
+        "cardinality": "many-to-one"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/understanding-telecom-customers-through-ontology/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

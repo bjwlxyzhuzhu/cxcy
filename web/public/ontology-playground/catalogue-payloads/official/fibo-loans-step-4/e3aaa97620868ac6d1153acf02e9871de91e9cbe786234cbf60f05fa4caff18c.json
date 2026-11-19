@@ -1,0 +1,244 @@
+{
+  "schemaVersion": 1,
+  "id": "official/fibo-loans-step-4",
+  "ontology": {
+    "name": "FIBO Loans Lab — Step 4",
+    "description": "Risk and classification entities for underwriting and collateral hierarchy modeling. Adapted from EDM Council FIBO. Source: https://github.com/edmcouncil/fibo — MIT License.",
+    "entityTypes": [
+      {
+        "id": "loan",
+        "name": "Loan",
+        "description": "Debt instrument extended to a borrower and repaid according to contract terms.",
+        "icon": "📄",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "loanId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "principalAmount",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "borrower",
+        "name": "Borrower",
+        "description": "Party that receives funds and assumes repayment obligations.",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "borrowerId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "lender",
+        "name": "Lender",
+        "description": "Party that provides funds or credit under loan agreement terms.",
+        "icon": "🏦",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "lenderId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "collateral",
+        "name": "Collateral",
+        "description": "Asset pledged to secure repayment obligations.",
+        "icon": "🏠",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "assetType",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "loanPaymentSchedule",
+        "name": "LoanPaymentSchedule",
+        "description": "Regular schedule defining due dates and expected loan payments.",
+        "icon": "🗓️",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "scheduleId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "servicer",
+        "name": "Servicer",
+        "description": "Financial service provider responsible for collecting loan payments.",
+        "icon": "🧾",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "servicerId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "paymentHistory",
+        "name": "PaymentHistory",
+        "description": "Record of all payment events associated with a loan account.",
+        "icon": "📚",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "paymentHistoryId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "paymentTransaction",
+        "name": "PaymentTransaction",
+        "description": "Single payment event that contributes to payment history.",
+        "icon": "💸",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "paymentTransactionId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "amount",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "ownershipInterest",
+        "name": "OwnershipInterest",
+        "description": "Classifier describing ownership nature for collateralized assets. Adapted from fibo-fnd-oac-own:OwnershipInterest.",
+        "icon": "📜",
+        "color": "#486991",
+        "properties": [
+          {
+            "name": "ownershipInterestType",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "lenderLienPosition",
+        "name": "LenderLienPosition",
+        "description": "Classifier indicating lender claim seniority for collateral assets. Adapted from fibo-fbc-dae-dbt:LenderLienPosition.",
+        "icon": "🏅",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "lienPosition",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "positionRank",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "owedBy",
+        "name": "owedBy",
+        "from": "loan",
+        "to": "borrower",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the borrower obligated to repay it."
+      },
+      {
+        "id": "originatedBy",
+        "name": "originatedBy",
+        "from": "loan",
+        "to": "lender",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the lending organization that originated it."
+      },
+      {
+        "id": "securedBy",
+        "name": "securedBy",
+        "from": "loan",
+        "to": "collateral",
+        "cardinality": "one-to-many",
+        "description": "Relates a secured loan to pledged collateral assets."
+      },
+      {
+        "id": "repaidBySchedule",
+        "name": "repaidBySchedule",
+        "from": "loan",
+        "to": "loanPaymentSchedule",
+        "cardinality": "one-to-one",
+        "description": "Relates a loan to its payment schedule."
+      },
+      {
+        "id": "servicedBy",
+        "name": "servicedBy",
+        "from": "loan",
+        "to": "servicer",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the servicing organization collecting payments."
+      },
+      {
+        "id": "hasPaymentHistory",
+        "name": "hasPaymentHistory",
+        "from": "loanPaymentSchedule",
+        "to": "paymentHistory",
+        "cardinality": "one-to-one",
+        "description": "Links a payment schedule to payment history records."
+      },
+      {
+        "id": "hasIndividualPayment",
+        "name": "hasIndividualPayment",
+        "from": "paymentHistory",
+        "to": "paymentTransaction",
+        "cardinality": "one-to-many",
+        "description": "Links a payment history record to each payment transaction event."
+      },
+      {
+        "id": "classifiesCollateralOwnership",
+        "name": "classifiesCollateralOwnership",
+        "from": "ownershipInterest",
+        "to": "collateral",
+        "cardinality": "one-to-many",
+        "description": "Classifies collateral using ownership interest categories."
+      },
+      {
+        "id": "hasLienPosition",
+        "name": "hasLienPosition",
+        "from": "collateral",
+        "to": "lenderLienPosition",
+        "cardinality": "many-to-one",
+        "description": "Classifies collateral by lender claim seniority."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/fibo-loans-step-4/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

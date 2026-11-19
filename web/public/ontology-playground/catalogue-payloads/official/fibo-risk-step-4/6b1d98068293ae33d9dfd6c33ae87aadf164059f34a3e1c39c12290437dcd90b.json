@@ -1,0 +1,422 @@
+{
+  "schemaVersion": 1,
+  "id": "official/fibo-risk-step-4",
+  "ontology": {
+    "name": "FIBO Risk Lab — Step 4",
+    "description": "Complete FIBO risk management model with industry, geographic, loan classification, and regulatory context including cross-domain relationships. Adapted from EDM Council FIBO. Source: https://github.com/edmcouncil/fibo — MIT License.",
+    "entityTypes": [
+      {
+        "id": "sector",
+        "name": "Sector",
+        "description": "Top-level economic sector grouping industries by broad function.",
+        "icon": "🏢",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "sectorCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "sectorName",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "subsector",
+        "name": "Subsector",
+        "description": "Subdivision of an economic sector for finer-grained classification.",
+        "icon": "🏗️",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "subsectorCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "subsectorName",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "industryGroup",
+        "name": "IndustryGroup",
+        "description": "NAICS-coded industry group with climate sensitivity and cyclicality attributes for risk analysis.",
+        "icon": "🏭",
+        "color": "#486991",
+        "properties": [
+          {
+            "name": "naicsCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "cyclicality",
+            "type": "string"
+          },
+          {
+            "name": "climateSensitivity",
+            "type": "string"
+          },
+          {
+            "name": "essentialServices",
+            "type": "boolean"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "name": "Region",
+        "description": "Continental or geographic region grouping for macroeconomic analysis.",
+        "icon": "🌍",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "regionCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "regionName",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "disasterProfile",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "country",
+        "name": "Country",
+        "description": "Nation-state with economic zone, currency, and regulatory framework attributes.",
+        "icon": "🏳️",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "countryCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "countryName",
+            "type": "string"
+          },
+          {
+            "name": "economicZone",
+            "type": "string"
+          },
+          {
+            "name": "currency",
+            "type": "string"
+          },
+          {
+            "name": "regulatoryFramework",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "jurisdiction",
+        "name": "Jurisdiction",
+        "description": "Subnational jurisdiction with disaster-zone flags for hurricane, flood, earthquake, and wildfire risk.",
+        "icon": "📍",
+        "color": "#00B294",
+        "properties": [
+          {
+            "name": "code",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "hurricaneZone",
+            "type": "boolean"
+          },
+          {
+            "name": "floodZone",
+            "type": "boolean"
+          },
+          {
+            "name": "earthquakeZone",
+            "type": "boolean"
+          },
+          {
+            "name": "wildfireZone",
+            "type": "boolean"
+          },
+          {
+            "name": "coastal",
+            "type": "boolean"
+          },
+          {
+            "name": "latitude",
+            "type": "decimal"
+          },
+          {
+            "name": "longitude",
+            "type": "decimal"
+          }
+        ]
+      },
+      {
+        "id": "concentrationCategory",
+        "name": "ConcentrationCategory",
+        "description": "Regulatory concentration bucket defined by OCC/FDIC guidance for portfolio risk management.",
+        "icon": "📊",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "categoryId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "occGuidance",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "loanType",
+        "name": "LoanType",
+        "description": "Loan product classification with Basel III risk weight, regulatory treatment, and capital tier.",
+        "icon": "💰",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "loanTypeCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "baselRiskWeight",
+            "type": "decimal",
+            "unit": "%"
+          },
+          {
+            "name": "regulatoryTreatment",
+            "type": "string"
+          },
+          {
+            "name": "capitalTier",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "collateralType",
+        "name": "CollateralType",
+        "description": "Collateral asset category with recovery expectations and concentration classification.",
+        "icon": "🏠",
+        "color": "#FF8C00",
+        "properties": [
+          {
+            "name": "collateralTypeCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "recoveryExpectation",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "regulation",
+        "name": "Regulation",
+        "description": "Regulatory framework issued by a banking authority (OCC, FDIC, Basel Committee) governing portfolio risk.",
+        "icon": "⚖️",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "regulationCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "issuingAuthority",
+            "type": "string"
+          },
+          {
+            "name": "effectiveDate",
+            "type": "date"
+          },
+          {
+            "name": "scope",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "regulatoryLimit",
+        "name": "RegulatoryLimit",
+        "description": "Quantitative threshold or limit imposed by a regulation on portfolio concentration, exposure, or capital ratios.",
+        "icon": "🚨",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "limitId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "limitName",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "thresholdPct",
+            "type": "decimal",
+            "unit": "%"
+          },
+          {
+            "name": "severity",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "partOfSector",
+        "name": "partOfSector",
+        "from": "subsector",
+        "to": "sector",
+        "cardinality": "many-to-one",
+        "description": "Links a subsector to its parent economic sector."
+      },
+      {
+        "id": "belongsToSubsector",
+        "name": "belongsToSubsector",
+        "from": "industryGroup",
+        "to": "subsector",
+        "cardinality": "many-to-one",
+        "description": "Links an industry group to its parent subsector."
+      },
+      {
+        "id": "inCountry",
+        "name": "inCountry",
+        "from": "jurisdiction",
+        "to": "country",
+        "cardinality": "many-to-one",
+        "description": "Links a jurisdiction to the country it belongs to."
+      },
+      {
+        "id": "inRegion",
+        "name": "inRegion",
+        "from": "jurisdiction",
+        "to": "region",
+        "cardinality": "many-to-one",
+        "description": "Links a jurisdiction to its geographic region."
+      },
+      {
+        "id": "loanClassifiedAs",
+        "name": "loanClassifiedAs",
+        "from": "loanType",
+        "to": "concentrationCategory",
+        "cardinality": "many-to-one",
+        "description": "Classifies a loan type into an OCC/FDIC concentration category."
+      },
+      {
+        "id": "collateralClassifiedAs",
+        "name": "collateralClassifiedAs",
+        "from": "collateralType",
+        "to": "concentrationCategory",
+        "cardinality": "many-to-one",
+        "description": "Classifies a collateral type into an OCC/FDIC concentration category."
+      },
+      {
+        "id": "typicallySecuredBy",
+        "name": "typicallySecuredBy",
+        "from": "collateralType",
+        "to": "loanType",
+        "cardinality": "many-to-many",
+        "description": "Links a collateral type to the loan types it typically secures."
+      },
+      {
+        "id": "mandatedBy",
+        "name": "mandatedBy",
+        "from": "regulatoryLimit",
+        "to": "regulation",
+        "cardinality": "many-to-one",
+        "description": "Links a regulatory limit to the regulation that mandates it."
+      },
+      {
+        "id": "limitAppliesToCategory",
+        "name": "limitAppliesToCategory",
+        "from": "regulatoryLimit",
+        "to": "concentrationCategory",
+        "cardinality": "many-to-one",
+        "description": "Links a regulatory limit to the concentration category it constrains."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/fibo-risk-step-4/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

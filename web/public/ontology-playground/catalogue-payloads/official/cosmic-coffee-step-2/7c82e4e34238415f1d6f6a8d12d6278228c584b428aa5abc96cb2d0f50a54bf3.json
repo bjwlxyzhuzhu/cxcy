@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "id": "official/cosmic-coffee-step-2",
+  "ontology": {
+    "name": "Fourth Coffee – Step 2",
+    "description": "Adds Store locations to the core ordering model, linking orders to where they are processed.",
+    "entityTypes": [
+      {
+        "id": "customer",
+        "name": "Customer",
+        "description": "A loyalty-program member who places orders",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "customerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "loyaltyTier",
+            "type": "enum",
+            "values": [
+              "Bronze",
+              "Silver",
+              "Gold",
+              "Platinum"
+            ]
+          },
+          {
+            "name": "joinDate",
+            "type": "date"
+          },
+          {
+            "name": "totalSpend",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "order",
+        "name": "Order",
+        "description": "A purchase transaction containing one or more products",
+        "icon": "🧾",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "orderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "timestamp",
+            "type": "datetime"
+          },
+          {
+            "name": "total",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "Pending",
+              "Preparing",
+              "Ready",
+              "Completed",
+              "Cancelled"
+            ]
+          },
+          {
+            "name": "paymentMethod",
+            "type": "enum",
+            "values": [
+              "Card",
+              "Cash",
+              "Mobile",
+              "Gift Card"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "product",
+        "name": "Product",
+        "description": "A menu item or merchandise available for sale",
+        "icon": "☕",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "productId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "enum",
+            "values": [
+              "Espresso",
+              "Brewed",
+              "Cold Brew",
+              "Tea",
+              "Food",
+              "Merchandise"
+            ]
+          },
+          {
+            "name": "price",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "origin",
+            "type": "string"
+          },
+          {
+            "name": "isOrganic",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "store",
+        "name": "Store",
+        "description": "A physical retail location where orders are prepared and served",
+        "icon": "🏪",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "storeId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "type": "string"
+          },
+          {
+            "name": "state",
+            "type": "string"
+          },
+          {
+            "name": "openDate",
+            "type": "date"
+          },
+          {
+            "name": "capacity",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "customer_places_order",
+        "name": "places",
+        "from": "customer",
+        "to": "order",
+        "cardinality": "one-to-many",
+        "description": "A customer places one or more orders"
+      },
+      {
+        "id": "order_contains_product",
+        "name": "contains",
+        "from": "order",
+        "to": "product",
+        "cardinality": "many-to-many",
+        "description": "An order contains one or more products"
+      },
+      {
+        "id": "order_processed_at_store",
+        "name": "processedAt",
+        "from": "order",
+        "to": "store",
+        "cardinality": "many-to-one",
+        "description": "An order is processed at a specific store"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/cosmic-coffee-step-2/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

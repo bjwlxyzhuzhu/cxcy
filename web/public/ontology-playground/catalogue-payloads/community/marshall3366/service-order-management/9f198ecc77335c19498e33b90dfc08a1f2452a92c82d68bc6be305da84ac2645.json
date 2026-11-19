@@ -1,0 +1,507 @@
+{
+  "schemaVersion": 1,
+  "id": "community/marshall3366/service-order-management",
+  "ontology": {
+    "name": "Service Order Management",
+    "description": "Service Order Management",
+    "entityTypes": [
+      {
+        "id": "new-entity-10",
+        "name": "Warehouse",
+        "description": "It tells the location of each warehouse/plant where the part is being kept and the inventory level information",
+        "icon": "🏢",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "Warehouse_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Product_ID",
+            "type": "string"
+          },
+          {
+            "name": "Location",
+            "type": "string"
+          },
+          {
+            "name": "Country",
+            "type": "string"
+          },
+          {
+            "name": "Stock_Quantity",
+            "type": "integer"
+          },
+          {
+            "name": "Reserved_Quantity",
+            "type": "integer"
+          },
+          {
+            "name": "Available_Quantity",
+            "type": "integer"
+          },
+          {
+            "name": "Last_Updated_Date",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-9",
+        "name": "ServiceEngineer",
+        "description": "Service orders are the parts or devices which requires installation and service engineer needs to inspect the site and do the installation",
+        "icon": "🔧",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "FSE_ID",
+            "type": "integer",
+            "isIdentifier": true
+          },
+          {
+            "name": "Service_Engineer",
+            "type": "string"
+          },
+          {
+            "name": "Skill_Type",
+            "type": "string"
+          },
+          {
+            "name": "Labour_Hours",
+            "type": "string"
+          },
+          {
+            "name": "Travel_Hours",
+            "type": "string"
+          },
+          {
+            "name": "Order_ID",
+            "type": "string"
+          },
+          {
+            "name": "Customer_ID",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-8",
+        "name": "Payment",
+        "description": "This a payment table and contains info about Payment method, Amount, Payment Status & Transaction ID",
+        "icon": "🌐",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "Transaction_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Payment_Method",
+            "type": "string"
+          },
+          {
+            "name": "Amount",
+            "type": "integer"
+          },
+          {
+            "name": "Payment_Status",
+            "type": "string"
+          },
+          {
+            "name": "Customer_ID",
+            "type": "string"
+          },
+          {
+            "name": "Order_ID",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-7",
+        "name": "Shipment",
+        "description": "It contains details regarding Courier type, Courier Service Name, Delivery Date, Dispatch Date, Delivery Status, Customer Name",
+        "icon": "⚡",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "Shipment_ID",
+            "type": "integer",
+            "isIdentifier": true
+          },
+          {
+            "name": "Courier_Service_Name",
+            "type": "string"
+          },
+          {
+            "name": "Freight_Type",
+            "type": "string"
+          },
+          {
+            "name": "Dispatch_Date",
+            "type": "date"
+          },
+          {
+            "name": "Delivery_Date",
+            "type": "date"
+          },
+          {
+            "name": "Delivery_status",
+            "type": "string"
+          },
+          {
+            "name": "Customer_Name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-6",
+        "name": "Parts",
+        "description": "Parts/Product related information like Product category, Brand and the Retail Price",
+        "icon": "📝",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "Product_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Category",
+            "type": "string"
+          },
+          {
+            "name": "Product_Name",
+            "type": "string"
+          },
+          {
+            "name": "Brand",
+            "type": "string"
+          },
+          {
+            "name": "Retail_Price",
+            "type": "integer"
+          },
+          {
+            "name": "Stock_level",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-5",
+        "name": "SalesTarget",
+        "description": "Monthly Sales target by each product ID",
+        "icon": "🎯",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "Month-Year",
+            "type": "string"
+          },
+          {
+            "name": "Product_ID",
+            "type": "string"
+          },
+          {
+            "name": "Sales_Target_Amount",
+            "type": "string"
+          },
+          {
+            "name": "Month-Year_Product_ID",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "new-entity-4",
+        "name": "Customer",
+        "description": "It has details regarding the Customer Name (people) and the region from which they ordered",
+        "icon": "👤",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "Region",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Customer_Name",
+            "type": "string"
+          },
+          {
+            "name": "Customer_ID",
+            "type": "string"
+          },
+          {
+            "name": "Pincode",
+            "type": "integer"
+          },
+          {
+            "name": "Country",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-3",
+        "name": "Return",
+        "description": "Devices that got returned by Customers",
+        "icon": "🛒",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "Order_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Returned",
+            "type": "string"
+          },
+          {
+            "name": "Region",
+            "type": "string"
+          },
+          {
+            "name": "Returned_Order",
+            "type": "string"
+          },
+          {
+            "name": "Returned_Date",
+            "type": "date"
+          },
+          {
+            "name": "Customer_ID",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-2",
+        "name": "ServiceOrders",
+        "description": "Orders placed by the customers, Products details, Shipment details, Sales Amount",
+        "icon": "📦",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "Row_ID",
+            "type": "integer",
+            "isIdentifier": true
+          },
+          {
+            "name": "Order_ID",
+            "type": "string"
+          },
+          {
+            "name": "Order_Date",
+            "type": "date"
+          },
+          {
+            "name": "Ship_Date",
+            "type": "date"
+          },
+          {
+            "name": "Ship_Mode",
+            "type": "string"
+          },
+          {
+            "name": "Customer_ID",
+            "type": "string"
+          },
+          {
+            "name": "Customer_Name",
+            "type": "string"
+          },
+          {
+            "name": "Segment",
+            "type": "string"
+          },
+          {
+            "name": "Postal_Code",
+            "type": "integer"
+          },
+          {
+            "name": "City",
+            "type": "string"
+          },
+          {
+            "name": "State",
+            "type": "string"
+          },
+          {
+            "name": "Country",
+            "type": "string"
+          },
+          {
+            "name": "Region",
+            "type": "string"
+          },
+          {
+            "name": "Market",
+            "type": "string"
+          },
+          {
+            "name": "Product_ID",
+            "type": "string"
+          },
+          {
+            "name": "Category",
+            "type": "string"
+          },
+          {
+            "name": "Sub_Category",
+            "type": "string"
+          },
+          {
+            "name": "Product_Name",
+            "type": "string"
+          },
+          {
+            "name": "Payment_ID",
+            "type": "string"
+          },
+          {
+            "name": "Sales_Amount",
+            "type": "decimal"
+          },
+          {
+            "name": "Quantity",
+            "type": "integer"
+          },
+          {
+            "name": "Discount",
+            "type": "decimal"
+          },
+          {
+            "name": "Profit",
+            "type": "decimal"
+          },
+          {
+            "name": "Shipping_Cost",
+            "type": "decimal"
+          },
+          {
+            "name": "Order_Priority",
+            "type": "string"
+          },
+          {
+            "name": "Delivery_Days",
+            "type": "integer"
+          },
+          {
+            "name": "Year",
+            "type": "integer"
+          },
+          {
+            "name": "Month-Year_Product_ID",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-relates-to-13",
+        "name": "maintains",
+        "from": "new-entity-10",
+        "to": "new-entity-6",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-12",
+        "name": "serves",
+        "from": "new-entity-9",
+        "to": "new-entity-4",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-11",
+        "name": "handled_by",
+        "from": "new-entity-2",
+        "to": "new-entity-9",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-10",
+        "name": "places",
+        "from": "new-entity-4",
+        "to": "new-entity-2",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-9",
+        "name": "refunded_via",
+        "from": "new-entity-3",
+        "to": "new-entity-8",
+        "cardinality": "one-to-one"
+      },
+      {
+        "id": "rel-relates-to-8",
+        "name": "made_by",
+        "from": "new-entity-8",
+        "to": "new-entity-4",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-7",
+        "name": "paid_via",
+        "from": "new-entity-2",
+        "to": "new-entity-8",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-6",
+        "name": "delivered_to",
+        "from": "new-entity-7",
+        "to": "new-entity-4",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-relates-to-5",
+        "name": "fulfilled_by",
+        "from": "new-entity-2",
+        "to": "new-entity-7",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-relates-to-4",
+        "name": "contains",
+        "from": "new-entity-2",
+        "to": "new-entity-6",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-relates-to-3",
+        "name": "drives",
+        "from": "new-entity-5",
+        "to": "new-entity-2",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-2",
+        "name": "made",
+        "from": "new-entity-4",
+        "to": "new-entity-3",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-1",
+        "name": "against",
+        "from": "new-entity-3",
+        "to": "new-entity-2",
+        "cardinality": "one-to-one"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/service-order-management/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

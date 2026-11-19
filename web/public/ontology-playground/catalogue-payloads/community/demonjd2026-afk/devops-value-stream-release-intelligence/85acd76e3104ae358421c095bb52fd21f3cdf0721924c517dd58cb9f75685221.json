@@ -1,0 +1,420 @@
+{
+  "schemaVersion": 1,
+  "id": "community/demonjd2026-afk/devops-value-stream-release-intelligence",
+  "ontology": {
+    "name": "DevOps Value Stream & Release Intelligence",
+    "description": "Models the full software delivery chain — from feature request through work items, builds, and releases to production incidents and post-mortems — enabling AI agents to trace exactly which feature caused a production failure and who is accountable.",
+    "entityTypes": [
+      {
+        "id": "featureRequest",
+        "name": "FeatureRequest",
+        "description": "A business-level request for new capability or change",
+        "icon": "💡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "featureId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique feature request identifier"
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "description": "Short descriptive title of the feature"
+          },
+          {
+            "name": "businessPriority",
+            "type": "enum",
+            "values": [
+              "Critical",
+              "High",
+              "Medium",
+              "Low"
+            ],
+            "description": "Business priority"
+          },
+          {
+            "name": "requestedBy",
+            "type": "string",
+            "description": "Stakeholder or team that raised the request"
+          },
+          {
+            "name": "targetReleaseVersion",
+            "type": "string",
+            "description": "Planned release version"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "Backlog",
+              "In Progress",
+              "Released",
+              "Cancelled"
+            ],
+            "description": "Current lifecycle status"
+          }
+        ]
+      },
+      {
+        "id": "workItem",
+        "name": "WorkItem",
+        "description": "A discrete unit of engineering work implementing part of a feature",
+        "icon": "📋",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "workItemId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique work item identifier"
+          },
+          {
+            "name": "type",
+            "type": "enum",
+            "values": [
+              "Story",
+              "Bug",
+              "Task",
+              "Hotfix"
+            ],
+            "description": "Type of engineering work"
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "description": "Work item title"
+          },
+          {
+            "name": "assignee",
+            "type": "string",
+            "description": "Engineer assigned to this work item"
+          },
+          {
+            "name": "sprintName",
+            "type": "string",
+            "description": "Sprint in which this work item was completed"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "Todo",
+              "In Progress",
+              "Code Review",
+              "Done"
+            ],
+            "description": "Current work item status"
+          }
+        ]
+      },
+      {
+        "id": "serviceComponent",
+        "name": "ServiceComponent",
+        "description": "A discrete service or module within the system architecture",
+        "icon": "⚙️",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "componentId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique service component identifier"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Service or component name"
+          },
+          {
+            "name": "owningTeam",
+            "type": "string",
+            "description": "Team responsible for this component"
+          },
+          {
+            "name": "tier",
+            "type": "enum",
+            "values": [
+              "Frontend",
+              "Backend",
+              "Data",
+              "Infrastructure",
+              "ML"
+            ],
+            "description": "Architectural tier"
+          },
+          {
+            "name": "criticalityLevel",
+            "type": "enum",
+            "values": [
+              "Critical",
+              "High",
+              "Medium",
+              "Low"
+            ],
+            "description": "Business criticality if this component fails"
+          },
+          {
+            "name": "language",
+            "type": "string",
+            "description": "Primary programming language or framework"
+          }
+        ]
+      },
+      {
+        "id": "buildPipeline",
+        "name": "BuildPipeline",
+        "description": "A CI/CD pipeline run that compiles, tests, and packages code",
+        "icon": "🔧",
+        "color": "#CA5010",
+        "properties": [
+          {
+            "name": "buildId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique build run identifier"
+          },
+          {
+            "name": "branch",
+            "type": "string",
+            "description": "Source branch that triggered the build"
+          },
+          {
+            "name": "triggeredBy",
+            "type": "string",
+            "description": "Person or event that initiated the build"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "Running",
+              "Passed",
+              "Failed",
+              "Cancelled"
+            ],
+            "description": "Build pipeline outcome"
+          },
+          {
+            "name": "durationSeconds",
+            "type": "integer",
+            "unit": "seconds",
+            "description": "Total build duration"
+          },
+          {
+            "name": "failedStage",
+            "type": "string",
+            "description": "Pipeline stage where the failure occurred"
+          }
+        ]
+      },
+      {
+        "id": "deploymentRelease",
+        "name": "DeploymentRelease",
+        "description": "A versioned deployment event pushing work items into a target environment",
+        "icon": "🚀",
+        "color": "#038387",
+        "properties": [
+          {
+            "name": "releaseId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique release identifier"
+          },
+          {
+            "name": "version",
+            "type": "string",
+            "description": "Semantic version of the release"
+          },
+          {
+            "name": "environment",
+            "type": "enum",
+            "values": [
+              "Development",
+              "Staging",
+              "Production"
+            ],
+            "description": "Target deployment environment"
+          },
+          {
+            "name": "deployedAt",
+            "type": "datetime",
+            "description": "Timestamp when the deployment completed"
+          },
+          {
+            "name": "deployedBy",
+            "type": "string",
+            "description": "Engineer or automation that executed the deployment"
+          },
+          {
+            "name": "rollbackAvailable",
+            "type": "boolean",
+            "description": "Whether a one-click rollback is available"
+          }
+        ]
+      },
+      {
+        "id": "incident",
+        "name": "Incident",
+        "description": "A production failure or degradation event impacting users or SLA commitments",
+        "icon": "🚨",
+        "color": "#D13438",
+        "properties": [
+          {
+            "name": "incidentId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique incident identifier"
+          },
+          {
+            "name": "severity",
+            "type": "enum",
+            "values": [
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ],
+            "description": "Incident severity"
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "description": "Short description of the failure"
+          },
+          {
+            "name": "detectedAt",
+            "type": "datetime",
+            "description": "Timestamp when the incident was first detected"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "Active",
+              "Mitigating",
+              "Resolved"
+            ],
+            "description": "Current incident status"
+          },
+          {
+            "name": "affectedUsers",
+            "type": "integer",
+            "unit": "users",
+            "description": "Estimated number of users impacted"
+          }
+        ]
+      },
+      {
+        "id": "postMortem",
+        "name": "PostMortem",
+        "description": "A structured retrospective documenting root cause and prevention actions for a resolved incident",
+        "icon": "📝",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "postMortemId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique post-mortem document identifier"
+          },
+          {
+            "name": "rootCause",
+            "type": "string",
+            "description": "Identified root cause of the incident"
+          },
+          {
+            "name": "contributingFactors",
+            "type": "string",
+            "description": "Secondary factors that enabled or worsened the incident"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "Draft",
+              "In Review",
+              "Published"
+            ],
+            "description": "Post-mortem document status"
+          },
+          {
+            "name": "actionItemCount",
+            "type": "integer",
+            "description": "Number of prevention action items generated"
+          },
+          {
+            "name": "publishedAt",
+            "type": "date",
+            "description": "Date the post-mortem was formally published"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "feature_decomposes_into_workitem",
+        "name": "decomposesInto",
+        "from": "featureRequest",
+        "to": "workItem",
+        "cardinality": "one-to-many",
+        "description": "A feature request is broken down into one or more discrete work items"
+      },
+      {
+        "id": "workitem_modifies_component",
+        "name": "modifies",
+        "from": "workItem",
+        "to": "serviceComponent",
+        "cardinality": "many-to-one",
+        "description": "A work item changes code within a specific service component"
+      },
+      {
+        "id": "workitem_bundled_in_release",
+        "name": "bundledIn",
+        "from": "workItem",
+        "to": "deploymentRelease",
+        "cardinality": "many-to-many",
+        "description": "Work items are bundled together and shipped as a deployment release"
+      },
+      {
+        "id": "build_validates_release",
+        "name": "validates",
+        "from": "buildPipeline",
+        "to": "deploymentRelease",
+        "cardinality": "many-to-one",
+        "description": "A build pipeline run validates and produces the artifacts for a release"
+      },
+      {
+        "id": "release_triggers_incident",
+        "name": "triggers",
+        "from": "deploymentRelease",
+        "to": "incident",
+        "cardinality": "one-to-many",
+        "description": "A deployment release introduces changes that trigger a production incident"
+      },
+      {
+        "id": "incident_impacts_component",
+        "name": "impacts",
+        "from": "incident",
+        "to": "serviceComponent",
+        "cardinality": "many-to-many",
+        "description": "A production incident degrades or takes down one or more service components"
+      },
+      {
+        "id": "postmortem_documents_incident",
+        "name": "documents",
+        "from": "postMortem",
+        "to": "incident",
+        "cardinality": "one-to-one",
+        "description": "A post-mortem documents the root cause and prevention actions for a resolved incident"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/devops-value-stream-release-intelligence/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

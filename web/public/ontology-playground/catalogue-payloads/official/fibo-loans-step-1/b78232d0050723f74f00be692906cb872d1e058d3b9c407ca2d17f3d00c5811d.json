@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "id": "official/fibo-loans-step-1",
+  "ontology": {
+    "name": "FIBO Loans Lab — Step 1",
+    "description": "Core loan actors and obligations adapted from EDM Council FIBO LOAN/LoansGeneral/Loans. Source: https://github.com/edmcouncil/fibo — MIT License.",
+    "entityTypes": [
+      {
+        "id": "loan",
+        "name": "Loan",
+        "description": "Debt instrument extended to a borrower and repaid according to contract terms.",
+        "icon": "📄",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "loanId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "principalAmount",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "isInterestOnly",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "borrower",
+        "name": "Borrower",
+        "description": "Party that receives funds and assumes repayment obligations.",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "borrowerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "creditScore",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "lender",
+        "name": "Lender",
+        "description": "Party that provides funds or credit under loan agreement terms.",
+        "icon": "🏦",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "lenderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "lenderType",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "owedBy",
+        "name": "owedBy",
+        "from": "loan",
+        "to": "borrower",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the borrower obligated to repay it."
+      },
+      {
+        "id": "originatedBy",
+        "name": "originatedBy",
+        "from": "loan",
+        "to": "lender",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the lending organization that originated it."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/fibo-loans-step-1/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

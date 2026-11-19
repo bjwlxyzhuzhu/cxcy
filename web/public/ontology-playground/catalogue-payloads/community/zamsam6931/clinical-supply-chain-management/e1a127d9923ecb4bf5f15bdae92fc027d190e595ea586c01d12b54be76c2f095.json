@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "id": "community/zamsam6931/clinical-supply-chain-management",
+  "ontology": {
+    "name": "Clinical Supply Chain Management",
+    "description": "            Enterprise Clinical Supply Chain Knowledge Graph  for Microsoft Fabric Ontology Playground        ",
+    "entityTypes": [
+      {
+        "id": "study",
+        "name": "Study",
+        "description": "Represents a clinical trial or research study.",
+        "icon": "📝",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "studyId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "studyName",
+            "type": "string"
+          },
+          {
+            "name": "studyPhase",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "site",
+        "name": "Site",
+        "description": "Represents a clinical research center or hospital.",
+        "icon": "🏢",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "siteId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "siteName",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "patient",
+        "name": "Patient",
+        "description": "Represents a participant enrolled in a study.",
+        "icon": "👤",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "patientId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "gender",
+            "type": "string"
+          },
+          {
+            "name": "age",
+            "type": "string"
+          },
+          {
+            "name": "patient_status",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "enrollment",
+        "name": "Enrollment",
+        "description": "Tracks patient recruitment and enrollment metrics.",
+        "icon": "📋",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "enrollment_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "study_id",
+            "type": "string"
+          },
+          {
+            "name": "site_id",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "visit",
+        "name": "Visit",
+        "description": "Represents a patient interaction or treatment visit.",
+        "icon": "🔗",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "visit_id",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "compound",
+        "name": "Compound",
+        "description": "Represents investigational drug products.",
+        "icon": "📦",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "compound_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "compound_name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "manufacturing",
+        "name": "Manufacturing",
+        "description": "Represents manufacturing operations and production batches.",
+        "icon": "🔧",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "manufacturing_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "produced_quantity",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "demand",
+        "name": "Demand",
+        "description": "Represents forecasted clinical supply demand.",
+        "icon": "📈",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "demand_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "study_id",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "depot",
+        "name": "Depot",
+        "description": "Regional supply storage center",
+        "icon": "📦",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "depot_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "depot_name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "shipment",
+        "name": "Shipment",
+        "description": "Represents movement of inventory between locations.",
+        "icon": "🛒",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "shipmentStatus",
+            "type": "string"
+          },
+          {
+            "name": "shipment_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "shipment_quantity",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "inventory",
+        "name": "Inventory",
+        "description": "Represents available stock of clinical supplies.",
+        "icon": "📦",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "quantity",
+            "type": "integer"
+          },
+          {
+            "name": "inventory_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "inventory_status",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "country",
+        "name": "Country",
+        "description": "Country geographic entity",
+        "icon": "🌐",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "country_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "country_name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "name": "Region",
+        "description": "Geographic region",
+        "icon": "📦",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "region_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "region_name",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-relates-to-2",
+        "name": "has demand",
+        "from": "patient",
+        "to": "demand",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "hasSite",
+        "name": "has site",
+        "from": "study",
+        "to": "site",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "usesCompound",
+        "name": "uses compound",
+        "from": "study",
+        "to": "compound",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "hasEnrollment",
+        "name": "has enrollment",
+        "from": "study",
+        "to": "enrollment",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "enrolledAt",
+        "name": "enrolled at",
+        "from": "patient",
+        "to": "site",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "participatesIn",
+        "name": "participates in",
+        "from": "patient",
+        "to": "study",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "hasVisit",
+        "name": "has visit",
+        "from": "patient",
+        "to": "visit",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "occursAt",
+        "name": "occurs at",
+        "from": "enrollment",
+        "to": "site",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "manufactures",
+        "name": "manufactures",
+        "from": "manufacturing",
+        "to": "compound",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "drivesManufacturing",
+        "name": "drives manufacturing",
+        "from": "demand",
+        "to": "manufacturing",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "storesInventory",
+        "name": "stores inventory",
+        "from": "depot",
+        "to": "inventory",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "shipsTo",
+        "name": "ships to",
+        "from": "depot",
+        "to": "site",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "deliversInventory",
+        "name": "delivers ",
+        "from": "shipment",
+        "to": "inventory",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "siteStoresInventory",
+        "name": "site stores ",
+        "from": "site",
+        "to": "inventory",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "locatedIn",
+        "name": "located in",
+        "from": "site",
+        "to": "country",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "belongsToRegion",
+        "name": "belongs to ",
+        "from": "country",
+        "to": "region",
+        "cardinality": "one-to-many"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/clinical-supply-chain-management/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

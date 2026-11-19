@@ -1,0 +1,423 @@
+{
+  "schemaVersion": 1,
+  "id": "community/mudassar-data-ai/learning-ontology",
+  "ontology": {
+    "name": "Learning Ontology",
+    "description": "Canonical learning ontology derived from the reference model in clean_with_keys_and_attributes.owl. It defines business entities, explicit key attributes, required non-key attributes, and core relationships for a learning domain.",
+    "entityTypes": [
+      {
+        "id": "person",
+        "name": "Person",
+        "description": "A learner or worker participating in learning programs, assignments, completions, and skill tracking.",
+        "icon": "👤",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "personId",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "Key attribute for Person."
+          },
+          {
+            "name": "userName",
+            "type": "string",
+            "description": "Required non-key attribute for Person."
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "description": "Required non-key attribute for Person."
+          },
+          {
+            "name": "jobRole",
+            "type": "string",
+            "description": "Required non-key attribute for Person."
+          },
+          {
+            "name": "employmentStatus",
+            "type": "string",
+            "description": "Required non-key attribute for Person."
+          }
+        ]
+      },
+      {
+        "id": "learningProgram",
+        "name": "LearningProgram",
+        "description": "A structured learning offering that can group curricula and coordinate mandatory or optional development activities.",
+        "icon": "🎓",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "programId",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "Key attribute for LearningProgram."
+          },
+          {
+            "name": "programName",
+            "type": "string",
+            "description": "Required non-key attribute for LearningProgram."
+          },
+          {
+            "name": "programType",
+            "type": "string",
+            "description": "Required non-key attribute for LearningProgram."
+          },
+          {
+            "name": "isMandatory",
+            "type": "boolean",
+            "description": "Required non-key attribute for LearningProgram."
+          }
+        ]
+      },
+      {
+        "id": "curriculum",
+        "name": "Curriculum",
+        "description": "A rules-based grouping of courses or learning items with an effective validity period and completion requirements.",
+        "icon": "📋",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "curriculumId",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "Key attribute for Curriculum."
+          },
+          {
+            "name": "curriculumName",
+            "type": "string",
+            "description": "Required non-key attribute for Curriculum."
+          },
+          {
+            "name": "completionRule",
+            "type": "string",
+            "description": "Required non-key attribute for Curriculum."
+          },
+          {
+            "name": "validFrom",
+            "type": "date",
+            "description": "Required non-key attribute for Curriculum."
+          },
+          {
+            "name": "validTo",
+            "type": "date",
+            "description": "Required non-key attribute for Curriculum."
+          }
+        ]
+      },
+      {
+        "id": "course",
+        "name": "Course",
+        "description": "A formal course container with a delivery model and duration measured in hours.",
+        "icon": "📚",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "courseId",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "Key attribute for Course."
+          },
+          {
+            "name": "courseTitle",
+            "type": "string",
+            "description": "Required non-key attribute for Course."
+          },
+          {
+            "name": "deliveryModel",
+            "type": "string",
+            "description": "Required non-key attribute for Course."
+          },
+          {
+            "name": "durationHours",
+            "type": "decimal",
+            "description": "Required non-key attribute for Course."
+          }
+        ]
+      },
+      {
+        "id": "learningItem",
+        "name": "LearningItem",
+        "description": "An atomic learning resource such as a module, class, video, assessment, or external content item.",
+        "icon": "📄",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "learningItemId",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "Key attribute for LearningItem."
+          },
+          {
+            "name": "itemTitle",
+            "type": "string",
+            "description": "Required non-key attribute for LearningItem."
+          },
+          {
+            "name": "itemType",
+            "type": "string",
+            "description": "Required non-key attribute for LearningItem."
+          },
+          {
+            "name": "provider",
+            "type": "string",
+            "description": "Required non-key attribute for LearningItem."
+          },
+          {
+            "name": "durationMinutes",
+            "type": "integer",
+            "description": "Required non-key attribute for LearningItem."
+          }
+        ]
+      },
+      {
+        "id": "learningAssignment",
+        "name": "LearningAssignment",
+        "description": "An assignment of a learning item to a person, including business reason and required completion dates.",
+        "icon": "📝",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "assignmentId",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "Key attribute for LearningAssignment."
+          },
+          {
+            "name": "assignmentReason",
+            "type": "string",
+            "description": "Required non-key attribute for LearningAssignment."
+          },
+          {
+            "name": "assignedDate",
+            "type": "date",
+            "description": "Required non-key attribute for LearningAssignment."
+          },
+          {
+            "name": "dueDate",
+            "type": "date",
+            "description": "Required non-key attribute for LearningAssignment."
+          }
+        ]
+      },
+      {
+        "id": "learningCompletion",
+        "name": "LearningCompletion",
+        "description": "A completion event for a learning item or assignment, including status, date, score, and optional attempt number.",
+        "icon": "✅",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "completionId",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "Key attribute for LearningCompletion."
+          },
+          {
+            "name": "completionStatus",
+            "type": "string",
+            "description": "Required non-key attribute for LearningCompletion."
+          },
+          {
+            "name": "completionDate",
+            "type": "date",
+            "description": "Required non-key attribute for LearningCompletion."
+          },
+          {
+            "name": "score",
+            "type": "decimal",
+            "description": "Required non-key attribute for LearningCompletion."
+          },
+          {
+            "name": "attemptNumber",
+            "type": "integer",
+            "description": "Optional non-key attribute for LearningCompletion representing retry count."
+          }
+        ]
+      },
+      {
+        "id": "skill",
+        "name": "Skill",
+        "description": "A capability, competency, or skill domain that can be developed by learning and associated with a person.",
+        "icon": "🎯",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "skillId",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "Key attribute for Skill."
+          },
+          {
+            "name": "skillName",
+            "type": "string",
+            "description": "Required non-key attribute for Skill."
+          },
+          {
+            "name": "skillCategory",
+            "type": "string",
+            "description": "Required non-key attribute for Skill."
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "hasCurriculum",
+        "name": "hasCurriculum",
+        "from": "learningProgram",
+        "to": "curriculum",
+        "cardinality": "one-to-many",
+        "description": "Links a learning program to a curriculum that belongs to it."
+      },
+      {
+        "id": "partOfProgram",
+        "name": "partOfProgram",
+        "from": "curriculum",
+        "to": "learningProgram",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "containsCourse",
+        "name": "containsCourse",
+        "from": "curriculum",
+        "to": "course",
+        "cardinality": "one-to-many",
+        "description": "Links a curriculum to courses that satisfy its structure."
+      },
+      {
+        "id": "partOfCurriculum",
+        "name": "partOfCurriculum",
+        "from": "course",
+        "to": "curriculum",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "includesLearningItem",
+        "name": "includesLearningItem",
+        "from": "course",
+        "to": "learningItem",
+        "cardinality": "one-to-many",
+        "description": "Links a course to one or more learning items that are delivered as part of the course."
+      },
+      {
+        "id": "partOfCourse",
+        "name": "partOfCourse",
+        "from": "learningItem",
+        "to": "course",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "assignedTo",
+        "name": "assignedTo",
+        "from": "learningAssignment",
+        "to": "person",
+        "cardinality": "one-to-many",
+        "description": "Links a learning assignment to the person who must complete it."
+      },
+      {
+        "id": "hasAssignment",
+        "name": "hasAssignment",
+        "from": "person",
+        "to": "learningAssignment",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "assignsLearningItem",
+        "name": "assignsLearningItem",
+        "from": "learningAssignment",
+        "to": "learningItem",
+        "cardinality": "one-to-many",
+        "description": "Links a learning assignment to the learning item being assigned."
+      },
+      {
+        "id": "itemAssignedBy",
+        "name": "itemAssignedBy",
+        "from": "learningItem",
+        "to": "learningAssignment",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "resultsInCompletion",
+        "name": "resultsInCompletion",
+        "from": "learningAssignment",
+        "to": "learningCompletion",
+        "cardinality": "one-to-many",
+        "description": "Links an assignment to the completion that records the result."
+      },
+      {
+        "id": "completionOfAssignment",
+        "name": "completionOfAssignment",
+        "from": "learningCompletion",
+        "to": "learningAssignment",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "completedBy",
+        "name": "completedBy",
+        "from": "learningCompletion",
+        "to": "person",
+        "cardinality": "one-to-many",
+        "description": "Links a completion record to the person who completed the learning."
+      },
+      {
+        "id": "hasCompletion",
+        "name": "hasCompletion",
+        "from": "person",
+        "to": "learningCompletion",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "completesLearningItem",
+        "name": "completesLearningItem",
+        "from": "learningCompletion",
+        "to": "learningItem",
+        "cardinality": "one-to-many",
+        "description": "Links a completion record to the learning item that was completed."
+      },
+      {
+        "id": "hasCompletionRecord",
+        "name": "hasCompletionRecord",
+        "from": "learningItem",
+        "to": "learningCompletion",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "hasSkill",
+        "name": "hasSkill",
+        "from": "person",
+        "to": "skill",
+        "cardinality": "one-to-many",
+        "description": "Links a person to a skill they hold or have demonstrated."
+      },
+      {
+        "id": "skillOfPerson",
+        "name": "skillOfPerson",
+        "from": "skill",
+        "to": "person",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "teachesSkill",
+        "name": "teachesSkill",
+        "from": "learningItem",
+        "to": "skill",
+        "cardinality": "one-to-many",
+        "description": "Links a learning item to a skill it develops."
+      },
+      {
+        "id": "skillTaughtBy",
+        "name": "skillTaughtBy",
+        "from": "skill",
+        "to": "learningItem",
+        "cardinality": "one-to-many"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/learning-ontology/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

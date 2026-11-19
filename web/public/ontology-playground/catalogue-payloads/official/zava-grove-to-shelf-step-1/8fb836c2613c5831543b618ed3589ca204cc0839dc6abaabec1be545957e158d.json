@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "id": "official/zava-grove-to-shelf-step-1",
+  "ontology": {
+    "name": "Zava Grove-to-Shelf — Step 1: Orchard Foundation",
+    "description": "Grower, Farm, Plot, FruitVariety — the foundational entities of multi-origin sourcing.",
+    "entityTypes": [
+      {
+        "id": "grower",
+        "name": "Grower",
+        "description": "A partner producer of fresh fruit and vegetables",
+        "icon": "👨‍🌾",
+        "color": "#498205",
+        "properties": [
+          {
+            "name": "growerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "type": "string"
+          },
+          {
+            "name": "partnerSince",
+            "type": "date"
+          },
+          {
+            "name": "isMasterGrower",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "farm",
+        "name": "Farm",
+        "description": "A geographic site owned or contracted by a grower",
+        "icon": "🌾",
+        "color": "#6EAA1F",
+        "properties": [
+          {
+            "name": "farmId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "type": "string"
+          },
+          {
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "name": "hectares",
+            "type": "decimal",
+            "unit": "ha"
+          }
+        ]
+      },
+      {
+        "id": "plot",
+        "name": "Plot",
+        "description": "A managed parcel within a farm planted with one variety",
+        "icon": "🌱",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "plotId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "hectares",
+            "type": "decimal",
+            "unit": "ha"
+          },
+          {
+            "name": "plantingYear",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "fruitvariety",
+        "name": "FruitVariety",
+        "description": "A commercial fruit or vegetable variety",
+        "icon": "🍊",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "varietyId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "commercialName",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "shelfLifeDays",
+            "type": "integer",
+            "unit": "days"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "grower-owns-farm",
+        "name": "GrowerOwnsFarm",
+        "from": "grower",
+        "to": "farm",
+        "cardinality": "one-to-many",
+        "description": "A grower owns or operates one or more farms"
+      },
+      {
+        "id": "farm-contains-plot",
+        "name": "FarmContainsPlot",
+        "from": "farm",
+        "to": "plot",
+        "cardinality": "one-to-many",
+        "description": "A farm contains many plots"
+      },
+      {
+        "id": "plot-grows-fruitvariety",
+        "name": "PlotGrowsFruitVariety",
+        "from": "plot",
+        "to": "fruitvariety",
+        "cardinality": "many-to-one",
+        "description": "Each plot grows a single fruit variety per cycle"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/zava-grove-to-shelf-step-1/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

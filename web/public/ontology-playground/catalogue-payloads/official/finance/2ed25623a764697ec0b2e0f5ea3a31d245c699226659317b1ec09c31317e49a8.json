@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "id": "official/finance",
+  "ontology": {
+    "name": "Banking & Finance",
+    "description": "Financial services with accounts, transactions, and investments",
+    "entityTypes": [
+      {
+        "id": "customer",
+        "name": "Customer",
+        "description": "Bank account holder",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "customerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "ssn",
+            "type": "string"
+          },
+          {
+            "name": "creditScore",
+            "type": "integer"
+          },
+          {
+            "name": "riskProfile",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "account",
+        "name": "Account",
+        "description": "Financial account",
+        "icon": "🏦",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "accountNumber",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "balance",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "interestRate",
+            "type": "decimal",
+            "unit": "%"
+          },
+          {
+            "name": "openDate",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "transaction",
+        "name": "Transaction",
+        "description": "Financial transaction",
+        "icon": "💳",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "transactionId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "amount",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "datetime"
+          },
+          {
+            "name": "merchant",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "loan",
+        "name": "Loan",
+        "description": "Credit product",
+        "icon": "📄",
+        "color": "#D13438",
+        "properties": [
+          {
+            "name": "loanId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "principal",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "apr",
+            "type": "decimal",
+            "unit": "%"
+          },
+          {
+            "name": "term",
+            "type": "integer",
+            "unit": "months"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "investment",
+        "name": "Investment",
+        "description": "Investment holding",
+        "icon": "📈",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "holdingId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "shares",
+            "type": "decimal"
+          },
+          {
+            "name": "purchasePrice",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "currentValue",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "customer_owns_acct",
+        "name": "owns",
+        "from": "customer",
+        "to": "account",
+        "cardinality": "one-to-many",
+        "description": "Customer's accounts"
+      },
+      {
+        "id": "account_has_txn",
+        "name": "has_transaction",
+        "from": "account",
+        "to": "transaction",
+        "cardinality": "one-to-many",
+        "description": "Account transactions"
+      },
+      {
+        "id": "customer_has_loan",
+        "name": "has_loan",
+        "from": "customer",
+        "to": "loan",
+        "cardinality": "one-to-many",
+        "description": "Customer loans"
+      },
+      {
+        "id": "account_funds_loan",
+        "name": "funds",
+        "from": "account",
+        "to": "loan",
+        "cardinality": "one-to-many",
+        "description": "Payment source"
+      },
+      {
+        "id": "customer_holds",
+        "name": "holds",
+        "from": "customer",
+        "to": "investment",
+        "cardinality": "one-to-many",
+        "description": "Investment portfolio"
+      },
+      {
+        "id": "account_linked",
+        "name": "linked_to",
+        "from": "account",
+        "to": "investment",
+        "cardinality": "one-to-many",
+        "description": "Brokerage account link"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/banking-finance/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

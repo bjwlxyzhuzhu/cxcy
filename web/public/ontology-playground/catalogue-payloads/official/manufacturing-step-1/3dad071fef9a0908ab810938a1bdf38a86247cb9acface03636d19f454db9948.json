@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "id": "official/manufacturing-step-1",
+  "ontology": {
+    "name": "Imported Ontology",
+    "description": "",
+    "entityTypes": [
+      {
+        "id": "machine",
+        "name": "Machine",
+        "description": "A manufacturing machine on the factory floor",
+        "icon": "🏭",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "machineId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "model",
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "lastMaintenance",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "sensor",
+        "name": "Sensor",
+        "description": "A sensor device that monitors machine parameters",
+        "icon": "📡",
+        "color": "#00B7C3",
+        "properties": [
+          {
+            "name": "sensorId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "unit",
+            "type": "string"
+          },
+          {
+            "name": "minThreshold",
+            "type": "decimal"
+          },
+          {
+            "name": "maxThreshold",
+            "type": "decimal"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "machine_has_sensor",
+        "name": "monitored_by",
+        "from": "machine",
+        "to": "sensor",
+        "cardinality": "one-to-many",
+        "description": "Sensors on machine"
+      }
+    ]
+  },
+  "bindings": []
+}

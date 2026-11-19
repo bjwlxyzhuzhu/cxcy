@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "id": "official/zava-grove-to-shelf-step-2",
+  "ontology": {
+    "name": "Zava Grove-to-Shelf — Step 2: Harvest & Quality",
+    "description": "Add HarvestLot and QualityCheck to capture harvest events and the four-stage QC regime.",
+    "entityTypes": [
+      {
+        "id": "grower",
+        "name": "Grower",
+        "description": "A partner producer of fresh fruit and vegetables",
+        "icon": "👨‍🌾",
+        "color": "#498205",
+        "properties": [
+          {
+            "name": "growerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "type": "string"
+          },
+          {
+            "name": "isMasterGrower",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "farm",
+        "name": "Farm",
+        "description": "A geographic site owned or contracted by a grower",
+        "icon": "🌾",
+        "color": "#6EAA1F",
+        "properties": [
+          {
+            "name": "farmId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "type": "string"
+          },
+          {
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "name": "hectares",
+            "type": "decimal",
+            "unit": "ha"
+          }
+        ]
+      },
+      {
+        "id": "plot",
+        "name": "Plot",
+        "description": "A managed parcel within a farm planted with one variety",
+        "icon": "🌱",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "plotId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "hectares",
+            "type": "decimal",
+            "unit": "ha"
+          },
+          {
+            "name": "plantingYear",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "fruitvariety",
+        "name": "FruitVariety",
+        "description": "A commercial fruit or vegetable variety",
+        "icon": "🍊",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "varietyId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "commercialName",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "shelfLifeDays",
+            "type": "integer",
+            "unit": "days"
+          }
+        ]
+      },
+      {
+        "id": "harvestlot",
+        "name": "HarvestLot",
+        "description": "A traceable harvest event from a single plot on a given date",
+        "icon": "📦",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "lotId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "harvestDate",
+            "type": "date"
+          },
+          {
+            "name": "kilograms",
+            "type": "decimal",
+            "unit": "kg"
+          },
+          {
+            "name": "qcGrade",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "qualitycheck",
+        "name": "QualityCheck",
+        "description": "One of the four-stage quality inspections (field, packhouse, DC, store)",
+        "icon": "🔍",
+        "color": "#C239B3",
+        "properties": [
+          {
+            "name": "checkId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "stage",
+            "type": "integer"
+          },
+          {
+            "name": "passed",
+            "type": "boolean"
+          },
+          {
+            "name": "defectRate",
+            "type": "decimal",
+            "unit": "%"
+          },
+          {
+            "name": "checkedAt",
+            "type": "datetime"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "grower-owns-farm",
+        "name": "GrowerOwnsFarm",
+        "from": "grower",
+        "to": "farm",
+        "cardinality": "one-to-many",
+        "description": "A grower owns or operates one or more farms"
+      },
+      {
+        "id": "farm-contains-plot",
+        "name": "FarmContainsPlot",
+        "from": "farm",
+        "to": "plot",
+        "cardinality": "one-to-many",
+        "description": "A farm contains many plots"
+      },
+      {
+        "id": "plot-grows-fruitvariety",
+        "name": "PlotGrowsFruitVariety",
+        "from": "plot",
+        "to": "fruitvariety",
+        "cardinality": "many-to-one",
+        "description": "Each plot grows a single fruit variety per cycle"
+      },
+      {
+        "id": "harvestlot-fromplot-plot",
+        "name": "HarvestLotFromPlot",
+        "from": "harvestlot",
+        "to": "plot",
+        "cardinality": "many-to-one",
+        "description": "Each harvest lot originates from one plot"
+      },
+      {
+        "id": "harvestlot-ofvariety-fruitvariety",
+        "name": "HarvestLotOfVariety",
+        "from": "harvestlot",
+        "to": "fruitvariety",
+        "cardinality": "many-to-one",
+        "description": "Each harvest lot carries one fruit variety"
+      },
+      {
+        "id": "qualitycheck-checks-harvestlot",
+        "name": "QualityCheckChecksHarvestLot",
+        "from": "qualitycheck",
+        "to": "harvestlot",
+        "cardinality": "many-to-one",
+        "description": "Each quality check targets one harvest lot at a given stage"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/zava-grove-to-shelf-step-2/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

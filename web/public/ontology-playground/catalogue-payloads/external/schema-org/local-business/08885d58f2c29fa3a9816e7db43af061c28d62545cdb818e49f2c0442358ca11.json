@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "id": "external/schema-org/local-business",
+  "ontology": {
+    "name": "Schema.org — LocalBusiness",
+    "description": "Local businesses, opening hours, reviews, and postal addresses — a subset of Schema.org for describing brick-and-mortar businesses.",
+    "entityTypes": [
+      {
+        "id": "localBusiness",
+        "name": "LocalBusiness",
+        "description": "A physical business establishment like a restaurant, shop, or service provider",
+        "icon": "🏪",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "businessName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "telephone",
+            "type": "string"
+          },
+          {
+            "name": "priceRange",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "postalAddress",
+        "name": "PostalAddress",
+        "description": "A mailing address with street, city, region, and country",
+        "icon": "📬",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "streetAddress",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "city",
+            "type": "string"
+          },
+          {
+            "name": "postalCode",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "openingHoursSpecification",
+        "name": "OpeningHours",
+        "description": "The days and times a business is open",
+        "icon": "🕐",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "dayOfWeek",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "opens",
+            "type": "string"
+          },
+          {
+            "name": "closes",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "review",
+        "name": "Review",
+        "description": "A customer review with rating and text",
+        "icon": "⭐",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "reviewRating",
+            "type": "decimal",
+            "isIdentifier": true
+          },
+          {
+            "name": "reviewBody",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "person",
+        "name": "Person",
+        "description": "A person who writes reviews or owns a business",
+        "icon": "👤",
+        "color": "#E74C3C",
+        "properties": [
+          {
+            "name": "personName",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "hasAddress",
+        "name": "hasAddress",
+        "from": "localBusiness",
+        "to": "postalAddress",
+        "cardinality": "one-to-one",
+        "description": "The postal address of the business"
+      },
+      {
+        "id": "openingHours",
+        "name": "openingHours",
+        "from": "localBusiness",
+        "to": "openingHoursSpecification",
+        "cardinality": "one-to-many",
+        "description": "The opening hours schedule for the business"
+      },
+      {
+        "id": "hasReview",
+        "name": "hasReview",
+        "from": "localBusiness",
+        "to": "review",
+        "cardinality": "one-to-many",
+        "description": "Customer reviews of the business"
+      },
+      {
+        "id": "author",
+        "name": "author",
+        "from": "review",
+        "to": "person",
+        "cardinality": "many-to-one",
+        "description": "The person who wrote the review"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "https://schema.org/local-business-subset/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

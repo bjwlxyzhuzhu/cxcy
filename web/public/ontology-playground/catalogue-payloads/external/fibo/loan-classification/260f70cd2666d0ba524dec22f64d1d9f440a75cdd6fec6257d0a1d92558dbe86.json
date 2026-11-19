@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "id": "external/fibo/loan-classification",
+  "ontology": {
+    "name": "FIBO Loan Classification",
+    "description": "Loan types with Basel risk weights, collateral categories, and OCC/FDIC concentration buckets. Adapted from EDM Council FIBO. Source: https://github.com/edmcouncil/fibo — MIT License.",
+    "entityTypes": [
+      {
+        "id": "concentrationCategory",
+        "name": "ConcentrationCategory",
+        "description": "Regulatory concentration bucket defined by OCC/FDIC guidance for portfolio risk management.",
+        "icon": "📊",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "categoryId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "occGuidance",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "loanType",
+        "name": "LoanType",
+        "description": "Loan product classification with Basel III risk weight, regulatory treatment, and capital tier.",
+        "icon": "💰",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "loanTypeCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "baselRiskWeight",
+            "type": "decimal",
+            "unit": "%"
+          },
+          {
+            "name": "regulatoryTreatment",
+            "type": "string"
+          },
+          {
+            "name": "capitalTier",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "collateralType",
+        "name": "CollateralType",
+        "description": "Collateral asset category with recovery expectations and concentration classification.",
+        "icon": "🏠",
+        "color": "#FF8C00",
+        "properties": [
+          {
+            "name": "collateralTypeCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "recoveryExpectation",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "loanClassifiedAs",
+        "name": "loanClassifiedAs",
+        "from": "loanType",
+        "to": "concentrationCategory",
+        "cardinality": "many-to-one",
+        "description": "Classifies a loan type into an OCC/FDIC concentration category."
+      },
+      {
+        "id": "collateralClassifiedAs",
+        "name": "collateralClassifiedAs",
+        "from": "collateralType",
+        "to": "concentrationCategory",
+        "cardinality": "many-to-one",
+        "description": "Classifies a collateral type into an OCC/FDIC concentration category."
+      },
+      {
+        "id": "typicallySecuredBy",
+        "name": "typicallySecuredBy",
+        "from": "collateralType",
+        "to": "loanType",
+        "cardinality": "many-to-many",
+        "description": "Links a collateral type to the loan types it typically secures."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/fibo-loan-classification/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

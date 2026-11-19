@@ -1,0 +1,596 @@
+{
+  "schemaVersion": 1,
+  "id": "community/bbreugel/emergency-management-agency",
+  "ontology": {
+    "name": "Emergency Management Agency ontology",
+    "description": "",
+    "entityTypes": [
+      {
+        "id": "new-entity-13",
+        "name": "Incident_Resolution",
+        "description": "This represents how and why the incident was closed / solved.\n\nIncident resolution is modeled explicitly through incident events and a resolution concept, allowing the ontology to capture not only when an incident ends, but also why and by whom it was resolved.",
+        "icon": "🔗",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "Incident_resolution_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "resolution_type",
+            "type": "string"
+          },
+          {
+            "name": "resolution_time",
+            "type": "datetime"
+          },
+          {
+            "name": "resolution_reason",
+            "type": "string"
+          },
+          {
+            "name": "closed_by",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-12",
+        "name": "Incident_Event",
+        "description": "Represents all the time events happening on the incident.\n\nNote that Incident_Event updates Incident_Classification",
+        "icon": "⚡",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "Incident_event_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Incident_start_time",
+            "type": "string"
+          },
+          {
+            "name": "Incident_end_time",
+            "type": "string"
+          },
+          {
+            "name": "Unit_initiating_time",
+            "type": "string"
+          },
+          {
+            "name": "Unit_departure_time",
+            "type": "string"
+          },
+          {
+            "name": "Unit_incident_arrival_time",
+            "type": "string"
+          },
+          {
+            "name": "Unit_return_time",
+            "type": "string"
+          },
+          {
+            "name": "Unit_station_arrival_time",
+            "type": "string"
+          },
+          {
+            "name": "GRIP",
+            "type": "integer"
+          },
+          {
+            "name": "Incident_level",
+            "type": "integer"
+          },
+          {
+            "name": "Current_status",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-11",
+        "name": "Fire_Station",
+        "description": "A location where fire vehicles and firefighters are located and togther they form a response unit",
+        "icon": "🎯",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "Fire_station_ID",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "new-entity-10",
+        "name": "Location",
+        "description": "location or area type of incident",
+        "icon": "🏢",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "Location_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "City",
+            "type": "string"
+          },
+          {
+            "name": "Postcode",
+            "type": "string"
+          },
+          {
+            "name": "Adress",
+            "type": "string"
+          },
+          {
+            "name": "Zip_code",
+            "type": "string"
+          },
+          {
+            "name": "Adress_nr",
+            "type": "string"
+          },
+          {
+            "name": "Region",
+            "type": "string"
+          },
+          {
+            "name": "Location_type",
+            "type": "string"
+          },
+          {
+            "name": "Object_type",
+            "type": "string"
+          },
+          {
+            "name": "Description",
+            "type": "string"
+          },
+          {
+            "name": "Longitude",
+            "type": "string"
+          },
+          {
+            "name": "Latitude",
+            "type": "string"
+          },
+          {
+            "name": "Area_type",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-9",
+        "name": "Incident_Classification",
+        "description": "Specifies",
+        "icon": "📝",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "id",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "new-entity-8",
+        "name": "Firefighter",
+        "description": "Represents an individual responder.",
+        "icon": "👤",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "Firefighter_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Rank",
+            "type": "string"
+          },
+          {
+            "name": "Role",
+            "type": "string"
+          },
+          {
+            "name": "Qualifications",
+            "type": "string"
+          },
+          {
+            "name": "Default_fire_station",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-7",
+        "name": "Vehicle",
+        "description": "A fire department vehicle",
+        "icon": "📊",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "Vehicle_ID",
+            "type": "integer",
+            "isIdentifier": true
+          },
+          {
+            "name": "Vehicle_name",
+            "type": "string"
+          },
+          {
+            "name": "Vehicle_description",
+            "type": "string"
+          },
+          {
+            "name": "Default_location",
+            "type": "string"
+          },
+          {
+            "name": "Vehicle_sort",
+            "type": "string"
+          },
+          {
+            "name": "Vehicle_code",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-6",
+        "name": "Response_Unit",
+        "description": "Represents a deployable fire department resource unit",
+        "icon": "🔧",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "Response_unit_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Unit_type",
+            "type": "string"
+          },
+          {
+            "name": "Unit_name",
+            "type": "string"
+          },
+          {
+            "name": "Fire_station",
+            "type": "string"
+          },
+          {
+            "name": "Unit_region",
+            "type": "string"
+          },
+          {
+            "name": "Role",
+            "type": "string"
+          },
+          {
+            "name": "Current_status",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-5",
+        "name": "Dispatcher",
+        "description": "Represents the individual assessing emergency call; calls and initiating responses.",
+        "icon": "👤",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "Dispatcher_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Dispatcher_Nr",
+            "type": "string"
+          },
+          {
+            "name": "Shift",
+            "type": "string"
+          },
+          {
+            "name": "Dispatcher_Role",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-4",
+        "name": "Dispatch_Center",
+        "description": "Represents the organizational unit handling intake, assessment, and coordination.",
+        "icon": "🏢",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "Dispatc_Center_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Region",
+            "type": "string"
+          },
+          {
+            "name": "Dispatch_location",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-3",
+        "name": "Emergency_Call",
+        "description": "Represents the initial report that triggers the incident lifecycle.",
+        "icon": "🌐",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "Emergency_call_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Call_timestamp",
+            "type": "datetime"
+          },
+          {
+            "name": "Call_Channel",
+            "type": "string"
+          },
+          {
+            "name": "Description",
+            "type": "string"
+          },
+          {
+            "name": "Location",
+            "type": "string"
+          },
+          {
+            "name": "Priority",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-2",
+        "name": "Caller",
+        "description": "Represents the person or system reporting the incident.",
+        "icon": "👤",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "Caller_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Caller_type",
+            "type": "string"
+          },
+          {
+            "name": "Role",
+            "type": "string"
+          },
+          {
+            "name": "Contact_information",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-1",
+        "name": "Incident",
+        "description": "Represents a single emergency situation requiring fire department involvement.",
+        "icon": "⚡",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "Incident_ID",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "Incident_NR",
+            "type": "integer"
+          },
+          {
+            "name": "Incident_type",
+            "type": "string"
+          },
+          {
+            "name": "Location",
+            "type": "string"
+          },
+          {
+            "name": "Region",
+            "type": "string"
+          },
+          {
+            "name": "Categorie",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-relates-to-27",
+        "name": "results_in",
+        "from": "new-entity-1",
+        "to": "new-entity-13",
+        "cardinality": "one-to-one",
+        "description": "Captures the closure / solving solution of an incident. The Incident event only captures the moment."
+      },
+      {
+        "id": "rel-relates-to-26",
+        "name": "Sits_in",
+        "from": "new-entity-8",
+        "to": "new-entity-7",
+        "cardinality": "many-to-one",
+        "description": "During an incident 1 or more firefighters are driving in a vehicle. "
+      },
+      {
+        "id": "rel-relates-to-24",
+        "name": "occurs_at",
+        "from": "new-entity-12",
+        "to": "new-entity-10",
+        "cardinality": "one-to-one",
+        "description": "An event happens at a location"
+      },
+      {
+        "id": "rel-relates-to-23",
+        "name": "relates_to",
+        "from": "new-entity-12",
+        "to": "new-entity-6",
+        "cardinality": "many-to-one",
+        "description": "Mulitple events belong to the same response unit. like: \n\n\nUnit_initiating_time = Dispatcher assigns response unit\nUnit_departure_time = Response unit leaves fire station\nUnit_incident_arrival_time = Response unit arrives at incident\nUnit_return_time = Response unit leaves incident \nUnit_station_arrival_time = \nResponse unit arrives back at fire station"
+      },
+      {
+        "id": "rel-relates-to-22",
+        "name": "has",
+        "from": "new-entity-1",
+        "to": "new-entity-12",
+        "cardinality": "one-to-many",
+        "description": "An Incident has multiple Events related in time"
+      },
+      {
+        "id": "rel-relates-to-21",
+        "name": "is_based_at_a",
+        "from": "new-entity-8",
+        "to": "new-entity-11",
+        "cardinality": "one-to-one",
+        "description": "A firefighter is based at a fire station."
+      },
+      {
+        "id": "rel-relates-to-20",
+        "name": "has_a_default",
+        "from": "new-entity-7",
+        "to": "new-entity-11",
+        "cardinality": "one-to-one",
+        "description": "A vehicle is parked at a specifc default fire station."
+      },
+      {
+        "id": "rel-relates-to-18",
+        "name": "Based_at_a",
+        "from": "new-entity-6",
+        "to": "new-entity-11",
+        "cardinality": "one-to-one",
+        "description": "A response unit is based on a specific fire station."
+      },
+      {
+        "id": "rel-relates-to-17",
+        "name": "Occurs_at",
+        "from": "new-entity-1",
+        "to": "new-entity-10",
+        "cardinality": "one-to-one",
+        "description": "An Incident occurs at 1 location."
+      },
+      {
+        "id": "rel-relates-to-16",
+        "name": "Has",
+        "from": "new-entity-1",
+        "to": "new-entity-9",
+        "cardinality": "one-to-many",
+        "description": "An Incident has one or more classifications descriptions"
+      },
+      {
+        "id": "rel-relates-to-15",
+        "name": "Is_located_at",
+        "from": "new-entity-5",
+        "to": "new-entity-4",
+        "cardinality": "one-to-one",
+        "description": "A dispatcher is located at a specific dispatch location"
+      },
+      {
+        "id": "rel-relates-to-13",
+        "name": "is_staffed_by",
+        "from": "new-entity-6",
+        "to": "new-entity-8",
+        "cardinality": "many-to-one",
+        "description": "A firefighter is part of the response unit, together with other firefighters in a vehicle"
+      },
+      {
+        "id": "rel-relates-to-12",
+        "name": "Reports_to",
+        "from": "new-entity-6",
+        "to": "new-entity-1",
+        "cardinality": "many-to-one",
+        "description": "1 or more response unit can be dispatched to an incident, and therefore the report to the incident"
+      },
+      {
+        "id": "rel-relates-to-11",
+        "name": "Uses",
+        "from": "new-entity-6",
+        "to": "new-entity-7",
+        "cardinality": "one-to-one",
+        "description": "A responce unit drives / uses a vehicle"
+      },
+      {
+        "id": "rel-relates-to-9",
+        "name": "Dispatches",
+        "from": "new-entity-5",
+        "to": "new-entity-6",
+        "cardinality": "one-to-many",
+        "description": "A dispatcher dispatches the response unit for the incident. there can be more units being dispatched."
+      },
+      {
+        "id": "rel-relates-to-8",
+        "name": "Asseses",
+        "from": "new-entity-5",
+        "to": "new-entity-1",
+        "cardinality": "one-to-one",
+        "description": "A dispatcher asseses the incident"
+      },
+      {
+        "id": "rel-relates-to-5",
+        "name": "Receives",
+        "from": "new-entity-5",
+        "to": "new-entity-3",
+        "cardinality": "one-to-many",
+        "description": "a specific Dispatcher at a Dispatch center receives the emergency call"
+      },
+      {
+        "id": "rel-relates-to-3",
+        "name": "Handles",
+        "from": "new-entity-4",
+        "to": "new-entity-3",
+        "cardinality": "one-to-many",
+        "description": "A dispatch center handles 1 or more emergency calls"
+      },
+      {
+        "id": "rel-relates-to-2",
+        "name": "Reports",
+        "from": "new-entity-3",
+        "to": "new-entity-1",
+        "cardinality": "many-to-one",
+        "description": "An emergency call reports an incident. There can be more calls for the same incident"
+      },
+      {
+        "id": "rel-relates-to-1",
+        "name": "initiates",
+        "from": "new-entity-2",
+        "to": "new-entity-3",
+        "cardinality": "one-to-one",
+        "description": "A Caller reports the incident with an emergency call"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/emergency-management-agency-ontology/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

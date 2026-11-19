@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 1,
+  "id": "official/iq-lab-retail-step-4",
+  "ontology": {
+    "name": "Retail Supply Chain — Step 4: Fulfillment & Logistics",
+    "description": "Shipment, Carrier, Warehouse model the delivery pipeline",
+    "entityTypes": [
+      {
+        "id": "customer",
+        "name": "Customer",
+        "description": "The buyer associated with an order",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "customerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "loyaltyTier",
+            "type": "string"
+          },
+          {
+            "name": "lifetimeValue",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "order",
+        "name": "Order",
+        "description": "A customer purchase transaction",
+        "icon": "📋",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "orderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "orderDate",
+            "type": "datetime"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "totalAmount",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "product",
+        "name": "Product",
+        "description": "Items available for sale",
+        "icon": "📦",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "productId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "unitCost",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "discountPercent",
+            "type": "decimal",
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "id": "orderline",
+        "name": "OrderLine",
+        "description": "Individual line items within an order",
+        "icon": "📝",
+        "color": "#00B7C3",
+        "properties": [
+          {
+            "name": "orderLineId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "quantity",
+            "type": "integer"
+          },
+          {
+            "name": "lineTotal",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "productcategory",
+        "name": "ProductCategory",
+        "description": "Groupings of related products",
+        "icon": "🏷️",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "categoryId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "categoryName",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "name": "Region",
+        "description": "Geographic areas containing stores and warehouses",
+        "icon": "🌐",
+        "color": "#E74C3C",
+        "properties": [
+          {
+            "name": "regionId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "regionName",
+            "type": "string"
+          },
+          {
+            "name": "timezone",
+            "type": "string"
+          },
+          {
+            "name": "coldChainRequired",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "store",
+        "name": "Store",
+        "description": "Retail locations where orders originate",
+        "icon": "🏪",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "storeId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "storeName",
+            "type": "string"
+          },
+          {
+            "name": "address",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "shipment",
+        "name": "Shipment",
+        "description": "Delivery records linking orders to carriers",
+        "icon": "🚚",
+        "color": "#0099BC",
+        "properties": [
+          {
+            "name": "shipmentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "shipDate",
+            "type": "date"
+          },
+          {
+            "name": "deliveryDate",
+            "type": "date"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "carrier",
+        "name": "Carrier",
+        "description": "Logistics providers handling shipments",
+        "icon": "✈️",
+        "color": "#7A7574",
+        "properties": [
+          {
+            "name": "carrierId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "carrierName",
+            "type": "string"
+          },
+          {
+            "name": "serviceType",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "warehouse",
+        "name": "Warehouse",
+        "description": "Fulfillment centers that ship orders",
+        "icon": "🏭",
+        "color": "#2D7D9A",
+        "properties": [
+          {
+            "name": "warehouseId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "warehouseName",
+            "type": "string"
+          },
+          {
+            "name": "capacity",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "order-placedby-customer",
+        "name": "OrderPlacedByCustomer",
+        "from": "order",
+        "to": "customer",
+        "cardinality": "many-to-one",
+        "description": "Which customer placed the order"
+      },
+      {
+        "id": "order-contains-product",
+        "name": "OrderContainsProduct",
+        "from": "order",
+        "to": "product",
+        "cardinality": "many-to-many",
+        "description": "Products included in the order"
+      },
+      {
+        "id": "order-has-lineitem",
+        "name": "OrderHasLineItem",
+        "from": "order",
+        "to": "orderline",
+        "cardinality": "one-to-many",
+        "description": "Line items within an order"
+      },
+      {
+        "id": "orderline-refs-product",
+        "name": "OrderLineReferencesProduct",
+        "from": "orderline",
+        "to": "product",
+        "cardinality": "many-to-one",
+        "description": "Which product this line item refers to"
+      },
+      {
+        "id": "product-in-category",
+        "name": "ProductInCategory",
+        "from": "product",
+        "to": "productcategory",
+        "cardinality": "many-to-one",
+        "description": "Which category a product belongs to"
+      },
+      {
+        "id": "order-to-region",
+        "name": "OrderFulfilledToRegion",
+        "from": "order",
+        "to": "region",
+        "cardinality": "many-to-one",
+        "description": "Where the order was fulfilled"
+      },
+      {
+        "id": "store-in-region",
+        "name": "StoreInRegion",
+        "from": "store",
+        "to": "region",
+        "cardinality": "many-to-one",
+        "description": "Which region a store is located in"
+      },
+      {
+        "id": "shipment-fulfills-order",
+        "name": "ShipmentFulfillsOrder",
+        "from": "shipment",
+        "to": "order",
+        "cardinality": "many-to-one",
+        "description": "Which order a shipment fulfills"
+      },
+      {
+        "id": "shipment-by-carrier",
+        "name": "ShipmentByCarrier",
+        "from": "shipment",
+        "to": "carrier",
+        "cardinality": "many-to-one",
+        "description": "Which carrier handles the shipment"
+      },
+      {
+        "id": "shipment-from-warehouse",
+        "name": "ShipmentDepartedFromWarehouse",
+        "from": "shipment",
+        "to": "warehouse",
+        "cardinality": "many-to-one",
+        "description": "Which warehouse the shipment departed from"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/retail-supply-chain-step-4-fulfillment-logistics/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "id": "official/iq-lab-retail-step-2",
+  "ontology": {
+    "name": "Retail Supply Chain — Step 2: Order Details & Categories",
+    "description": "OrderLine and ProductCategory add detail and grouping",
+    "entityTypes": [
+      {
+        "id": "customer",
+        "name": "Customer",
+        "description": "The buyer associated with an order",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "customerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "loyaltyTier",
+            "type": "string"
+          },
+          {
+            "name": "lifetimeValue",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "order",
+        "name": "Order",
+        "description": "A customer purchase transaction",
+        "icon": "📋",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "orderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "orderDate",
+            "type": "datetime"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "totalAmount",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "product",
+        "name": "Product",
+        "description": "Items available for sale",
+        "icon": "📦",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "productId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "unitCost",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "discountPercent",
+            "type": "decimal",
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "id": "orderline",
+        "name": "OrderLine",
+        "description": "Individual line items within an order",
+        "icon": "📝",
+        "color": "#00B7C3",
+        "properties": [
+          {
+            "name": "orderLineId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "quantity",
+            "type": "integer"
+          },
+          {
+            "name": "lineTotal",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "productcategory",
+        "name": "ProductCategory",
+        "description": "Groupings of related products",
+        "icon": "🏷️",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "categoryId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "categoryName",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "order-placedby-customer",
+        "name": "OrderPlacedByCustomer",
+        "from": "order",
+        "to": "customer",
+        "cardinality": "many-to-one",
+        "description": "Which customer placed the order"
+      },
+      {
+        "id": "order-contains-product",
+        "name": "OrderContainsProduct",
+        "from": "order",
+        "to": "product",
+        "cardinality": "many-to-many",
+        "description": "Products included in the order"
+      },
+      {
+        "id": "order-has-lineitem",
+        "name": "OrderHasLineItem",
+        "from": "order",
+        "to": "orderline",
+        "cardinality": "one-to-many",
+        "description": "Line items within an order"
+      },
+      {
+        "id": "orderline-refs-product",
+        "name": "OrderLineReferencesProduct",
+        "from": "orderline",
+        "to": "product",
+        "cardinality": "many-to-one",
+        "description": "Which product this line item refers to"
+      },
+      {
+        "id": "product-in-category",
+        "name": "ProductInCategory",
+        "from": "product",
+        "to": "productcategory",
+        "cardinality": "many-to-one",
+        "description": "Which category a product belongs to"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/retail-supply-chain-step-2-order-details-categories/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

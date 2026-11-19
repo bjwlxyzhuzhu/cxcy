@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "id": "external/schema-org/event",
+  "ontology": {
+    "name": "Schema.org — Event",
+    "description": "Events, venues, performers, and offers — a subset of Schema.org's vocabulary for describing events, ticket sales, and scheduling.",
+    "entityTypes": [
+      {
+        "id": "event",
+        "name": "Event",
+        "description": "A happening at a specific time and place — concert, conference, sports match, etc.",
+        "icon": "🎫",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "eventName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "startDate",
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "place",
+        "name": "Place",
+        "description": "A venue or location where an event takes place",
+        "icon": "📍",
+        "color": "#E74C3C",
+        "properties": [
+          {
+            "name": "placeName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "address",
+            "type": "string"
+          },
+          {
+            "name": "maximumCapacity",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "person",
+        "name": "Person",
+        "description": "A performer, organizer, or attendee of an event",
+        "icon": "👤",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "personName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "email",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "organization",
+        "name": "Organization",
+        "description": "A company or group that sponsors or organizes events",
+        "icon": "🏢",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "orgName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "url",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "offer",
+        "name": "Offer",
+        "description": "A ticket or admission offer with price and availability",
+        "icon": "🎟️",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "price",
+            "type": "decimal",
+            "isIdentifier": true
+          },
+          {
+            "name": "availability",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "location",
+        "name": "location",
+        "from": "event",
+        "to": "place",
+        "cardinality": "many-to-one",
+        "description": "The venue where the event takes place"
+      },
+      {
+        "id": "performer",
+        "name": "performer",
+        "from": "event",
+        "to": "person",
+        "cardinality": "many-to-many",
+        "description": "A person performing at the event"
+      },
+      {
+        "id": "organizer",
+        "name": "organizer",
+        "from": "event",
+        "to": "organization",
+        "cardinality": "many-to-one",
+        "description": "The organization that hosts or sponsors the event"
+      },
+      {
+        "id": "offers",
+        "name": "offers",
+        "from": "event",
+        "to": "offer",
+        "cardinality": "one-to-many",
+        "description": "Ticket or admission offers available for the event"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "https://schema.org/event-subset/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "id": "community/sandervandevelde/productionline-ontology-sample",
+  "ontology": {
+    "name": "Productionline Ontology Sample",
+    "description": "An IoT domain with devices, sensors, and readings.",
+    "entityTypes": [
+      {
+        "id": "new-entity-14",
+        "name": "Workorder",
+        "description": "",
+        "icon": "📝",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "workorderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "lineId",
+            "type": "string"
+          },
+          {
+            "name": "technicianId",
+            "type": "string"
+          },
+          {
+            "name": "workOrderType",
+            "type": "integer"
+          },
+          {
+            "name": "status",
+            "type": "integer"
+          },
+          {
+            "name": "priority",
+            "type": "integer"
+          },
+          {
+            "name": "orderDate",
+            "type": "datetime"
+          },
+          {
+            "name": "lastUpdatedDate",
+            "type": "datetime"
+          },
+          {
+            "name": "estimatedStartDate",
+            "type": "datetime"
+          },
+          {
+            "name": "commitmentDate",
+            "type": "datetime"
+          },
+          {
+            "name": "estimatedLabourHours",
+            "type": "integer"
+          },
+          {
+            "name": "actualLabourHours",
+            "type": "integer"
+          },
+          {
+            "name": "actualEndDate",
+            "type": "datetime"
+          },
+          {
+            "name": "site",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-13",
+        "name": "Technician",
+        "description": "",
+        "icon": "👤",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-12",
+        "name": "Schedule",
+        "description": "",
+        "icon": "📋",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "scheduleId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "operatorId",
+            "type": "string"
+          },
+          {
+            "name": "lineId",
+            "type": "string"
+          },
+          {
+            "name": "dayOfWeek",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-11",
+        "name": "ProductionLine",
+        "description": "",
+        "icon": "🏢",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "product",
+            "type": "string"
+          },
+          {
+            "name": "grade",
+            "type": "string"
+          },
+          {
+            "name": "IsOperational",
+            "type": "boolean"
+          },
+          {
+            "name": "installationDate",
+            "type": "datetime"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-10",
+        "name": "PositioningSensor",
+        "description": "",
+        "icon": "⚡",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "sensorId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "technician",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "sensorType",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-9",
+        "name": "Operator",
+        "description": "",
+        "icon": "👤",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "manager",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-8",
+        "name": "AmbientSensor",
+        "description": "",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "sensorId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "productionLine",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "mounting",
+            "type": "string"
+          },
+          {
+            "name": "sensorType",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-relates-to-6",
+        "name": "HasSchedule",
+        "from": "new-entity-11",
+        "to": "new-entity-12",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-5",
+        "name": "IsScheduled",
+        "from": "new-entity-9",
+        "to": "new-entity-12",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-4",
+        "name": "Tracks",
+        "from": "new-entity-10",
+        "to": "new-entity-13",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-3",
+        "name": "Samples",
+        "from": "new-entity-8",
+        "to": "new-entity-11",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-2",
+        "name": "ExecutedFor",
+        "from": "new-entity-14",
+        "to": "new-entity-11",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "rel-relates-to-1",
+        "name": "Performs",
+        "from": "new-entity-13",
+        "to": "new-entity-14",
+        "cardinality": "one-to-many"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/productionline-ontology-sample/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

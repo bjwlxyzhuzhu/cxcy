@@ -1,0 +1,837 @@
+{
+  "schemaVersion": 1,
+  "id": "community/daocoding/elements-of-software",
+  "ontology": {
+    "name": "Elements of Software",
+    "description": "A reusable reference model for common SaaS and business-application concepts. It demonstrates parties instead of person-shaped duplicates, roles as reified states rather than entity types, one Task that nests, pipelines as properties rather than entity-type chains, and views, automations, permissions and audit events as first-class records. Software agents are modeled as parties alongside people and organizations.",
+    "entityTypes": [
+      {
+        "id": "party",
+        "name": "Party",
+        "description": "Anyone who can act: a person, an organization, or a software agent. Relations that any actor may hold point here once — assign a Task to a Party and all three kinds qualify. This single abstraction removes most person-shaped duplicate entity types from a schema.",
+        "icon": "🎭",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "partyId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "One identifier for every kind of actor — person, organization or agent"
+          },
+          {
+            "name": "displayName",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "person",
+        "name": "Person",
+        "description": "A human being. Note the modeling choice: an email address is a property of a Person; an email you send is an Interaction. Same word, two different kinds of thing.",
+        "icon": "👤",
+        "color": "#3498DB",
+        "properties": [
+          {
+            "name": "partyId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "fullName",
+            "type": "string"
+          },
+          {
+            "name": "emailAddress",
+            "type": "string",
+            "description": "An address is a property; a message sent to it is an Interaction"
+          },
+          {
+            "name": "phone",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "organization",
+        "name": "Organization",
+        "description": "A company, institution, or other legal actor. Company, Account and Vendor are not three entity types — they are one Organization playing three different Roles.",
+        "icon": "🏢",
+        "color": "#2E86AB",
+        "properties": [
+          {
+            "name": "partyId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "legalName",
+            "type": "string"
+          },
+          {
+            "name": "webDomain",
+            "type": "string"
+          },
+          {
+            "name": "size",
+            "type": "enum",
+            "values": [
+              "solo",
+              "small",
+              "mid",
+              "enterprise"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "agent",
+        "name": "Agent",
+        "description": "A software actor. Modeled as a Party, not a feature: an agent holds tasks, sends interactions, and appears in the audit trail like anyone else. Every agent is operated by some Party — autonomy with a named principal.",
+        "icon": "🤖",
+        "color": "#8E44AD",
+        "properties": [
+          {
+            "name": "partyId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "model",
+            "type": "string",
+            "description": "The underlying model or runtime this agent runs on"
+          },
+          {
+            "name": "purpose",
+            "type": "string"
+          },
+          {
+            "name": "autonomyLevel",
+            "type": "enum",
+            "values": [
+              "suggest",
+              "approve",
+              "autonomous"
+            ],
+            "description": "How far the agent may act before a person confirms"
+          }
+        ]
+      },
+      {
+        "id": "role",
+        "name": "Role",
+        "description": "Lead, Customer, Vendor, Employee — not entity types, but roles a Party plays for a while, in the context of some Organization. Reifying the role keeps one Person one node while their relationships change. Promoting roles to entity types is the most common modeling mistake in business software.",
+        "icon": "🎫",
+        "color": "#9B59B6",
+        "properties": [
+          {
+            "name": "roleId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "kind",
+            "type": "enum",
+            "values": [
+              "lead",
+              "prospect",
+              "customer",
+              "vendor",
+              "employee",
+              "partner"
+            ],
+            "description": "The role names that business software usually promotes to entity types"
+          },
+          {
+            "name": "validFrom",
+            "type": "date"
+          },
+          {
+            "name": "validTo",
+            "type": "date",
+            "description": "Roles end; people persist"
+          }
+        ]
+      },
+      {
+        "id": "team",
+        "name": "Team",
+        "description": "An organizational unit that owns work. People are members; teams belong to an Organization.",
+        "icon": "👥",
+        "color": "#16A085",
+        "properties": [
+          {
+            "name": "teamId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "teamName",
+            "type": "string"
+          },
+          {
+            "name": "focus",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "project",
+        "name": "Project",
+        "description": "A bounded body of work with an owner and a lifecycle. Tasks belong to it; documents attach to it.",
+        "icon": "📁",
+        "color": "#27AE60",
+        "properties": [
+          {
+            "name": "projectId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "projectName",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "active",
+              "paused",
+              "done"
+            ]
+          },
+          {
+            "name": "startedAt",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "task",
+        "name": "Task",
+        "description": "A unit of work. One entity type with a parent relation replaces Task and Subtask — nesting is a relationship, not a new kind of thing. Assigned to a Party, so a person, a team's org, or an agent can hold it.",
+        "icon": "✅",
+        "color": "#2ECC71",
+        "properties": [
+          {
+            "name": "taskId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "todo",
+              "doing",
+              "blocked",
+              "done"
+            ],
+            "description": "Lifecycle as a property, not an entity type per state"
+          },
+          {
+            "name": "priority",
+            "type": "enum",
+            "values": [
+              "low",
+              "normal",
+              "high",
+              "urgent"
+            ]
+          },
+          {
+            "name": "dueAt",
+            "type": "datetime"
+          }
+        ]
+      },
+      {
+        "id": "document",
+        "name": "Document",
+        "description": "Doc, File, Note and Template are formats of one thing: authored content that attaches to work. The kind property distinguishes them; four entity types would not.",
+        "icon": "📄",
+        "color": "#95A5A6",
+        "properties": [
+          {
+            "name": "documentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "kind",
+            "type": "enum",
+            "values": [
+              "doc",
+              "file",
+              "note",
+              "template"
+            ],
+            "description": "Doc, File, Note, Template: formats of one thing"
+          },
+          {
+            "name": "updatedAt",
+            "type": "datetime"
+          }
+        ]
+      },
+      {
+        "id": "product",
+        "name": "Product",
+        "description": "What you sell. A Service is a Product you cannot drop on your foot; a Plan is a Product that recurs. One entity type, a kind property, and a price.",
+        "icon": "🧩",
+        "color": "#F39C12",
+        "properties": [
+          {
+            "name": "productId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "productName",
+            "type": "string"
+          },
+          {
+            "name": "kind",
+            "type": "enum",
+            "values": [
+              "good",
+              "service",
+              "plan"
+            ],
+            "description": "A Service is a Product you cannot drop on your foot; a Plan is a Product that recurs"
+          },
+          {
+            "name": "price",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "deal",
+        "name": "Deal",
+        "description": "A potential transaction moving through a pipeline. The pipeline lives in the stage property — modeling Lead, Opportunity and Deal as separate entity types forces a migration every time a prospect advances.",
+        "icon": "💼",
+        "color": "#E67E22",
+        "properties": [
+          {
+            "name": "dealId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "stage",
+            "type": "enum",
+            "values": [
+              "qualifying",
+              "proposal",
+              "negotiation",
+              "won",
+              "lost"
+            ],
+            "description": "The pipeline as a property — advancing a deal is an update, not a migration"
+          },
+          {
+            "name": "amount",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "probability",
+            "type": "decimal",
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "id": "subscription",
+        "name": "Subscription",
+        "description": "An ongoing agreement binding a Party to a Product over time. The recurring-revenue chain reads directly off the graph: Subscription is billed by Invoices, Invoices are settled by Payments.",
+        "icon": "🔁",
+        "color": "#D4A017",
+        "properties": [
+          {
+            "name": "subscriptionId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "trial",
+              "active",
+              "past_due",
+              "canceled"
+            ]
+          },
+          {
+            "name": "startedAt",
+            "type": "date"
+          },
+          {
+            "name": "renewsAt",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "invoice",
+        "name": "Invoice",
+        "description": "A demand for money owed under a Subscription. Has identity, lifecycle, and legal weight — a real entity, not a report.",
+        "icon": "🧾",
+        "color": "#C0A062",
+        "properties": [
+          {
+            "name": "invoiceNumber",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "amount",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "draft",
+              "sent",
+              "paid",
+              "void"
+            ]
+          },
+          {
+            "name": "dueDate",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "payment",
+        "name": "Payment",
+        "description": "Money actually moving. Settles an Invoice; the invoice-to-payment relation is where reconciliation lives.",
+        "icon": "💳",
+        "color": "#B7950B",
+        "properties": [
+          {
+            "name": "paymentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "amount",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "method",
+            "type": "enum",
+            "values": [
+              "card",
+              "bank_transfer",
+              "cash",
+              "credit"
+            ]
+          },
+          {
+            "name": "paidAt",
+            "type": "datetime"
+          }
+        ]
+      },
+      {
+        "id": "interaction",
+        "name": "Interaction",
+        "description": "An email, call, meeting or chat message: one entity type, a channel property. Splitting these into four entity types duplicates every relation they share — participants, timestamps, the deal they concern.",
+        "icon": "💬",
+        "color": "#E91E8C",
+        "properties": [
+          {
+            "name": "interactionId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "channel",
+            "type": "enum",
+            "values": [
+              "email",
+              "call",
+              "meeting",
+              "chat"
+            ],
+            "description": "Email, call, meeting, chat — a property, not four entity types"
+          },
+          {
+            "name": "direction",
+            "type": "enum",
+            "values": [
+              "inbound",
+              "outbound"
+            ]
+          },
+          {
+            "name": "occurredAt",
+            "type": "datetime"
+          },
+          {
+            "name": "summary",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "savedView",
+        "name": "SavedView",
+        "description": "A Kanban board is not a thing in your domain — it is a way of looking at things. But a SAVED view is a real record: it has an owner, a filter, and a layout. The layout belongs in a property; the view belongs in the schema.",
+        "icon": "🗂️",
+        "color": "#7F8C8D",
+        "properties": [
+          {
+            "name": "viewId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "viewName",
+            "type": "string"
+          },
+          {
+            "name": "layout",
+            "type": "enum",
+            "values": [
+              "list",
+              "board",
+              "calendar",
+              "timeline",
+              "map"
+            ],
+            "description": "Kanban, list, calendar: ways of looking, so they live in a property"
+          },
+          {
+            "name": "filterQuery",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "automation",
+        "name": "Automation",
+        "description": "A rule is data: when trigger, if condition, then action. Storing it as an entity means it can be owned, versioned, disabled and audited — automation you can hold accountable.",
+        "icon": "⚙️",
+        "color": "#34495E",
+        "properties": [
+          {
+            "name": "automationId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "trigger",
+            "type": "string",
+            "description": "When: the event that wakes this rule"
+          },
+          {
+            "name": "condition",
+            "type": "string",
+            "description": "If: the test that must hold before it acts"
+          },
+          {
+            "name": "action",
+            "type": "string",
+            "description": "Then: what it does"
+          },
+          {
+            "name": "enabled",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "permission",
+        "name": "Permission",
+        "description": "A grant of access: which Party may do how much to what kind of resource. Modeled as an entity so access is queryable — who can edit this, and since when.",
+        "icon": "🔐",
+        "color": "#5D6D7E",
+        "properties": [
+          {
+            "name": "permissionId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "level",
+            "type": "enum",
+            "values": [
+              "view",
+              "comment",
+              "edit",
+              "admin"
+            ]
+          },
+          {
+            "name": "resourceKind",
+            "type": "string",
+            "description": "What kind of thing the grant covers, e.g. Project or Document"
+          }
+        ]
+      },
+      {
+        "id": "auditEvent",
+        "name": "AuditEvent",
+        "description": "The append-only memory of the system: who did what, when, to what. In software where agents act alongside people, the audit trail is what makes trust checkable rather than assumed.",
+        "icon": "📜",
+        "color": "#909497",
+        "properties": [
+          {
+            "name": "auditEventId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "verb",
+            "type": "string",
+            "description": "What was done: created, updated, deleted, approved, exported"
+          },
+          {
+            "name": "occurredAt",
+            "type": "datetime"
+          },
+          {
+            "name": "resourceKind",
+            "type": "string"
+          },
+          {
+            "name": "detail",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-agent-operated-by",
+        "name": "operated by",
+        "from": "agent",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "description": "Every agent answers to a principal"
+      },
+      {
+        "id": "rel-party-plays-role",
+        "name": "plays",
+        "from": "party",
+        "to": "role",
+        "cardinality": "one-to-many",
+        "description": "Party plays Role: the pattern that replaces Lead, Customer and Vendor as entity types"
+      },
+      {
+        "id": "rel-role-at-organization",
+        "name": "at",
+        "from": "role",
+        "to": "organization",
+        "cardinality": "many-to-one",
+        "description": "A role is played somewhere: you are a customer AT a company, an employee AT another"
+      },
+      {
+        "id": "rel-team-part-of",
+        "name": "part of",
+        "from": "team",
+        "to": "organization",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-person-member-of",
+        "name": "member of",
+        "from": "person",
+        "to": "team",
+        "cardinality": "many-to-many"
+      },
+      {
+        "id": "rel-project-owned-by",
+        "name": "owned by",
+        "from": "project",
+        "to": "team",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-task-belongs-to",
+        "name": "belongs to",
+        "from": "task",
+        "to": "project",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-task-subtask-of",
+        "name": "subtask of",
+        "from": "task",
+        "to": "task",
+        "cardinality": "many-to-one",
+        "description": "The self-relation that deletes the Subtask entity type: nesting is a relationship, not a kind"
+      },
+      {
+        "id": "rel-task-assigned-to",
+        "name": "assigned to",
+        "from": "task",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "description": "Assigned to a Party — so a person or an agent can hold it, with no schema change"
+      },
+      {
+        "id": "rel-document-attached-to",
+        "name": "attached to",
+        "from": "document",
+        "to": "project",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-document-authored-by",
+        "name": "authored by",
+        "from": "document",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "description": "People and agents both write; the byline points at Party"
+      },
+      {
+        "id": "rel-deal-with-party",
+        "name": "with",
+        "from": "deal",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "description": "The counterparty — a person or an organization, which is why it points at Party"
+      },
+      {
+        "id": "rel-deal-for-product",
+        "name": "for",
+        "from": "deal",
+        "to": "product",
+        "cardinality": "many-to-many"
+      },
+      {
+        "id": "rel-subscription-held-by",
+        "name": "held by",
+        "from": "subscription",
+        "to": "party",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-subscription-for-product",
+        "name": "for",
+        "from": "subscription",
+        "to": "product",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-invoice-bills",
+        "name": "bills",
+        "from": "invoice",
+        "to": "subscription",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-payment-settles",
+        "name": "settles",
+        "from": "payment",
+        "to": "invoice",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-interaction-involves",
+        "name": "involves",
+        "from": "interaction",
+        "to": "party",
+        "cardinality": "many-to-many",
+        "description": "Participants are Parties: a meeting of two people and an agent is one Interaction"
+      },
+      {
+        "id": "rel-interaction-regarding",
+        "name": "regarding",
+        "from": "interaction",
+        "to": "deal",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-savedview-created-by",
+        "name": "created by",
+        "from": "savedView",
+        "to": "party",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "rel-automation-maintained-by",
+        "name": "maintained by",
+        "from": "automation",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "description": "Every rule has an owner you can ask why"
+      },
+      {
+        "id": "rel-automation-creates",
+        "name": "creates",
+        "from": "automation",
+        "to": "task",
+        "cardinality": "one-to-many",
+        "description": "When it fires, work appears — and the AuditEvent says so"
+      },
+      {
+        "id": "rel-permission-granted-to",
+        "name": "granted to",
+        "from": "permission",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "description": "Access is granted to Parties — people and agents under one policy model"
+      },
+      {
+        "id": "rel-auditevent-performed-by",
+        "name": "performed by",
+        "from": "auditEvent",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "description": "Whoever acted — person, organization or agent — the trail reads the same"
+      },
+      {
+        "id": "person-subClassOf-party",
+        "name": "subClassOf",
+        "from": "person",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "kind": "subclass"
+      },
+      {
+        "id": "organization-subClassOf-party",
+        "name": "subClassOf",
+        "from": "organization",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "kind": "subclass"
+      },
+      {
+        "id": "agent-subClassOf-party",
+        "name": "subClassOf",
+        "from": "agent",
+        "to": "party",
+        "cardinality": "many-to-one",
+        "kind": "subclass"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/elements-of-software/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "id": "official/iq-lab-retail-step-1",
+  "ontology": {
+    "name": "Retail Supply Chain — Step 1: Core Commerce",
+    "description": "Customer, Order, Product — the foundational entities",
+    "entityTypes": [
+      {
+        "id": "customer",
+        "name": "Customer",
+        "description": "The buyer associated with an order",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "customerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "loyaltyTier",
+            "type": "string"
+          },
+          {
+            "name": "lifetimeValue",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "order",
+        "name": "Order",
+        "description": "A customer purchase transaction",
+        "icon": "📋",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "orderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "orderDate",
+            "type": "datetime"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "totalAmount",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "product",
+        "name": "Product",
+        "description": "Items available for sale",
+        "icon": "📦",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "productId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "unitCost",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "discountPercent",
+            "type": "decimal",
+            "unit": "%"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "order-placedby-customer",
+        "name": "OrderPlacedByCustomer",
+        "from": "order",
+        "to": "customer",
+        "cardinality": "many-to-one",
+        "description": "Which customer placed the order"
+      },
+      {
+        "id": "order-contains-product",
+        "name": "OrderContainsProduct",
+        "from": "order",
+        "to": "product",
+        "cardinality": "many-to-many",
+        "description": "Products included in the order"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/retail-supply-chain-step-1-core-commerce/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

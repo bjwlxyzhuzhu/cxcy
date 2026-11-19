@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "id": "official/healthcare-step-1",
+  "ontology": {
+    "name": "Healthcare System — Step 1",
+    "description": "Patient, Provider, and Appointment entities with basic scheduling relationships.",
+    "entityTypes": [
+      {
+        "id": "patient",
+        "name": "Patient",
+        "description": "A patient in the healthcare system",
+        "icon": "🏥",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "patientId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "mrn",
+            "type": "string"
+          },
+          {
+            "name": "dateOfBirth",
+            "type": "date"
+          },
+          {
+            "name": "bloodType",
+            "type": "string"
+          },
+          {
+            "name": "allergies",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "provider",
+        "name": "Provider",
+        "description": "A healthcare provider",
+        "icon": "👨‍⚕️",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "providerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "specialty",
+            "type": "string"
+          },
+          {
+            "name": "licenseNumber",
+            "type": "string"
+          },
+          {
+            "name": "department",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "appointment",
+        "name": "Appointment",
+        "description": "A scheduled appointment between a patient and a provider",
+        "icon": "📅",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "appointmentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "scheduledTime",
+            "type": "datetime"
+          },
+          {
+            "name": "duration",
+            "type": "integer",
+            "unit": "minutes"
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "patient_has_appt",
+        "name": "has_appointment",
+        "from": "patient",
+        "to": "appointment",
+        "cardinality": "one-to-many",
+        "description": "Patient's scheduled visits"
+      },
+      {
+        "id": "provider_sees",
+        "name": "sees",
+        "from": "provider",
+        "to": "appointment",
+        "cardinality": "one-to-many",
+        "description": "Provider's appointments"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/healthcare-step-1/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

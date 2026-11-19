@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "id": "official/university",
+  "ontology": {
+    "name": "University System",
+    "description": "Academic institution with students, courses, and faculty",
+    "entityTypes": [
+      {
+        "id": "student",
+        "name": "Student",
+        "description": "Enrolled learner",
+        "icon": "🎓",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "studentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "major",
+            "type": "string"
+          },
+          {
+            "name": "gpa",
+            "type": "decimal"
+          },
+          {
+            "name": "enrollmentYear",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "professor",
+        "name": "Professor",
+        "description": "Faculty member",
+        "icon": "👨‍🏫",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "facultyId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "department",
+            "type": "string"
+          },
+          {
+            "name": "tenure",
+            "type": "boolean"
+          },
+          {
+            "name": "researchArea",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "course",
+        "name": "Course",
+        "description": "Academic class",
+        "icon": "📚",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "courseCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "credits",
+            "type": "integer"
+          },
+          {
+            "name": "level",
+            "type": "string"
+          },
+          {
+            "name": "maxEnrollment",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "department",
+        "name": "Department",
+        "description": "Academic unit",
+        "icon": "🏛️",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "deptCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "building",
+            "type": "string"
+          },
+          {
+            "name": "budget",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "enrollment",
+        "name": "Enrollment",
+        "description": "Course registration",
+        "icon": "📝",
+        "color": "#00B7C3",
+        "properties": [
+          {
+            "name": "enrollmentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "semester",
+            "type": "string"
+          },
+          {
+            "name": "grade",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "student_enrolls",
+        "name": "enrolled_in",
+        "from": "student",
+        "to": "enrollment",
+        "cardinality": "one-to-many",
+        "description": "Student registrations"
+      },
+      {
+        "id": "enrollment_for",
+        "name": "for_course",
+        "from": "enrollment",
+        "to": "course",
+        "cardinality": "many-to-one",
+        "description": "Course enrollment"
+      },
+      {
+        "id": "prof_teaches",
+        "name": "teaches",
+        "from": "professor",
+        "to": "course",
+        "cardinality": "one-to-many",
+        "description": "Courses taught"
+      },
+      {
+        "id": "prof_belongs",
+        "name": "belongs_to",
+        "from": "professor",
+        "to": "department",
+        "cardinality": "many-to-one",
+        "description": "Faculty department"
+      },
+      {
+        "id": "course_offered",
+        "name": "offered_by",
+        "from": "course",
+        "to": "department",
+        "cardinality": "many-to-one",
+        "description": "Course department"
+      },
+      {
+        "id": "student_advised",
+        "name": "advised_by",
+        "from": "student",
+        "to": "professor",
+        "cardinality": "many-to-one",
+        "description": "Academic advisor"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/university-system/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

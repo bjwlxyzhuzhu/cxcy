@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "id": "external/schema-org/medical-entity",
+  "ontology": {
+    "name": "Schema.org — MedicalEntity",
+    "description": "Medical conditions, drugs, procedures, and healthcare providers — a health-domain subset of Schema.org.",
+    "entityTypes": [
+      {
+        "id": "medicalCondition",
+        "name": "MedicalCondition",
+        "description": "A disease, disorder, or medical condition",
+        "icon": "🩺",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "conditionName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "icdCode",
+            "type": "string"
+          },
+          {
+            "name": "riskFactor",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "drug",
+        "name": "Drug",
+        "description": "A pharmaceutical drug used to treat or manage a condition",
+        "icon": "💊",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "drugName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "dosageForm",
+            "type": "string"
+          },
+          {
+            "name": "activeIngredient",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "medicalProcedure",
+        "name": "MedicalProcedure",
+        "description": "A medical test, surgery, or therapeutic procedure",
+        "icon": "🏥",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "procedureName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "procedureType",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "hospital",
+        "name": "Hospital",
+        "description": "A hospital or healthcare facility",
+        "icon": "🏨",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "hospitalName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "bedCount",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "physician",
+        "name": "Physician",
+        "description": "A medical doctor or specialist",
+        "icon": "👨‍⚕️",
+        "color": "#E74C3C",
+        "properties": [
+          {
+            "name": "physicianName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "specialty",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "possibleTreatment",
+        "name": "possibleTreatment",
+        "from": "medicalCondition",
+        "to": "drug",
+        "cardinality": "one-to-many",
+        "description": "A drug that may treat or manage this condition"
+      },
+      {
+        "id": "diagnosticTest",
+        "name": "diagnosticTest",
+        "from": "medicalCondition",
+        "to": "medicalProcedure",
+        "cardinality": "one-to-many",
+        "description": "A procedure used to diagnose this condition"
+      },
+      {
+        "id": "availableAt",
+        "name": "availableAt",
+        "from": "medicalProcedure",
+        "to": "hospital",
+        "cardinality": "many-to-many",
+        "description": "A hospital where this procedure is performed"
+      },
+      {
+        "id": "affiliatedWith",
+        "name": "affiliatedWith",
+        "from": "physician",
+        "to": "hospital",
+        "cardinality": "many-to-one",
+        "description": "The hospital a physician is affiliated with"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "https://schema.org/medical-entity-subset/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

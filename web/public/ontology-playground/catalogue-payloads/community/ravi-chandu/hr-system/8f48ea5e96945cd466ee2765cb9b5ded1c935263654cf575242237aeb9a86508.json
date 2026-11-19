@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "id": "community/ravi-chandu/hr-system",
+  "ontology": {
+    "name": "HR System",
+    "description": "Human resources ontology for organizational structure, staffing, and performance management.",
+    "entityTypes": [
+      {
+        "id": "employee",
+        "name": "Employee",
+        "description": "Person employed by the organization.",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "employeeId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "hireDate",
+            "type": "date"
+          },
+          {
+            "name": "employmentStatus",
+            "type": "enum",
+            "values": [
+              "active",
+              "onLeave",
+              "terminated"
+            ]
+          },
+          {
+            "name": "jobLevel",
+            "type": "enum",
+            "values": [
+              "junior",
+              "mid",
+              "senior",
+              "lead",
+              "manager",
+              "director"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "department",
+        "name": "Department",
+        "description": "Organizational unit responsible for a business function.",
+        "icon": "🏢",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "departmentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "budget",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "active",
+              "inactive"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "position",
+        "name": "Position",
+        "description": "Defined role within the organization.",
+        "icon": "💼",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "positionId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "level",
+            "type": "enum",
+            "values": [
+              "individualContributor",
+              "teamLead",
+              "manager",
+              "director"
+            ]
+          },
+          {
+            "name": "salaryBand",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "assignment",
+        "name": "Assignment",
+        "description": "Employee assignment to a department and position over a period of time.",
+        "icon": "📋",
+        "color": "#00B7C3",
+        "properties": [
+          {
+            "name": "assignmentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "startDate",
+            "type": "date"
+          },
+          {
+            "name": "endDate",
+            "type": "date"
+          },
+          {
+            "name": "isPrimary",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "performanceReview",
+        "name": "PerformanceReview",
+        "description": "Periodic evaluation of employee performance.",
+        "icon": "⭐",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "reviewId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "reviewPeriod",
+            "type": "string"
+          },
+          {
+            "name": "rating",
+            "type": "enum",
+            "values": [
+              "below",
+              "meets",
+              "exceeds",
+              "outstanding"
+            ]
+          },
+          {
+            "name": "reviewDate",
+            "type": "date"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "employee_has_assignment",
+        "name": "has_assignment",
+        "from": "employee",
+        "to": "assignment",
+        "cardinality": "one-to-many",
+        "description": "Assignments associated with an employee."
+      },
+      {
+        "id": "assignment_for_department",
+        "name": "for_department",
+        "from": "assignment",
+        "to": "department",
+        "cardinality": "many-to-one",
+        "description": "Department attached to an assignment."
+      },
+      {
+        "id": "assignment_for_position",
+        "name": "for_position",
+        "from": "assignment",
+        "to": "position",
+        "cardinality": "many-to-one",
+        "description": "Position attached to an assignment."
+      },
+      {
+        "id": "employee_has_review",
+        "name": "has_review",
+        "from": "employee",
+        "to": "performanceReview",
+        "cardinality": "one-to-many",
+        "description": "Performance reviews recorded for an employee."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/hr-system/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

@@ -1,0 +1,952 @@
+{
+  "schemaVersion": 1,
+  "id": "community/1010yab/university-class-search",
+  "ontology": {
+    "name": "NAUClassSearchOntology",
+    "description": "Grounded ontology for the NAU Class Search Data Agent. Internal RDF identifiers are kept stable so the ontology playground preserves the graph connections, while entity display titles use underscores and relationship labels read as natural language. The model separates Course from Course_Offering, models Course_Offering as subject plus catalog number, places prerequisites and requisites on Course_Offering, separates Term from Session, models multiple Sessions per Term with week lengths, connects Buildings to Campus and Campus to College, and models Class_Section enrollment through Academic_Policy and Reserve_Capacity_Rule.",
+    "entityTypes": [
+      {
+        "id": "course",
+        "name": "Course",
+        "description": "Catalog-level academic course concept grounded in course catalog data. A Course represents the stable academic idea, including title, units, career, level, and long catalog description text. Specific offerable variants, subject/catalog-number combinations, course_offer_number, and requisite logic are modeled through Course_Offering.",
+        "icon": "🎓",
+        "color": "#2F80ED",
+        "properties": [
+          {
+            "name": "course_id",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "PeopleSoft COURSE_ID or durable course identifier."
+          },
+          {
+            "name": "course_title",
+            "type": "string",
+            "description": "Course title."
+          },
+          {
+            "name": "course_description",
+            "type": "string",
+            "description": "Long catalog description text used for text-based AI search and retrieval."
+          },
+          {
+            "name": "academic_career",
+            "type": "string",
+            "description": "Academic career such as UGRD or GRAD."
+          },
+          {
+            "name": "academic_level",
+            "type": "string",
+            "description": "Academic level such as undergraduate or graduate."
+          },
+          {
+            "name": "units",
+            "type": "decimal",
+            "description": "Credit hours or course units."
+          }
+        ]
+      },
+      {
+        "id": "courseOffering",
+        "name": "Course_Offering",
+        "description": "Offerable course concept grounded in the PeopleSoft course_id + course_offer_number pattern. A Course_Offering is made up of a Subject and catalog_number, belongs to a parent Course, can be scheduled as Class_Sections, and is the correct place to attach prerequisite, co-requisite, placement, equivalency, and recommended preparation rules.",
+        "icon": "🧾",
+        "color": "#6C63FF",
+        "properties": [
+          {
+            "name": "course_offering_key",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Business identifier for a Course_Offering, normally course_id + course_offer_number."
+          },
+          {
+            "name": "course_id",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "PeopleSoft COURSE_ID inherited from the parent Course."
+          },
+          {
+            "name": "course_offer_number",
+            "type": "integer",
+            "isIdentifier": true,
+            "description": "PeopleSoft COURSE_OFFER_NUMBER. This belongs to Course_Offering, not the generic Course concept."
+          },
+          {
+            "name": "subject_code",
+            "type": "string",
+            "description": "Subject code that forms the first part of the class offering, such as CS, BIO, MATH, PSY, or EE."
+          },
+          {
+            "name": "catalog_number",
+            "type": "string",
+            "description": "Catalog number that forms the second part of the class offering, such as 101, 238, or 310."
+          },
+          {
+            "name": "course_code",
+            "type": "string",
+            "description": "Combined subject + catalog number display code such as CS 310 or MATH 238."
+          },
+          {
+            "name": "offering_status",
+            "type": "string",
+            "description": "Whether the Course_Offering is active, inactive, or otherwise available to schedule."
+          }
+        ]
+      },
+      {
+        "id": "subject",
+        "name": "Subject",
+        "description": "Academic subject code such as CS, BIO, MATH, PSY, or EE. A Subject is mapped to an Academic_Organization and College so class search can reason from subject area to academic ownership.",
+        "icon": "🔤",
+        "color": "#1ABC9C",
+        "properties": [
+          {
+            "name": "subject_code",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Subject code, such as CS, BIO, MATH, PSY, or EE."
+          },
+          {
+            "name": "subject_description",
+            "type": "string",
+            "description": "Full subject description."
+          }
+        ]
+      },
+      {
+        "id": "college",
+        "name": "College",
+        "description": "College-level academic grouping. A College can contain multiple Academic_Organizations and can own or be associated with Subjects.",
+        "icon": "🏫",
+        "color": "#F2A541",
+        "properties": [
+          {
+            "name": "college_code",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "College code or identifier."
+          },
+          {
+            "name": "college_name",
+            "type": "string",
+            "description": "College name."
+          }
+        ]
+      },
+      {
+        "id": "classSection",
+        "name": "Class_Section",
+        "description": "Scheduled class section grounded in class scheduling data. A Class_Section is the student-facing scheduled instance of a Course_Offering in a specific Session, with enrollment, capacity, status, delivery mode, class number, multiple Meeting_Patterns, instructors, Reserve_Capacity_Rules, and Academic_Policy controls for add, drop, and waitlist timing.",
+        "icon": "🗓️",
+        "color": "#00A6ED",
+        "properties": [
+          {
+            "name": "class_section_sk",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Surrogate key for the Class_Section."
+          },
+          {
+            "name": "class_section_business_key",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Composite business key for a section, generally course_id + course_offer_number + term_id + session_id + class_section_id."
+          },
+          {
+            "name": "term_id",
+            "type": "string",
+            "description": "Term code for the Class_Section."
+          },
+          {
+            "name": "session_id",
+            "type": "string",
+            "description": "Session code for the Class_Section."
+          },
+          {
+            "name": "class_section_id",
+            "type": "string",
+            "description": "PeopleSoft CLASS_SECTION or section identifier."
+          },
+          {
+            "name": "class_number",
+            "type": "integer",
+            "description": "Student-facing class number."
+          },
+          {
+            "name": "delivery_mode",
+            "type": "string",
+            "description": "Delivery mode such as in-person, online, hybrid, or blended."
+          },
+          {
+            "name": "enrollment_status",
+            "type": "string",
+            "description": "Enrollment status such as open, closed, cancelled, waitlist, or tentatively scheduled."
+          },
+          {
+            "name": "enrollment_capacity",
+            "type": "integer",
+            "description": "Maximum enrollment capacity."
+          },
+          {
+            "name": "students_enrolled",
+            "type": "integer",
+            "description": "Current number of enrolled students."
+          },
+          {
+            "name": "open_seats",
+            "type": "integer",
+            "description": "Calculated seats available for enrollment."
+          },
+          {
+            "name": "waitlist_capacity",
+            "type": "integer",
+            "description": "Maximum waitlist capacity."
+          },
+          {
+            "name": "students_on_waitlist",
+            "type": "integer",
+            "description": "Current number of students on the waitlist."
+          },
+          {
+            "name": "class_start_date",
+            "type": "date",
+            "description": "Class_Section start date."
+          },
+          {
+            "name": "class_end_date",
+            "type": "date",
+            "description": "Class_Section end date."
+          },
+          {
+            "name": "class_length_in_weeks",
+            "type": "decimal",
+            "description": "Length of the Class_Section in weeks when calculated or available."
+          },
+          {
+            "name": "dynamically_dated",
+            "type": "boolean",
+            "description": "Whether the Class_Section uses dynamically dated add, drop, or enrollment dates."
+          }
+        ]
+      },
+      {
+        "id": "term",
+        "name": "Term",
+        "description": "Academic term such as Fall, Spring, or Summer. A Term is measured in number of weeks and can contain multiple Sessions. For example, a Summer Term may be 12 weeks while it contains multiple 5-week summer sessions.",
+        "icon": "📅",
+        "color": "#00B894",
+        "properties": [
+          {
+            "name": "term_id",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Term code such as 1257 or 1264."
+          },
+          {
+            "name": "term_description",
+            "type": "string",
+            "description": "Term description such as Fall 2026, Spring 2027, or Summer 2027."
+          },
+          {
+            "name": "term_begin_date",
+            "type": "date",
+            "description": "Term begin date."
+          },
+          {
+            "name": "term_end_date",
+            "type": "date",
+            "description": "Term end date."
+          },
+          {
+            "name": "term_length_in_weeks",
+            "type": "decimal",
+            "description": "Length of the Term in weeks. Example: a Summer Term may be 12 weeks."
+          }
+        ]
+      },
+      {
+        "id": "session",
+        "name": "Session",
+        "description": "Session within a Term, such as a 12-week summer session, 5-week summer session 1, 5-week summer session 2, or 5-week summer session 3. Each Session is measured in number of weeks and can contain multiple Class_Sections.",
+        "icon": "⏱️",
+        "color": "#20C997",
+        "properties": [
+          {
+            "name": "session_key",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique Session key, normally term_id + session_id."
+          },
+          {
+            "name": "session_id",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Session code such as 12W, 5W1, 5W2, 5W3, M16, N5A, N5B, N10, N12, or dynamically dated session code."
+          },
+          {
+            "name": "session_description",
+            "type": "string",
+            "description": "Session description such as Summer 5-week Session 1."
+          },
+          {
+            "name": "session_begin_date",
+            "type": "date",
+            "description": "Session begin date."
+          },
+          {
+            "name": "session_end_date",
+            "type": "date",
+            "description": "Session end date."
+          },
+          {
+            "name": "session_length_in_weeks",
+            "type": "decimal",
+            "description": "Length of the Session in weeks. Example: Summer sessions may be 5 weeks within a 12-week Summer Term."
+          }
+        ]
+      },
+      {
+        "id": "enrollmentDateRule",
+        "name": "Academic_Policy",
+        "description": "Academic policy governing Class_Section enrollment timing and rules, including open enrollment, add/drop periods, waitlist policy, withdrawal deadlines, and related session or section-specific controls.",
+        "icon": "🚦",
+        "color": "#FF8C42",
+        "properties": [
+          {
+            "name": "academic_policy_id",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Identifier for an enrollment date control rule."
+          },
+          {
+            "name": "open_enrollment_start_date",
+            "type": "date",
+            "description": "Date when enrollment opens."
+          },
+          {
+            "name": "open_enrollment_end_date",
+            "type": "date",
+            "description": "Date when open enrollment closes or changes."
+          },
+          {
+            "name": "add_start_date",
+            "type": "date",
+            "description": "Date when students may begin adding a Class_Section."
+          },
+          {
+            "name": "add_end_date",
+            "type": "date",
+            "description": "Last date to add a Class_Section."
+          },
+          {
+            "name": "drop_start_date",
+            "type": "date",
+            "description": "Date when students may begin dropping a Class_Section."
+          },
+          {
+            "name": "drop_end_date",
+            "type": "date",
+            "description": "Last date to drop a Class_Section without the relevant penalty."
+          },
+          {
+            "name": "withdrawal_deadline",
+            "type": "date",
+            "description": "Withdrawal deadline when available."
+          },
+          {
+            "name": "policy_source",
+            "type": "string",
+            "description": "Whether the date rule is derived from term, session, class section, dynamic dating, or another registrar rule source."
+          }
+        ]
+      },
+      {
+        "id": "professorInstructor",
+        "name": "Instructor",
+        "description": "Professor or instructor assigned to teach a Class_Section. Uses EMPLID or another person identifier as the stable natural key and instructor_name as the display value.",
+        "icon": "👩‍🏫",
+        "color": "#9B51E0",
+        "properties": [
+          {
+            "name": "instructor_sk",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Surrogate key for the instructor."
+          },
+          {
+            "name": "emplid",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Employee or person identifier for the instructor."
+          },
+          {
+            "name": "instructor_name",
+            "type": "string",
+            "description": "Instructor display name."
+          },
+          {
+            "name": "instructor_role",
+            "type": "string",
+            "description": "Instructor role such as primary instructor, secondary instructor, or teaching assistant."
+          }
+        ]
+      },
+      {
+        "id": "academicOrganization",
+        "name": "Academic_Organization",
+        "description": "Academic owner such as college, division, department, school, or academic organization. Supports questions by organization, subject ownership, class ownership, and program ownership.",
+        "icon": "🏛️",
+        "color": "#F2994A",
+        "properties": [
+          {
+            "name": "academic_org_sk",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Surrogate or business key for the academic organization."
+          },
+          {
+            "name": "academic_owner_id",
+            "type": "string",
+            "description": "Academic owner identifier when available."
+          },
+          {
+            "name": "academic_org_name",
+            "type": "string",
+            "description": "Academic organization name."
+          },
+          {
+            "name": "organization_type",
+            "type": "string",
+            "description": "Organization type such as college, division, department, school, or program-owning unit."
+          },
+          {
+            "name": "department",
+            "type": "string",
+            "description": "Department name when applicable."
+          },
+          {
+            "name": "division",
+            "type": "string",
+            "description": "Division name when applicable."
+          }
+        ]
+      },
+      {
+        "id": "meetingPattern",
+        "name": "Meeting_Pattern",
+        "description": "Meeting days, meeting times, and location pattern for a Class_Section. A Class_Section can have multiple Meeting_Patterns for lecture, lab, fieldwork, or other components.",
+        "icon": "🕒",
+        "color": "#27AE60",
+        "properties": [
+          {
+            "name": "meeting_pattern_sk",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Surrogate key for the Meeting_Pattern."
+          },
+          {
+            "name": "meeting_pattern_number",
+            "type": "integer",
+            "description": "Meeting pattern number or sequence."
+          },
+          {
+            "name": "meeting_days",
+            "type": "string",
+            "description": "Meeting days such as MWF, TuTh, or Online."
+          },
+          {
+            "name": "meeting_start_time",
+            "type": "string",
+            "description": "Meeting start time."
+          },
+          {
+            "name": "meeting_end_time",
+            "type": "string",
+            "description": "Meeting end time."
+          }
+        ]
+      },
+      {
+        "id": "facilityRoom",
+        "name": "Room",
+        "description": "Physical room or facility where a Meeting_Pattern occurs. A Facility_Room is located in a Building.",
+        "icon": "🚪",
+        "color": "#56CCF2",
+        "properties": [
+          {
+            "name": "facility_id",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Facility or room identifier."
+          },
+          {
+            "name": "room_number",
+            "type": "string",
+            "description": "Room number."
+          },
+          {
+            "name": "room_description",
+            "type": "string",
+            "description": "Room description or display name."
+          }
+        ]
+      },
+      {
+        "id": "building",
+        "name": "Building",
+        "description": "Campus building that contains one or more Facility_Rooms. A Building is located on a Campus.",
+        "icon": "🏢",
+        "color": "#828282",
+        "properties": [
+          {
+            "name": "building_id",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Building identifier."
+          },
+          {
+            "name": "building_name",
+            "type": "string",
+            "description": "Building name."
+          }
+        ]
+      },
+      {
+        "id": "campus",
+        "name": "Campus",
+        "description": "Campus or location context for Buildings and Class_Sections, such as the Flagstaff Mountain Campus. A Campus belongs to a College in this ontology design.",
+        "icon": "🌲",
+        "color": "#145A32",
+        "properties": [
+          {
+            "name": "campus_code",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Campus or location code."
+          },
+          {
+            "name": "campus_name",
+            "type": "string",
+            "description": "Campus name."
+          }
+        ]
+      },
+      {
+        "id": "reserveCapacityRule",
+        "name": "Reserve_Capacity_Rule",
+        "description": "Reserve capacity rule that allows eligible student populations to enroll in a Class_Section. A Class_Section can have multiple Reserve_Capacity_Rules with reserved seats, eligible populations, consent requirements, and enrollment counts.",
+        "icon": "🔐",
+        "color": "#EB5757",
+        "properties": [
+          {
+            "name": "reserve_sk",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Surrogate key for the reserve capacity rule."
+          },
+          {
+            "name": "reserve_capacity_id",
+            "type": "string",
+            "description": "Reserve capacity rule identifier."
+          },
+          {
+            "name": "reserve_start_date",
+            "type": "date",
+            "description": "Date when the reserve capacity rule begins."
+          },
+          {
+            "name": "reserve_group_description",
+            "type": "string",
+            "description": "Description of the student group eligible for the reserved seats."
+          },
+          {
+            "name": "eligible_population",
+            "type": "string",
+            "description": "Population allowed to enroll through this reserve rule, such as plan, campus, cohort, career, or student group."
+          },
+          {
+            "name": "enrollment_consent",
+            "type": "string",
+            "description": "Enrollment consent requirement if the reserve rule requires permission."
+          },
+          {
+            "name": "reserve_capacity",
+            "type": "integer",
+            "description": "Number of seats reserved for the eligible population."
+          },
+          {
+            "name": "reserve_enrolled",
+            "type": "integer",
+            "description": "Number of students enrolled against the reserve capacity."
+          },
+          {
+            "name": "reserve_open_seats",
+            "type": "integer",
+            "description": "Available seats under the reserve capacity rule."
+          }
+        ]
+      },
+      {
+        "id": "classAttribute",
+        "name": "Class_Attribute",
+        "description": "Attribute attached to a Class_Section or Course_Offering, such as Liberal Studies, CCAT, component, lecture, lab, fieldwork, or other designations.",
+        "icon": "🏷️",
+        "color": "#F2C94C",
+        "properties": [
+          {
+            "name": "attribute_sk",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Surrogate key for the Class_Attribute."
+          },
+          {
+            "name": "attribute_id",
+            "type": "string",
+            "description": "Attribute code."
+          },
+          {
+            "name": "attribute_value_id",
+            "type": "string",
+            "description": "Attribute value code."
+          },
+          {
+            "name": "attribute_description",
+            "type": "string",
+            "description": "Attribute description."
+          },
+          {
+            "name": "value_description",
+            "type": "string",
+            "description": "Attribute value description."
+          }
+        ]
+      },
+      {
+        "id": "requisiteRule",
+        "name": "Requisite_Rule",
+        "description": "Prerequisite, co-requisite, equivalency, placement, or recommended preparation rule. Requisite_Rules attach to Course_Offerings and point to prerequisite Course_Offerings, which avoids a direct Course-to-Course loop.",
+        "icon": "🔗",
+        "color": "#BB6BD9",
+        "properties": [
+          {
+            "name": "requisite_rule_id",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Identifier for the prerequisite, co-requisite, equivalency, placement, or recommended preparation rule."
+          },
+          {
+            "name": "requisite_type",
+            "type": "string",
+            "description": "Type such as prerequisite, co-requisite, equivalency, placement, or recommended preparation."
+          },
+          {
+            "name": "rule_text",
+            "type": "string",
+            "description": "Human-readable requisite text."
+          },
+          {
+            "name": "effective_date",
+            "type": "date",
+            "description": "Effective date for the rule."
+          },
+          {
+            "name": "minimum_grade",
+            "type": "string",
+            "description": "Minimum required grade when applicable."
+          },
+          {
+            "name": "logical_operator",
+            "type": "string",
+            "description": "Logical operator such as AND, OR, concurrent, minimum score, or minimum grade grouping."
+          }
+        ]
+      },
+      {
+        "id": "academicProgram",
+        "name": "Academic_Program",
+        "description": "Degree, plan, certificate, or academic program that contains Academic_Requirements and may require Courses or Course_Offerings.",
+        "icon": "🎯",
+        "color": "#219653",
+        "properties": [
+          {
+            "name": "program_code",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Academic program or plan code."
+          },
+          {
+            "name": "program_name",
+            "type": "string",
+            "description": "Academic program name."
+          },
+          {
+            "name": "degree",
+            "type": "string",
+            "description": "Degree type or award."
+          },
+          {
+            "name": "catalog_code",
+            "type": "string",
+            "description": "Catalog requirement code or catalog year when available."
+          }
+        ]
+      },
+      {
+        "id": "academicRequirement",
+        "name": "Academic_Requirement",
+        "description": "Requirement inside an Academic_Program, such as capstone, lab science, Liberal Studies, major requirement, or prerequisite-ready pathway. Requirements may be satisfied by Courses or Course_Offerings.",
+        "icon": "✅",
+        "color": "#2D9CDB",
+        "properties": [
+          {
+            "name": "requirement_code",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Requirement identifier."
+          },
+          {
+            "name": "requirement_name",
+            "type": "string",
+            "description": "Requirement name."
+          },
+          {
+            "name": "requirement_type",
+            "type": "string",
+            "description": "Requirement type such as capstone, lab science, Liberal Studies, prerequisite, or major requirement."
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "course_has_course_offering",
+        "name": "has",
+        "from": "course",
+        "to": "courseOffering",
+        "cardinality": "one-to-many",
+        "description": "A catalog-level Course can have one or more Course_Offerings. This separates the stable course concept from PeopleSoft course_offer_number and offering-specific requisite rules."
+      },
+      {
+        "id": "course_offering_for_course",
+        "name": "of",
+        "from": "courseOffering",
+        "to": "course",
+        "cardinality": "many-to-one",
+        "description": "A Course_Offering belongs to one parent Course."
+      },
+      {
+        "id": "course_offering_has_subject",
+        "name": "has",
+        "from": "courseOffering",
+        "to": "subject",
+        "cardinality": "many-to-one",
+        "description": "A Course_Offering is made up of a Subject and catalog_number."
+      },
+      {
+        "id": "subject_mapped_to_academic_organization",
+        "name": "owned by",
+        "from": "subject",
+        "to": "academicOrganization",
+        "cardinality": "many-to-one",
+        "description": "A Subject is mapped to the Academic_Organization that owns or administers that subject area."
+      },
+      {
+        "id": "college_has_academic_organization",
+        "name": "owns",
+        "from": "college",
+        "to": "academicOrganization",
+        "cardinality": "one-to-many",
+        "description": "A College can contain multiple Academic_Organizations such as divisions, schools, or departments."
+      },
+      {
+        "id": "course_offering_has_section",
+        "name": "schedules",
+        "from": "courseOffering",
+        "to": "classSection",
+        "cardinality": "one-to-many",
+        "description": "A Course_Offering can be scheduled as many Class_Sections across Terms and Sessions."
+      },
+      {
+        "id": "class_section_for_course_offering",
+        "name": "of",
+        "from": "classSection",
+        "to": "courseOffering",
+        "cardinality": "many-to-one",
+        "description": "A Class_Section is the scheduled instance of one Course_Offering, joined by course_id and course_offer_number plus term, session, and section identifiers."
+      },
+      {
+        "id": "term_has_session",
+        "name": "has",
+        "from": "term",
+        "to": "session",
+        "cardinality": "one-to-many",
+        "description": "A Term can have multiple Sessions, and each Session is measured in number of weeks. For example, a 12-week Summer Term may contain 5-week summer sessions 1, 2, and 3."
+      },
+      {
+        "id": "session_part_of_term",
+        "name": "in",
+        "from": "session",
+        "to": "term",
+        "cardinality": "many-to-one",
+        "description": "A Session belongs to one Term."
+      },
+      {
+        "id": "class_section_offered_in_session",
+        "name": "in",
+        "from": "classSection",
+        "to": "session",
+        "cardinality": "many-to-one",
+        "description": "A Class_Section is offered in one Session, and the Session belongs to a Term."
+      },
+      {
+        "id": "session_has_class_section",
+        "name": "has",
+        "from": "session",
+        "to": "classSection",
+        "cardinality": "one-to-many",
+        "description": "A Session can include many Class_Sections."
+      },
+      {
+        "id": "class_section_has_enrollment_date_rule",
+        "name": "governed by",
+        "from": "classSection",
+        "to": "enrollmentDateRule",
+        "cardinality": "one-to-many",
+        "description": "A Class_Section is controlled by an Academic_Policy for open enrollment, add/drop dates, waitlist dates, and withdrawal deadlines."
+      },
+      {
+        "id": "class_section_taught_by",
+        "name": "taught by",
+        "from": "classSection",
+        "to": "professorInstructor",
+        "cardinality": "many-to-one",
+        "description": "A Class_Section is taught by a Professor_Instructor."
+      },
+      {
+        "id": "professor_instructor_teaches_class_section",
+        "name": "teaches",
+        "from": "professorInstructor",
+        "to": "classSection",
+        "cardinality": "one-to-many",
+        "description": "A Professor_Instructor teaches one or more Class_Sections."
+      },
+      {
+        "id": "professor_instructor_affiliated_with",
+        "name": "affiliated with",
+        "from": "professorInstructor",
+        "to": "academicOrganization",
+        "cardinality": "many-to-one",
+        "description": "A Professor_Instructor may be affiliated with an Academic_Organization."
+      },
+      {
+        "id": "class_section_has_meeting_pattern",
+        "name": "has",
+        "from": "classSection",
+        "to": "meetingPattern",
+        "cardinality": "one-to-many",
+        "description": "A Class_Section can have multiple Meeting_Patterns for lecture, lab, fieldwork, discussion, or other scheduled components."
+      },
+      {
+        "id": "meeting_pattern_occurs_in_facility_room",
+        "name": "occur in",
+        "from": "meetingPattern",
+        "to": "facilityRoom",
+        "cardinality": "many-to-one",
+        "description": "A Meeting_Pattern occurs in a specific Facility_Room."
+      },
+      {
+        "id": "facility_room_located_in_building",
+        "name": "in ",
+        "from": "facilityRoom",
+        "to": "building",
+        "cardinality": "many-to-one",
+        "description": "A Facility_Room is located in a Building."
+      },
+      {
+        "id": "building_located_on_campus",
+        "name": "on ",
+        "from": "building",
+        "to": "campus",
+        "cardinality": "many-to-one",
+        "description": "A Building is located on a Campus."
+      },
+      {
+        "id": "campus_belongs_to_academic_organization",
+        "name": "belongs to ",
+        "from": "campus",
+        "to": "college",
+        "cardinality": "many-to-one",
+        "description": "A Campus belongs to a College."
+      },
+      {
+        "id": "class_section_has_reserve_capacity_rule",
+        "name": "has",
+        "from": "classSection",
+        "to": "reserveCapacityRule",
+        "cardinality": "one-to-many",
+        "description": "A Class_Section can have multiple Reserve_Capacity_Rules that allow eligible student populations to enroll in the section."
+      },
+      {
+        "id": "reserve_capacity_rule_allows_enrollment_in_class_section",
+        "name": "applies to",
+        "from": "reserveCapacityRule",
+        "to": "classSection",
+        "cardinality": "many-to-one",
+        "description": "A Reserve_Capacity_Rule allows students in an eligible population to enroll in a Class_Section when seats are reserved for them."
+      },
+      {
+        "id": "class_section_has_attribute",
+        "name": "has",
+        "from": "classSection",
+        "to": "classAttribute",
+        "cardinality": "many-to-many",
+        "description": "A Class_Section can carry Liberal Studies, CCAT, component, modality, lecture, lab, fieldwork, or other attributes."
+      },
+      {
+        "id": "course_offering_has_requisite_rule",
+        "name": "has",
+        "from": "courseOffering",
+        "to": "requisiteRule",
+        "cardinality": "one-to-many",
+        "description": "A Course_Offering can have prerequisite, co-requisite, placement, equivalency, or recommended preparation rules that must be evaluated before a student takes a Class_Section of that offering."
+      },
+      {
+        "id": "requisite_rule_applies_to_course_offering",
+        "name": "applies to",
+        "from": "requisiteRule",
+        "to": "courseOffering",
+        "cardinality": "many-to-one",
+        "description": "The target Course_Offering the student wants to take. This is the offering whose Class_Sections are blocked or conditioned by the Requisite_Rule."
+      },
+      {
+        "id": "academic_program_has_requirement",
+        "name": "has",
+        "from": "academicProgram",
+        "to": "academicRequirement",
+        "cardinality": "one-to-many",
+        "description": "An Academic_Program has one or more Academic_Requirements."
+      },
+      {
+        "id": "academic_requirement_satisfied_by_course",
+        "name": "satisfied by ",
+        "from": "academicRequirement",
+        "to": "course",
+        "cardinality": "many-to-many",
+        "description": "An Academic_Requirement may be satisfied by one or more Courses."
+      },
+      {
+        "id": "academic_program_owned_by_academic_organization",
+        "name": "owned by ",
+        "from": "academicProgram",
+        "to": "academicOrganization",
+        "cardinality": "many-to-one",
+        "description": "An Academic_Program is owned by an Academic_Organization."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/nauclasssearchontology/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

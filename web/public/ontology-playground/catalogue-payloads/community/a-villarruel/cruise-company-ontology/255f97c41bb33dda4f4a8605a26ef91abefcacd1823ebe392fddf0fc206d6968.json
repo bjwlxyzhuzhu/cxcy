@@ -1,0 +1,520 @@
+{
+  "schemaVersion": 1,
+  "id": "community/a-villarruel/cruise-company-ontology",
+  "ontology": {
+    "name": "Cruise Company Operations",
+    "description": "Cruise line operations & guest experience.",
+    "entityTypes": [
+      {
+        "id": "new-entity-9",
+        "name": "LoyaltyTier",
+        "description": "Loyalty program levels (Silver, Gold, Platinum, Diamond).",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "tierName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "minimumPoints",
+            "type": "integer"
+          },
+          {
+            "name": "benefits",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-8",
+        "name": "Department",
+        "description": "Organizational unit (Hotel, Deck, Engine, Food & Beverage, Entertainment, etc.).",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "departmentName",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "headOfDepartment",
+            "type": "string"
+          },
+          {
+            "name": "budgetAllocation",
+            "type": "decimal"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-7",
+        "name": "CrewMember",
+        "description": "Employee working on the ship.",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "crewId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "fullName",
+            "type": "string"
+          },
+          {
+            "name": "position",
+            "type": "string"
+          },
+          {
+            "name": "department",
+            "type": "string"
+          },
+          {
+            "name": "nationality",
+            "type": "string"
+          },
+          {
+            "name": "contractStart",
+            "type": "date"
+          },
+          {
+            "name": "contractEnd",
+            "type": "date"
+          },
+          {
+            "name": "certifications",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-6",
+        "name": "OnboardService",
+        "description": "Any paid or complimentary service consumed onboard.",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "serviceId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "category",
+            "type": "enum"
+          },
+          {
+            "name": "priceType",
+            "type": "enum"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-5",
+        "name": "Excursion",
+        "description": "Shore excursion or tour.",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "excursionId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "pricePerPerson",
+            "type": "decimal"
+          },
+          {
+            "name": "durationHours",
+            "type": "decimal"
+          },
+          {
+            "name": "difficultyLevel",
+            "type": "enum"
+          },
+          {
+            "name": "maxParticipants",
+            "type": "integer"
+          },
+          {
+            "name": "languageOptions",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-4",
+        "name": "Port",
+        "description": "Destination port / city.",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "portCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "portName",
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "type": "string"
+          },
+          {
+            "name": "arrivalTime",
+            "type": "datetime"
+          },
+          {
+            "name": "departureTime",
+            "type": "datetime"
+          },
+          {
+            "name": "dockingType",
+            "type": "enum"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-3",
+        "name": "Itinerary",
+        "description": "Route and sequence of ports.",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "itineraryId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "routeType",
+            "type": "enum"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-2",
+        "name": "Cabin",
+        "description": "Individual stateroom or suite.",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "cabinNumber",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "cabinType",
+            "type": "enum"
+          },
+          {
+            "name": "deck",
+            "type": "string"
+          },
+          {
+            "name": "maxOccupancy",
+            "type": "integer"
+          },
+          {
+            "name": "basePrice",
+            "type": "decimal"
+          },
+          {
+            "name": "currentStatus",
+            "type": "enum"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-1",
+        "name": "Ship",
+        "description": "Physical vessel (e.g. Fabric Dream, Fabric Adventure)",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "shipId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "shipName",
+            "type": "string"
+          },
+          {
+            "name": "buildYear",
+            "type": "integer"
+          },
+          {
+            "name": "grossTonnage",
+            "type": "decimal"
+          },
+          {
+            "name": "passengerCapacity",
+            "type": "integer"
+          },
+          {
+            "name": "crewCapacity",
+            "type": "integer"
+          },
+          {
+            "name": "currentLocation",
+            "type": "string"
+          },
+          {
+            "name": "maintenanceStatus",
+            "type": "enum"
+          }
+        ]
+      },
+      {
+        "id": "customer",
+        "name": "Guest",
+        "description": "Individual passenger (includes loyalty members).",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "guestId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "fullName",
+            "type": "string"
+          },
+          {
+            "name": "dateOfBirth",
+            "type": "date"
+          },
+          {
+            "name": "nationality",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "phone",
+            "type": "string"
+          },
+          {
+            "name": "loyaltyNumber",
+            "type": "string"
+          },
+          {
+            "name": "loyaltyTier",
+            "type": "string"
+          },
+          {
+            "name": "totalCruisesTaken",
+            "type": "string"
+          },
+          {
+            "name": "lifetimeSpend",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "product",
+        "name": "Booking",
+        "description": "Reservation / booking record.",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "bookingId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "bookingDate",
+            "type": "date"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "unit": "USD"
+          },
+          {
+            "name": "totalAmount",
+            "type": "string"
+          },
+          {
+            "name": "depositPaid",
+            "type": "decimal"
+          },
+          {
+            "name": "finalPaymentDate",
+            "type": "date"
+          },
+          {
+            "name": "numberOfGuests",
+            "type": "integer"
+          },
+          {
+            "name": "currency",
+            "type": "enum"
+          }
+        ]
+      },
+      {
+        "id": "order",
+        "name": "Sailing",
+        "description": "Specific departure of a ship (e.g. 7-night Mediterranean on July 15).",
+        "icon": "⚡",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "sailingId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "departureDate",
+            "type": "date"
+          },
+          {
+            "name": "returnDate",
+            "type": "date",
+            "unit": "USD"
+          },
+          {
+            "name": "durationNights",
+            "type": "integer"
+          },
+          {
+            "name": "occupancyRate",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "enum"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-relates-to-10",
+        "name": "books",
+        "from": "customer",
+        "to": "new-entity-5",
+        "cardinality": "many-to-many",
+        "description": "Guests book excursions during a sailing (N:N)."
+      },
+      {
+        "id": "rel-relates-to-9",
+        "name": "is assigned to",
+        "from": "new-entity-7",
+        "to": "order",
+        "cardinality": "many-to-many",
+        "description": "A crew member is assigned to a sailing (N:N)."
+      },
+      {
+        "id": "rel-relates-to-8",
+        "name": "reserves",
+        "from": "product",
+        "to": "new-entity-2",
+        "cardinality": "many-to-one",
+        "description": "Booking reserves a cabin on a specific sailing (N:1)."
+      },
+      {
+        "id": "rel-relates-to-7",
+        "name": "belongs to",
+        "from": "customer",
+        "to": "new-entity-9",
+        "cardinality": "one-to-many",
+        "description": "Guest belongs to a Loyalty Tier (N:1)."
+      },
+      {
+        "id": "rel-relates-to-6",
+        "name": "belongs to",
+        "from": "new-entity-2",
+        "to": "new-entity-1",
+        "cardinality": "many-to-one",
+        "description": "Cabin belongs to a ship (N:1)."
+      },
+      {
+        "id": "rel-relates-to-5",
+        "name": "works in ",
+        "from": "new-entity-7",
+        "to": "new-entity-8",
+        "cardinality": "many-to-one",
+        "description": "The crew members work in one department (N:1)."
+      },
+      {
+        "id": "rel-relates-to-4",
+        "name": "consumes",
+        "from": "customer",
+        "to": "new-entity-6",
+        "cardinality": "many-to-many",
+        "description": "Guests consume onboard services (N:N, with date, amount spent, location on ship)."
+      },
+      {
+        "id": "rel-relates-to-3",
+        "name": "take place in",
+        "from": "new-entity-5",
+        "to": "new-entity-4",
+        "cardinality": "many-to-one",
+        "description": "Excursions take place in a port (N:1)."
+      },
+      {
+        "id": "rel-relates-to-2",
+        "name": "visits",
+        "from": "new-entity-3",
+        "to": "new-entity-4",
+        "cardinality": "one-to-many",
+        "description": "Itinerary visits ports (1:N, with sequence number and times)."
+      },
+      {
+        "id": "rel-relates-to-1",
+        "name": "follows a",
+        "from": "order",
+        "to": "new-entity-3",
+        "cardinality": "one-to-one",
+        "description": "Sailing follows a Itinerary."
+      },
+      {
+        "id": "r-places",
+        "name": "makes",
+        "from": "customer",
+        "to": "product",
+        "cardinality": "one-to-many",
+        "description": "Guest makes booking."
+      },
+      {
+        "id": "r-contains",
+        "name": "is operated by",
+        "from": "order",
+        "to": "new-entity-1",
+        "cardinality": "many-to-one",
+        "description": "Sailing is operated by a ship."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/cruise-company-operations/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

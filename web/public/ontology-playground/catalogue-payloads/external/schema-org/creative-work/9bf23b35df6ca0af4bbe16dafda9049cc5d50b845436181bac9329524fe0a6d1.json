@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "id": "external/schema-org/creative-work",
+  "ontology": {
+    "name": "Schema.org — CreativeWork",
+    "description": "Books, articles, movies and other creative works with authorship, publication, and ratings — a Schema.org subset.",
+    "entityTypes": [
+      {
+        "id": "creativeWork",
+        "name": "CreativeWork",
+        "description": "A book, article, movie, or other creative output",
+        "icon": "📖",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "title",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "genre",
+            "type": "string"
+          },
+          {
+            "name": "datePublished",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "person",
+        "name": "Person",
+        "description": "An author or contributor of a creative work",
+        "icon": "👤",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "personName",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "organization",
+        "name": "Organization",
+        "description": "A publisher or production company",
+        "icon": "🏢",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "orgName",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "rating",
+        "name": "Rating",
+        "description": "An aggregate or individual rating for a creative work",
+        "icon": "⭐",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "ratingValue",
+            "type": "decimal",
+            "isIdentifier": true
+          },
+          {
+            "name": "ratingCount",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "comment",
+        "name": "Comment",
+        "description": "A reader or viewer comment on a creative work",
+        "icon": "💬",
+        "color": "#E74C3C",
+        "properties": [
+          {
+            "name": "commentText",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "dateCreated",
+            "type": "date"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "author",
+        "name": "author",
+        "from": "creativeWork",
+        "to": "person",
+        "cardinality": "many-to-one",
+        "description": "The author of the creative work"
+      },
+      {
+        "id": "publisher",
+        "name": "publisher",
+        "from": "creativeWork",
+        "to": "organization",
+        "cardinality": "many-to-one",
+        "description": "The organization that published the work"
+      },
+      {
+        "id": "aggregateRating",
+        "name": "aggregateRating",
+        "from": "creativeWork",
+        "to": "rating",
+        "cardinality": "one-to-one",
+        "description": "The aggregate audience rating of the work"
+      },
+      {
+        "id": "hasComment",
+        "name": "hasComment",
+        "from": "creativeWork",
+        "to": "comment",
+        "cardinality": "one-to-many",
+        "description": "A reader or viewer comment on the work"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "https://schema.org/creative-work-subset/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

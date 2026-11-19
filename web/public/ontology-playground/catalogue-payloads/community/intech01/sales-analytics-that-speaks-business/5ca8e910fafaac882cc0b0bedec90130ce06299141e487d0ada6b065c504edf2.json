@@ -1,0 +1,419 @@
+{
+  "schemaVersion": 1,
+  "id": "community/intech01/sales-analytics-that-speaks-business",
+  "ontology": {
+    "name": "Sales Analytics That Speaks Business—Using Fabric IQ Ontology",
+    "description": "A Fabric IQ–powered sales ontology that turns transactional data into the language of the business — Customer places Order, Order generates Invoice, Return reduces Revenue — so leaders ask questions in plain business terms, not SQL.",
+    "entityTypes": [
+      {
+        "id": "customer",
+        "name": "Customer",
+        "description": "A person or organization that purchases goods or services from the company. Holds an address, maintains a balance, and engages in orders, invoices, and returns.",
+        "icon": "🙋‍♂️",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "customerId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "customerAddress",
+        "name": "Customer_Address",
+        "description": "A physical or mailing location associated with a customer, used for billing and delivery.",
+        "icon": "🏠",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "addressId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "item",
+        "name": "Item",
+        "description": "A product or service offered by the company. Can be ordered, stored in a warehouse, sold by a sales person, and transacted through a point of sale.",
+        "icon": "📦",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "itemId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "warehouse",
+        "name": "Warehouse",
+        "description": "A physical facility where items are stored, orders are fulfilled, and returns are processed. Owned and operated by the company.",
+        "icon": "🏭",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "warehouseId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "department",
+        "name": "Department",
+        "description": "An internal organizational unit that groups sales personnel, sits within a company, and contributes to overall revenue.",
+        "icon": "🏛️",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "departmentId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "salesPerson",
+        "name": "Sales_Person",
+        "description": "An employee who handles customer orders, sells items, works within a department, and is evaluated through sales performance.",
+        "icon": "💼",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "salesPersonId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "company",
+        "name": "Company",
+        "description": "The legal business entity that owns warehouses, operates points of sale, and employs sales personnel.",
+        "icon": "🏢",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "companyId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "order",
+        "name": "Order",
+        "description": "A request placed by a customer to purchase one or more items. Fulfilled from a warehouse, handled by a sales person, recorded at a point of sale, and generates an invoice.",
+        "icon": "🛒",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "orderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "orderDate",
+            "type": "datetime"
+          }
+        ]
+      },
+      {
+        "id": "invoice",
+        "name": "Invoice",
+        "description": "A billing document generated from an order and issued to a customer. Records the amount payable and contributes to revenue.",
+        "icon": "📝",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "invoiceId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "invoiceAmount",
+            "type": "decimal"
+          }
+        ]
+      },
+      {
+        "id": "return",
+        "name": "Return",
+        "description": "A transaction in which a customer sends back items from a prior order. Processed at a warehouse and reduces recognized revenue.",
+        "icon": "🚚",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "returnId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "customerBalance",
+        "name": "Customer_Balance",
+        "description": "The current outstanding monetary amount owed by, or credit held for, a customer at a given point in time.",
+        "icon": "📊",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "balanceId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "balanceAmount",
+            "type": "decimal"
+          }
+        ]
+      },
+      {
+        "id": "salesPerformance",
+        "name": "Sales_Performance",
+        "description": "A measure of a sales person's effectiveness over a period, evaluated in terms of revenue achieved.",
+        "icon": "📈",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "performanceId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "revenue",
+        "name": "Revenue",
+        "description": "The total monetary income recognized by the business, generated through invoices, departments, and points of sale, and reduced by returns.",
+        "icon": "💵",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "revenueId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "revenueValue",
+            "type": "decimal"
+          }
+        ]
+      },
+      {
+        "id": "pointOfSales",
+        "name": "Point_of_Sales",
+        "description": "A location or terminal where sales transactions are completed and recorded. Operated by the company and generates revenue.",
+        "icon": "💰",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "posId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "places",
+        "name": "places",
+        "from": "customer",
+        "to": "order",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "hasAddress",
+        "name": "has address",
+        "from": "customer",
+        "to": "customerAddress",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "maintains",
+        "name": "maintains balance",
+        "from": "customer",
+        "to": "customerBalance",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "receives",
+        "name": "receives",
+        "from": "customer",
+        "to": "invoice",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "files",
+        "name": "files return",
+        "from": "customer",
+        "to": "return",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "contains",
+        "name": "contains",
+        "from": "order",
+        "to": "item",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "fulfilledBy",
+        "name": "fulfilled by",
+        "from": "order",
+        "to": "warehouse",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "handledBy",
+        "name": "handled by",
+        "from": "order",
+        "to": "salesPerson",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "generatesInvoice",
+        "name": "generates invoice",
+        "from": "order",
+        "to": "invoice",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "recordedAt",
+        "name": "recorded at",
+        "from": "order",
+        "to": "pointOfSales",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "billedTo",
+        "name": "billed to",
+        "from": "invoice",
+        "to": "customer",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "contributesTo",
+        "name": "contributes to",
+        "from": "invoice",
+        "to": "revenue",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "references",
+        "name": "references",
+        "from": "return",
+        "to": "order",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "processedAt",
+        "name": "processed at",
+        "from": "return",
+        "to": "warehouse",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "reduces",
+        "name": "reduces revenue",
+        "from": "return",
+        "to": "revenue",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "storedIn",
+        "name": "stored in",
+        "from": "item",
+        "to": "warehouse",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "soldBy",
+        "name": "sold by",
+        "from": "item",
+        "to": "salesPerson",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "soldThrough",
+        "name": "sold through",
+        "from": "item",
+        "to": "pointOfSales",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "worksIn",
+        "name": "works in",
+        "from": "salesPerson",
+        "to": "department",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "hasPerformance",
+        "name": "has performance",
+        "from": "salesPerson",
+        "to": "salesPerformance",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "employedBy",
+        "name": "employed by",
+        "from": "salesPerson",
+        "to": "company",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "partOf",
+        "name": "part of",
+        "from": "department",
+        "to": "company",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "generatesRevenue",
+        "name": "generates revenue",
+        "from": "department",
+        "to": "revenue",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "owns",
+        "name": "owns",
+        "from": "company",
+        "to": "warehouse",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "operates",
+        "name": "operates",
+        "from": "company",
+        "to": "pointOfSales",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "measuredIn",
+        "name": "measured in",
+        "from": "salesPerformance",
+        "to": "revenue",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "posGeneratesRevenue",
+        "name": "generates revenue",
+        "from": "pointOfSales",
+        "to": "revenue",
+        "cardinality": "one-to-many"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/sales-analytics-that-speaks-businessusing-fabric-iq-ontology/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

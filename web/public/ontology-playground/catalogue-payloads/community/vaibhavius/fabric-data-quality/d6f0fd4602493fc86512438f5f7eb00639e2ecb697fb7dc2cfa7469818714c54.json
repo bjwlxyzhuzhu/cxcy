@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "id": "community/vaibhavius/fabric-data-quality",
+  "ontology": {
+    "name": "Fabric Data Quality Ontology",
+    "description": "",
+    "entityTypes": [
+      {
+        "id": "new-entity-8",
+        "name": "Resolution",
+        "description": "Represents actions taken to resolve the issue.",
+        "icon": "🎯",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "resolution_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "summary",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "date_implemented",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-7",
+        "name": "RootCause",
+        "description": "Represents the identified root cause of the issues.",
+        "icon": "📝",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "rootcause_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "short_description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-6",
+        "name": "DataPipeline",
+        "description": "Represents ingestion or transformation pipelines.",
+        "icon": "⚡",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "pipeline_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "pipeline_name",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "last_run_time",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-5",
+        "name": "DataAssets",
+        "description": "Represents Microsoft Fabric assets involved in the issue. (semantic models,reports, notebooks, LH,WH, dataflow etc)",
+        "icon": "🛒",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "asset_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "asset_name",
+            "type": "string"
+          },
+          {
+            "name": "asset_type",
+            "type": "string"
+          },
+          {
+            "name": "workspace_name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-3",
+        "name": "DataQualityIssues",
+        "description": "Represents a reported data issue affecting analytics or reporting.",
+        "icon": "📝",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "issue_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "issue_title",
+            "type": "string"
+          },
+          {
+            "name": "issue_description",
+            "type": "string"
+          },
+          {
+            "name": "severity",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "reported_datetime",
+            "type": "string"
+          },
+          {
+            "name": "issue_type",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-2",
+        "name": "DataEngineer",
+        "description": "Represents the engineer responsible for resolving data issues.",
+        "icon": "👤",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "engineer_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "engineer_name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-1",
+        "name": "User",
+        "description": "Represents a person interacting with the data solutions/process",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "user_id",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "user_name",
+            "type": "string"
+          },
+          {
+            "name": "user_email",
+            "type": "string"
+          },
+          {
+            "name": "user_role",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-relates-to-10",
+        "name": "provides",
+        "from": "new-entity-2",
+        "to": "new-entity-8",
+        "cardinality": "many-to-one",
+        "description": "One or many data engineers provide a solution"
+      },
+      {
+        "id": "rel-relates-to-9",
+        "name": "originates_from",
+        "from": "new-entity-3",
+        "to": "new-entity-6",
+        "cardinality": "many-to-many",
+        "description": "Data quality issues originating from data pipeline"
+      },
+      {
+        "id": "rel-relates-to-8",
+        "name": "linkedto_known",
+        "from": "new-entity-3",
+        "to": "new-entity-7",
+        "cardinality": "many-to-one",
+        "description": "Data quality issue can be linked to a known rootcause"
+      },
+      {
+        "id": "rel-relates-to-7",
+        "name": "fixes",
+        "from": "new-entity-2",
+        "to": "new-entity-6",
+        "cardinality": "one-to-many",
+        "description": "DataEngineer fixes pipeline"
+      },
+      {
+        "id": "rel-relates-to-6",
+        "name": "works_on",
+        "from": "new-entity-2",
+        "to": "new-entity-3",
+        "cardinality": "one-to-many",
+        "description": "Dataengineer works on the data quality issues."
+      },
+      {
+        "id": "rel-relates-to-5",
+        "name": "reports",
+        "from": "new-entity-1",
+        "to": "new-entity-3",
+        "cardinality": "one-to-many",
+        "description": "User reports data quality issue"
+      },
+      {
+        "id": "rel-relates-to-3",
+        "name": "impacts",
+        "from": "new-entity-3",
+        "to": "new-entity-5",
+        "cardinality": "one-to-many",
+        "description": "Data quality issue impacts one or more data assets"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/fabric-data-quality-ontology/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

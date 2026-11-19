@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "id": "official/ecommerce-step-1",
+  "ontology": {
+    "name": "E-Commerce Platform – Step 1",
+    "description": "Foundation: Buyer, Product, and Order with basic purchasing relationships.",
+    "entityTypes": [
+      {
+        "id": "buyer",
+        "name": "Buyer",
+        "description": "A customer who purchases products on the platform.",
+        "icon": "🛒",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "buyerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "memberSince",
+            "type": "date"
+          },
+          {
+            "name": "loyaltyTier",
+            "type": "string"
+          },
+          {
+            "name": "totalSpent",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "product",
+        "name": "Product",
+        "description": "An item available for purchase on the platform.",
+        "icon": "📦",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "sku",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "price",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "stockQty",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "order",
+        "name": "Order",
+        "description": "A purchase order placed by a buyer.",
+        "icon": "📋",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "orderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "orderDate",
+            "type": "datetime"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "total",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "shippingMethod",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "places",
+        "name": "places",
+        "from": "buyer",
+        "to": "order",
+        "cardinality": "one-to-many",
+        "description": "A buyer places an order."
+      },
+      {
+        "id": "includes",
+        "name": "includes",
+        "from": "order",
+        "to": "product",
+        "cardinality": "many-to-many",
+        "description": "An order includes one or more products."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/ecommerce-step-1/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "id": "official/fibo-risk-step-1",
+  "ontology": {
+    "name": "FIBO Risk Lab — Step 1",
+    "description": "Industry classification hierarchy for concentration risk analysis. Adapted from EDM Council FIBO. Source: https://github.com/edmcouncil/fibo — MIT License.",
+    "entityTypes": [
+      {
+        "id": "sector",
+        "name": "Sector",
+        "description": "Top-level economic sector grouping industries by broad function.",
+        "icon": "🏢",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "sectorCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "sectorName",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "subsector",
+        "name": "Subsector",
+        "description": "Subdivision of an economic sector for finer-grained classification.",
+        "icon": "🏗️",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "subsectorCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "subsectorName",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "industryGroup",
+        "name": "IndustryGroup",
+        "description": "NAICS-coded industry group with climate sensitivity and cyclicality attributes for risk analysis.",
+        "icon": "🏭",
+        "color": "#486991",
+        "properties": [
+          {
+            "name": "naicsCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "cyclicality",
+            "type": "string"
+          },
+          {
+            "name": "climateSensitivity",
+            "type": "string"
+          },
+          {
+            "name": "essentialServices",
+            "type": "boolean"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "partOfSector",
+        "name": "partOfSector",
+        "from": "subsector",
+        "to": "sector",
+        "cardinality": "many-to-one",
+        "description": "Links a subsector to its parent economic sector."
+      },
+      {
+        "id": "belongsToSubsector",
+        "name": "belongsToSubsector",
+        "from": "industryGroup",
+        "to": "subsector",
+        "cardinality": "many-to-one",
+        "description": "Links an industry group to its parent subsector."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/fibo-risk-step-1/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

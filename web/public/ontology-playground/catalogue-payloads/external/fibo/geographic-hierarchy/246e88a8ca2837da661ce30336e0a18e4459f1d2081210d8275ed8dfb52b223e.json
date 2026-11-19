@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "id": "external/fibo/geographic-hierarchy",
+  "ontology": {
+    "name": "FIBO Geographic Hierarchy",
+    "description": "Regions, countries, and jurisdictions with disaster-zone flags for climate risk analysis. Adapted from EDM Council FIBO. Source: https://github.com/edmcouncil/fibo — MIT License.",
+    "entityTypes": [
+      {
+        "id": "region",
+        "name": "Region",
+        "description": "Continental or geographic region grouping for macroeconomic analysis.",
+        "icon": "🌍",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "regionCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "regionName",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "disasterProfile",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "country",
+        "name": "Country",
+        "description": "Nation-state with economic zone, currency, and regulatory framework attributes.",
+        "icon": "🏳️",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "countryCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "countryName",
+            "type": "string"
+          },
+          {
+            "name": "economicZone",
+            "type": "string"
+          },
+          {
+            "name": "currency",
+            "type": "string"
+          },
+          {
+            "name": "regulatoryFramework",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "jurisdiction",
+        "name": "Jurisdiction",
+        "description": "Subnational jurisdiction with disaster-zone flags for hurricane, flood, earthquake, and wildfire risk.",
+        "icon": "📍",
+        "color": "#00B294",
+        "properties": [
+          {
+            "name": "code",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "hurricaneZone",
+            "type": "boolean"
+          },
+          {
+            "name": "floodZone",
+            "type": "boolean"
+          },
+          {
+            "name": "earthquakeZone",
+            "type": "boolean"
+          },
+          {
+            "name": "wildfireZone",
+            "type": "boolean"
+          },
+          {
+            "name": "coastal",
+            "type": "boolean"
+          },
+          {
+            "name": "latitude",
+            "type": "decimal"
+          },
+          {
+            "name": "longitude",
+            "type": "decimal"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "inCountry",
+        "name": "inCountry",
+        "from": "jurisdiction",
+        "to": "country",
+        "cardinality": "many-to-one",
+        "description": "Links a jurisdiction to the country it belongs to."
+      },
+      {
+        "id": "inRegion",
+        "name": "inRegion",
+        "from": "jurisdiction",
+        "to": "region",
+        "cardinality": "many-to-one",
+        "description": "Links a jurisdiction to its geographic region."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/fibo-geographic-hierarchy/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

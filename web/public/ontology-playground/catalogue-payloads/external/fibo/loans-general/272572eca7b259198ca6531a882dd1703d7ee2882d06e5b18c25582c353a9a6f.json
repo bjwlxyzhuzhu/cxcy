@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "id": "external/fibo/loans-general",
+  "ontology": {
+    "name": "FIBO Loans General (Adapted Subset)",
+    "description": "Adapted from EDM Council FIBO Loans ontology for educational use in Ontology Playground. This is a subset model aligned with classes and semantics from LOAN/LoansGeneral/Loans. Source: https://github.com/edmcouncil/fibo — MIT License.",
+    "entityTypes": [
+      {
+        "id": "loan",
+        "name": "Loan",
+        "description": "Debt instrument whereby one party extends money or credit to another party with repayment obligations. Adapted from fibo-loan-ln-ln:Loan.",
+        "icon": "📄",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "loanId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "principalAmount",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "isInterestOnly",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "borrower",
+        "name": "Borrower",
+        "description": "Party that signs loan obligations and is responsible for repayment. Adapted from fibo-loan-ln-ln:Borrower.",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "borrowerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "creditScore",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "lender",
+        "name": "Lender",
+        "description": "Party that provides loan capital and sets contractual lending terms. Adapted from fibo-loan-ln-ln:Lender.",
+        "icon": "🏦",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "lenderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "lenderType",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "collateral",
+        "name": "Collateral",
+        "description": "Asset pledged to secure repayment obligations under a loan agreement. Adapted from fibo-fbc-dae-dbt:Collateral.",
+        "icon": "🏠",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "assetType",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "appraisedValue",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "loanPaymentSchedule",
+        "name": "LoanPaymentSchedule",
+        "description": "Payment schedule associated with a loan-specific account. Adapted from fibo-loan-ln-ln:LoanPaymentSchedule.",
+        "icon": "🗓️",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "scheduleId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "expectedPayments",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "servicer",
+        "name": "Servicer",
+        "description": "Financial service provider that collects principal and interest on behalf of the lender. Adapted from fibo-loan-ln-ln:Servicer.",
+        "icon": "🧾",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "servicerId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "paymentHistory",
+        "name": "PaymentHistory",
+        "description": "Record of actual borrower payments toward principal, interest, and fees. Adapted from fibo-fbc-pas-caa:PaymentHistory.",
+        "icon": "📚",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "paymentHistoryId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "owedBy",
+        "name": "owedBy",
+        "from": "loan",
+        "to": "borrower",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the borrower obligated to repay it."
+      },
+      {
+        "id": "originatedBy",
+        "name": "originatedBy",
+        "from": "loan",
+        "to": "lender",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the lending organization that originated it."
+      },
+      {
+        "id": "securedBy",
+        "name": "securedBy",
+        "from": "loan",
+        "to": "collateral",
+        "cardinality": "one-to-many",
+        "description": "Relates a secured loan to pledged collateral assets."
+      },
+      {
+        "id": "repaidBySchedule",
+        "name": "repaidBySchedule",
+        "from": "loan",
+        "to": "loanPaymentSchedule",
+        "cardinality": "one-to-one",
+        "description": "Relates a loan to its payment schedule."
+      },
+      {
+        "id": "servicedBy",
+        "name": "servicedBy",
+        "from": "loan",
+        "to": "servicer",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the servicing organization collecting payments."
+      },
+      {
+        "id": "hasPaymentHistory",
+        "name": "hasPaymentHistory",
+        "from": "loanPaymentSchedule",
+        "to": "paymentHistory",
+        "cardinality": "one-to-one",
+        "description": "Links a payment schedule to payment history records."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "https://spec.edmcouncil.org/fibo/ontology/LOAN/LoansGeneral/Loans/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

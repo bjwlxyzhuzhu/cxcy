@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "id": "official/healthcare",
+  "ontology": {
+    "name": "Healthcare System",
+    "description": "Patient care management with providers, appointments, and treatments",
+    "entityTypes": [
+      {
+        "id": "patient",
+        "name": "Patient",
+        "description": "Individual receiving medical care",
+        "icon": "🏥",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "patientId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "mrn",
+            "type": "string"
+          },
+          {
+            "name": "dateOfBirth",
+            "type": "date"
+          },
+          {
+            "name": "bloodType",
+            "type": "string"
+          },
+          {
+            "name": "allergies",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "provider",
+        "name": "Provider",
+        "description": "Healthcare professional",
+        "icon": "👨‍⚕️",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "providerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "specialty",
+            "type": "string"
+          },
+          {
+            "name": "licenseNumber",
+            "type": "string"
+          },
+          {
+            "name": "department",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "appointment",
+        "name": "Appointment",
+        "description": "Scheduled patient visit",
+        "icon": "📅",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "appointmentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "scheduledTime",
+            "type": "datetime"
+          },
+          {
+            "name": "duration",
+            "type": "integer",
+            "unit": "minutes"
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "diagnosis",
+        "name": "Diagnosis",
+        "description": "Medical condition identified",
+        "icon": "🩺",
+        "color": "#D13438",
+        "properties": [
+          {
+            "name": "diagnosisId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "icdCode",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "severity",
+            "type": "string"
+          },
+          {
+            "name": "diagnosedDate",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "prescription",
+        "name": "Prescription",
+        "description": "Medication order",
+        "icon": "💊",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "rxNumber",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "medication",
+            "type": "string"
+          },
+          {
+            "name": "dosage",
+            "type": "string"
+          },
+          {
+            "name": "frequency",
+            "type": "string"
+          },
+          {
+            "name": "refillsRemaining",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "patient_has_appt",
+        "name": "has_appointment",
+        "from": "patient",
+        "to": "appointment",
+        "cardinality": "one-to-many",
+        "description": "Patient's scheduled visits"
+      },
+      {
+        "id": "provider_sees",
+        "name": "sees",
+        "from": "provider",
+        "to": "appointment",
+        "cardinality": "one-to-many",
+        "description": "Provider's appointments"
+      },
+      {
+        "id": "patient_diagnosed",
+        "name": "diagnosed_with",
+        "from": "patient",
+        "to": "diagnosis",
+        "cardinality": "one-to-many",
+        "description": "Patient diagnoses"
+      },
+      {
+        "id": "provider_diagnoses",
+        "name": "diagnoses",
+        "from": "provider",
+        "to": "diagnosis",
+        "cardinality": "one-to-many",
+        "description": "Diagnoses made by provider"
+      },
+      {
+        "id": "diagnosis_treated",
+        "name": "treated_by",
+        "from": "diagnosis",
+        "to": "prescription",
+        "cardinality": "one-to-many",
+        "description": "Prescriptions for diagnosis"
+      },
+      {
+        "id": "provider_prescribes",
+        "name": "prescribes",
+        "from": "provider",
+        "to": "prescription",
+        "cardinality": "one-to-many",
+        "description": "Provider prescriptions"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/healthcare-system/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

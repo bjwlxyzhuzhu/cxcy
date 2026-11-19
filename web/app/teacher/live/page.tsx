@@ -224,6 +224,7 @@ const DOCK = [
   { icon: "🧭", label: "引导师面板", href: "/teacher#panel", color: "#8b5cf6" },
   { icon: "📖", label: "课堂口径", href: "/apply/ontology?tab=glossary", color: "#0ea5e9" },
   { icon: "📘", label: "课程单元", href: "/course", color: "#22c55e" },
+  { icon: "🧩", label: "本体拼图", href: "/teacher/ontology-game", color: "#10b981" },
   { icon: "🏆", label: "参赛材料", href: "/teacher/contest", color: "#ec4899" },
   { icon: "👥", label: "名单导入", href: "/admin", color: "#14b8a6" },
 ];

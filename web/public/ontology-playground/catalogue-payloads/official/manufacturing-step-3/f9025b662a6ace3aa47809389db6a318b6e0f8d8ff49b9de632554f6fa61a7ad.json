@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "id": "official/manufacturing-step-3",
+  "ontology": {
+    "name": "Imported Ontology",
+    "description": "",
+    "entityTypes": [
+      {
+        "id": "machine",
+        "name": "Machine",
+        "description": "A manufacturing machine on the factory floor",
+        "icon": "🏭",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "machineId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "model",
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "lastMaintenance",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "sensor",
+        "name": "Sensor",
+        "description": "A sensor device that monitors machine parameters",
+        "icon": "📡",
+        "color": "#00B7C3",
+        "properties": [
+          {
+            "name": "sensorId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "unit",
+            "type": "string"
+          },
+          {
+            "name": "minThreshold",
+            "type": "decimal"
+          },
+          {
+            "name": "maxThreshold",
+            "type": "decimal"
+          }
+        ]
+      },
+      {
+        "id": "workorder",
+        "name": "Work-Order",
+        "description": "A work order for manufacturing a product",
+        "icon": "📋",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "workOrderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "product",
+            "type": "string"
+          },
+          {
+            "name": "quantity",
+            "type": "integer"
+          },
+          {
+            "name": "priority",
+            "type": "string"
+          },
+          {
+            "name": "dueDate",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "id": "part",
+        "name": "Part",
+        "description": "A component or spare part used in manufacturing",
+        "icon": "🔩",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "partNumber",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "stockLevel",
+            "type": "integer"
+          },
+          {
+            "name": "reorderPoint",
+            "type": "integer"
+          },
+          {
+            "name": "unitCost",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "qualitycheck",
+        "name": "Quality-Check",
+        "description": "A quality inspection performed on a work order",
+        "icon": "✅",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "checkId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "timestamp",
+            "type": "datetime"
+          },
+          {
+            "name": "passed",
+            "type": "boolean"
+          },
+          {
+            "name": "defectType",
+            "type": "string"
+          },
+          {
+            "name": "inspector",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "machine_has_sensor",
+        "name": "monitored_by",
+        "from": "machine",
+        "to": "sensor",
+        "cardinality": "one-to-many",
+        "description": "Sensors on machine"
+      },
+      {
+        "id": "machine_runs",
+        "name": "executes",
+        "from": "machine",
+        "to": "workorder",
+        "cardinality": "one-to-many",
+        "description": "Work orders on machine"
+      },
+      {
+        "id": "workorder_uses",
+        "name": "uses",
+        "from": "workorder",
+        "to": "part",
+        "cardinality": "many-to-many",
+        "description": "Parts consumed"
+      },
+      {
+        "id": "machine_maintains",
+        "name": "requires",
+        "from": "machine",
+        "to": "part",
+        "cardinality": "many-to-many",
+        "description": "Spare parts needed"
+      },
+      {
+        "id": "workorder_checked",
+        "name": "inspected_by",
+        "from": "workorder",
+        "to": "qualitycheck",
+        "cardinality": "one-to-many",
+        "description": "Quality inspections"
+      }
+    ]
+  },
+  "bindings": []
+}

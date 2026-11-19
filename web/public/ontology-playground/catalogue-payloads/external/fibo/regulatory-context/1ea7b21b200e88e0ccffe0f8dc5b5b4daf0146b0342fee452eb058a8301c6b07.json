@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "id": "external/fibo/regulatory-context",
+  "ontology": {
+    "name": "FIBO Regulatory Context",
+    "description": "Banking regulations and concentration limits for OCC, FDIC, and Basel III compliance. Adapted from EDM Council FIBO. Source: https://github.com/edmcouncil/fibo — MIT License.",
+    "entityTypes": [
+      {
+        "id": "regulation",
+        "name": "Regulation",
+        "description": "Regulatory framework issued by a banking authority (OCC, FDIC, Basel Committee) governing portfolio risk.",
+        "icon": "⚖️",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "regulationCode",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "issuingAuthority",
+            "type": "string"
+          },
+          {
+            "name": "effectiveDate",
+            "type": "date"
+          },
+          {
+            "name": "scope",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "regulatoryLimit",
+        "name": "RegulatoryLimit",
+        "description": "Quantitative threshold or limit imposed by a regulation on portfolio concentration, exposure, or capital ratios.",
+        "icon": "🚨",
+        "color": "#8764B8",
+        "properties": [
+          {
+            "name": "limitId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "limitName",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "thresholdPct",
+            "type": "decimal",
+            "unit": "%"
+          },
+          {
+            "name": "severity",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "mandatedBy",
+        "name": "mandatedBy",
+        "from": "regulatoryLimit",
+        "to": "regulation",
+        "cardinality": "many-to-one",
+        "description": "Links a regulatory limit to the regulation that mandates it."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/fibo-regulatory-context/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

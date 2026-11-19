@@ -1,0 +1,419 @@
+{
+  "schemaVersion": 1,
+  "id": "community/ravi-chandu/supply-chain-disruption-risk-propagation",
+  "ontology": {
+    "name": "Supply Chain Disruption & Risk Propagation",
+    "description": "Models how a disruption to one supplier cascades through components and product lines, enabling AI to recommend mitigation before the impact reaches customers.",
+    "entityTypes": [
+      {
+        "id": "supplier",
+        "name": "Supplier",
+        "description": "External company that provides raw materials or components",
+        "icon": "🏭",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "supplierId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique supplier identifier"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Supplier company name"
+          },
+          {
+            "name": "country",
+            "type": "string",
+            "description": "Country of operation"
+          },
+          {
+            "name": "tier",
+            "type": "enum",
+            "values": [
+              "Tier 1",
+              "Tier 2",
+              "Tier 3"
+            ],
+            "description": "Supply chain tier"
+          },
+          {
+            "name": "reliabilityScore",
+            "type": "decimal",
+            "description": "Historical on-time delivery score (0–100)"
+          },
+          {
+            "name": "singleSourced",
+            "type": "boolean",
+            "description": "True if no approved alternative exists"
+          }
+        ]
+      },
+      {
+        "id": "component",
+        "name": "Component",
+        "description": "A part, material, or sub-assembly sourced from one or more suppliers",
+        "icon": "🔩",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "componentId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique component identifier"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Component name"
+          },
+          {
+            "name": "category",
+            "type": "enum",
+            "values": [
+              "Electronic",
+              "Mechanical",
+              "Chemical",
+              "Packaging",
+              "Raw Material"
+            ],
+            "description": "Component category"
+          },
+          {
+            "name": "daysOfSupplyOnHand",
+            "type": "integer",
+            "unit": "days",
+            "description": "Current inventory buffer in days"
+          },
+          {
+            "name": "leadTimeDays",
+            "type": "integer",
+            "unit": "days",
+            "description": "Typical replenishment lead time"
+          },
+          {
+            "name": "criticalityLevel",
+            "type": "enum",
+            "values": [
+              "Critical",
+              "High",
+              "Medium",
+              "Low"
+            ],
+            "description": "Impact level if this component is unavailable"
+          }
+        ]
+      },
+      {
+        "id": "productLine",
+        "name": "ProductLine",
+        "description": "A group of finished products that share one or more common components",
+        "icon": "📦",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "productLineId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique product line identifier"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Product line name"
+          },
+          {
+            "name": "annualRevenue",
+            "type": "decimal",
+            "unit": "USD",
+            "description": "Annual revenue attributed to this product line"
+          },
+          {
+            "name": "marketSegment",
+            "type": "string",
+            "description": "Target market segment"
+          },
+          {
+            "name": "productionStatus",
+            "type": "enum",
+            "values": [
+              "Active",
+              "At Risk",
+              "Halted",
+              "Discontinued"
+            ],
+            "description": "Current production status"
+          }
+        ]
+      },
+      {
+        "id": "disruptionEvent",
+        "name": "DisruptionEvent",
+        "description": "An event that interrupts or threatens normal supply from one or more suppliers",
+        "icon": "⚠️",
+        "color": "#D13438",
+        "properties": [
+          {
+            "name": "eventId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique event identifier"
+          },
+          {
+            "name": "type",
+            "type": "enum",
+            "values": [
+              "Natural Disaster",
+              "Geopolitical",
+              "Financial",
+              "Logistics",
+              "Quality Recall",
+              "Pandemic",
+              "Cyber Attack"
+            ],
+            "description": "Category of disruption"
+          },
+          {
+            "name": "severity",
+            "type": "enum",
+            "values": [
+              "Critical",
+              "High",
+              "Medium",
+              "Low"
+            ],
+            "description": "Severity of the disruption"
+          },
+          {
+            "name": "startDate",
+            "type": "date",
+            "description": "When the disruption began"
+          },
+          {
+            "name": "estimatedDurationDays",
+            "type": "integer",
+            "unit": "days",
+            "description": "Expected duration of the disruption"
+          },
+          {
+            "name": "region",
+            "type": "string",
+            "description": "Geographic region affected"
+          }
+        ]
+      },
+      {
+        "id": "riskAssessment",
+        "name": "RiskAssessment",
+        "description": "An analysis of the business impact when a disruption affects the supply chain",
+        "icon": "📊",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "assessmentId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique assessment identifier"
+          },
+          {
+            "name": "assessedDate",
+            "type": "datetime",
+            "description": "When the assessment was performed"
+          },
+          {
+            "name": "revenueAtRisk",
+            "type": "decimal",
+            "unit": "USD",
+            "description": "Estimated revenue impacted if no action taken"
+          },
+          {
+            "name": "timeToImpactDays",
+            "type": "integer",
+            "unit": "days",
+            "description": "Days until production is affected if supply is not restored"
+          },
+          {
+            "name": "confidenceLevel",
+            "type": "enum",
+            "values": [
+              "High",
+              "Medium",
+              "Low"
+            ],
+            "description": "Confidence in the assessment accuracy"
+          },
+          {
+            "name": "recommendedAction",
+            "type": "string",
+            "description": "Top recommended response"
+          }
+        ]
+      },
+      {
+        "id": "mitigationAction",
+        "name": "MitigationAction",
+        "description": "A concrete step taken to reduce or eliminate the impact of a supply disruption",
+        "icon": "🛡️",
+        "color": "#008575",
+        "properties": [
+          {
+            "name": "actionId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique action identifier"
+          },
+          {
+            "name": "type",
+            "type": "enum",
+            "values": [
+              "Activate Alternative Supplier",
+              "Increase Safety Stock",
+              "Redesign Component",
+              "Reduce Production",
+              "Expedite Shipment",
+              "Customer Communication"
+            ],
+            "description": "Type of mitigation"
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "values": [
+              "Proposed",
+              "Approved",
+              "In Progress",
+              "Completed",
+              "Cancelled"
+            ],
+            "description": "Current action status"
+          },
+          {
+            "name": "estimatedCost",
+            "type": "decimal",
+            "unit": "USD",
+            "description": "Estimated cost to execute"
+          },
+          {
+            "name": "leadTimeSavedDays",
+            "type": "integer",
+            "unit": "days",
+            "description": "Days of disruption impact avoided by this action"
+          }
+        ]
+      },
+      {
+        "id": "alternativeSupplier",
+        "name": "AlternativeSupplier",
+        "description": "A qualified backup supplier capable of substituting for a disrupted primary supplier",
+        "icon": "🔄",
+        "color": "#CA5010",
+        "properties": [
+          {
+            "name": "altSupplierId",
+            "type": "string",
+            "isIdentifier": true,
+            "description": "Unique alternative supplier identifier"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Alternative supplier company name"
+          },
+          {
+            "name": "country",
+            "type": "string",
+            "description": "Country of operation"
+          },
+          {
+            "name": "qualificationStatus",
+            "type": "enum",
+            "values": [
+              "Pre-qualified",
+              "Approved",
+              "Pending Audit",
+              "Not Qualified"
+            ],
+            "description": "Supplier qualification status"
+          },
+          {
+            "name": "capacityAvailable",
+            "type": "integer",
+            "unit": "units/month",
+            "description": "Available monthly production capacity"
+          },
+          {
+            "name": "pricePremiumPercent",
+            "type": "decimal",
+            "unit": "%",
+            "description": "Cost premium vs primary supplier"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "supplier_supplies_component",
+        "name": "supplies",
+        "from": "supplier",
+        "to": "component",
+        "cardinality": "one-to-many",
+        "description": "A supplier provides one or more components to the operation"
+      },
+      {
+        "id": "component_usedin_productline",
+        "name": "usedIn",
+        "from": "component",
+        "to": "productLine",
+        "cardinality": "many-to-many",
+        "description": "A component is incorporated into one or more product lines"
+      },
+      {
+        "id": "disruption_affects_supplier",
+        "name": "affects",
+        "from": "disruptionEvent",
+        "to": "supplier",
+        "cardinality": "many-to-many",
+        "description": "A disruption event impacts the supply capability of a supplier"
+      },
+      {
+        "id": "disruption_triggers_assessment",
+        "name": "triggers",
+        "from": "disruptionEvent",
+        "to": "riskAssessment",
+        "cardinality": "one-to-many",
+        "description": "A disruption event causes one or more risk assessments to be performed"
+      },
+      {
+        "id": "assessment_recommends_mitigation",
+        "name": "recommends",
+        "from": "riskAssessment",
+        "to": "mitigationAction",
+        "cardinality": "one-to-many",
+        "description": "A risk assessment drives specific mitigation actions"
+      },
+      {
+        "id": "mitigation_activates_altsupplier",
+        "name": "activates",
+        "from": "mitigationAction",
+        "to": "alternativeSupplier",
+        "cardinality": "many-to-many",
+        "description": "A mitigation action may bring alternative suppliers into production"
+      },
+      {
+        "id": "altsupplier_canreplace_supplier",
+        "name": "canReplace",
+        "from": "alternativeSupplier",
+        "to": "supplier",
+        "cardinality": "many-to-one",
+        "description": "An alternative supplier is qualified to substitute for a primary supplier"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/supply-chain-disruption-risk-propagation/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

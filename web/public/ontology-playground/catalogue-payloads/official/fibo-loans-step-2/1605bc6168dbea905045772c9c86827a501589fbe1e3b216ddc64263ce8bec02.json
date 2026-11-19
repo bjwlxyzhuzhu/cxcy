@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "id": "official/fibo-loans-step-2",
+  "ontology": {
+    "name": "FIBO Loans Lab — Step 2",
+    "description": "Collateral and payment schedule concepts added to the core loan model. Adapted from EDM Council FIBO. Source: https://github.com/edmcouncil/fibo — MIT License.",
+    "entityTypes": [
+      {
+        "id": "loan",
+        "name": "Loan",
+        "description": "Debt instrument extended to a borrower and repaid according to contract terms.",
+        "icon": "📄",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "loanId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "principalAmount",
+            "type": "decimal",
+            "unit": "USD"
+          },
+          {
+            "name": "isInterestOnly",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "borrower",
+        "name": "Borrower",
+        "description": "Party that receives funds and assumes repayment obligations.",
+        "icon": "👤",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "borrowerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "creditScore",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "lender",
+        "name": "Lender",
+        "description": "Party that provides funds or credit under loan agreement terms.",
+        "icon": "🏦",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "lenderId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "collateral",
+        "name": "Collateral",
+        "description": "Asset pledged to secure repayment obligations. Adapted from fibo-fbc-dae-dbt:Collateral.",
+        "icon": "🏠",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "assetType",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "appraisedValue",
+            "type": "decimal",
+            "unit": "USD"
+          }
+        ]
+      },
+      {
+        "id": "loanPaymentSchedule",
+        "name": "LoanPaymentSchedule",
+        "description": "Regular schedule defining due dates and expected loan payments. Adapted from fibo-loan-ln-ln:LoanPaymentSchedule.",
+        "icon": "🗓️",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "scheduleId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "expectedPayments",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "owedBy",
+        "name": "owedBy",
+        "from": "loan",
+        "to": "borrower",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the borrower obligated to repay it."
+      },
+      {
+        "id": "originatedBy",
+        "name": "originatedBy",
+        "from": "loan",
+        "to": "lender",
+        "cardinality": "many-to-one",
+        "description": "Relates a loan to the lending organization that originated it."
+      },
+      {
+        "id": "securedBy",
+        "name": "securedBy",
+        "from": "loan",
+        "to": "collateral",
+        "cardinality": "one-to-many",
+        "description": "Relates a secured loan to pledged collateral assets."
+      },
+      {
+        "id": "repaidBySchedule",
+        "name": "repaidBySchedule",
+        "from": "loan",
+        "to": "loanPaymentSchedule",
+        "cardinality": "one-to-one",
+        "description": "Relates a loan to its payment schedule."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/fibo-loans-step-2/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

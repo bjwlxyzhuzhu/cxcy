@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 1,
+  "id": "community/demonjd2026-afk/incident-management",
+  "ontology": {
+    "name": "Incident Management",
+    "description": "Models the people, systems, and artifacts in an enterprise incident management workflow.",
+    "entityTypes": [
+      {
+        "id": "new-entity-12",
+        "name": "ChangeRequest",
+        "description": "The governed deployment vehicle through which a resolution is released to a controlled environment. Provides the audit trail, approval, and scheduled window required by enterprise change-management processes.",
+        "icon": "🏷️",
+        "color": "#008272",
+        "properties": [
+          {
+            "name": "crNumber",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "approver",
+            "type": "string"
+          },
+          {
+            "name": "plannedWindow",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-11",
+        "name": "Resolution",
+        "description": "The fix or workaround applied to close the incident. May be a permanent code fix, a configuration change, a rollback to a previous version, or a temporary workaround pending a longer-term solution.",
+        "icon": "🔧",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "resolutionId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "appliedAt",
+            "type": "datetime"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-10",
+        "name": "RootCause",
+        "description": "The underlying defect or condition that produced the incident. Categorized by type (code, configuration, data, or infrastructure) to support trend analysis and prevention.",
+        "icon": "🎯",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "rootCauseId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-9",
+        "name": "BusinessOwner",
+        "description": "The accountable owner of the affected application or business process. Reports the real-world impact, signs off on the resolution, and is the final stakeholder informed when the incident is closed.",
+        "icon": "👤",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "ownerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "businessUnit",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-8",
+        "name": "Tester",
+        "description": "Validates the proposed fix in lower environments before it is released. Confirms that the resolution actually solves the original incident and does not introduce regressions.",
+        "icon": "🔧",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "testerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "coverageArea",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-7",
+        "name": "BusinessAnalyst",
+        "description": "Translates technical incident details into business impact and vice versa. Helps the technical team understand what business processes are affected and helps the business understand what is being done about it.",
+        "icon": "📊",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "baId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "businessArea",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-6",
+        "name": "ScrumMaster",
+        "description": "The team coordinator who runs the incident response process. Removes blockers, manages communication, runs the war room or bridge call, and ensures the right people are engaged at the right time.",
+        "icon": "📋",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "scrumMasterId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "team",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-5",
+        "name": "SMEArchitect",
+        "description": "A subject-matter expert or architect with deep domain or technical knowledge. Consulted when an incident requires authority beyond a single developer, such as cross-system design decisions or complex root-cause analysis.",
+        "icon": "👤",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "smeId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "expertiseArea",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-4",
+        "name": "Developer",
+        "description": "The engineer assigned to investigate and fix the incident. Owns the technical debugging, code or configuration change, and works with other roles to drive the incident to resolution.",
+        "icon": "👤",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "developerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "team",
+            "type": "string"
+          },
+          {
+            "name": "onCallStatus",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-3",
+        "name": "Environment",
+        "description": "The deployment context where an incident occurs, such as Production, UAT, or Development. Distinguishing the environment is essential because the same defect can have very different business impact depending on where it surfaces.",
+        "icon": "🏢",
+        "color": "#00A9E0",
+        "properties": [
+          {
+            "name": "environmentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "name": "region",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-2",
+        "name": "Application",
+        "description": "A software service or system that delivers business functionality. The application is the subject of an incident — what is broken, slow, or behaving unexpectedly.",
+        "icon": "🌐",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "applicationId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "criticalityTier",
+            "type": "string"
+          },
+          {
+            "name": "techStack",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "new-entity-1",
+        "name": "Incident",
+        "description": "An unplanned disruption or degradation of a service that requires investigation and resolution. Tracked by severity, status, and SLA target from the moment it is reported until it is closed.",
+        "icon": "⚡",
+        "color": "#E81123",
+        "properties": [
+          {
+            "name": "incidentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "severity",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "openedAt",
+            "type": "datetime"
+          },
+          {
+            "name": "slaTarget",
+            "type": "string"
+          },
+          {
+            "name": "source",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel-relates-to-15",
+        "name": "affects",
+        "from": "new-entity-1",
+        "to": "new-entity-2",
+        "cardinality": "many-to-one",
+        "description": "An incident affects a specific application — the system that is broken or degraded."
+      },
+      {
+        "id": "rel-relates-to-14",
+        "name": "occursIn",
+        "from": "new-entity-1",
+        "to": "new-entity-3",
+        "cardinality": "many-to-one",
+        "description": "Identifies which environment the incident surfaced in (Production, UAT, Dev)."
+      },
+      {
+        "id": "rel-relates-to-13",
+        "name": "assignedTo",
+        "from": "new-entity-1",
+        "to": "new-entity-4",
+        "cardinality": "many-to-one",
+        "description": "When an incident requires deeper expertise, it escalates to a subject-matter expert or architect."
+      },
+      {
+        "id": "rel-relates-to-12",
+        "name": "escalatesTo",
+        "from": "new-entity-1",
+        "to": "new-entity-5",
+        "cardinality": "many-to-one",
+        "description": "When an incident requires deeper expertise, it escalates to a subject-matter expert or architect."
+      },
+      {
+        "id": "rel-relates-to-11",
+        "name": "coordinatedBy",
+        "from": "new-entity-1",
+        "to": "new-entity-6",
+        "cardinality": "many-to-one",
+        "description": "The scrum master who coordinates the response, runs the war room, and removes blockers."
+      },
+      {
+        "id": "rel-relates-to-10",
+        "name": "consults",
+        "from": "new-entity-4",
+        "to": "new-entity-7",
+        "cardinality": "many-to-many",
+        "description": "The developer consults the business analyst to understand business impact and clarify requirements."
+      },
+      {
+        "id": "rel-relates-to-9",
+        "name": "notifies",
+        "from": "new-entity-7",
+        "to": "new-entity-9",
+        "cardinality": "many-to-many",
+        "description": "The business analyst notifies the affected business owner about incident impact and progress."
+      },
+      {
+        "id": "rel-relates-to-8",
+        "name": "identifies",
+        "from": "new-entity-4",
+        "to": "new-entity-10",
+        "cardinality": "one-to-many",
+        "description": "The developer identifies the underlying defect or condition that caused the incident."
+      },
+      {
+        "id": "rel-relates-to-7",
+        "name": "leadsTo",
+        "from": "new-entity-10",
+        "to": "new-entity-11",
+        "cardinality": "one-to-many",
+        "description": "The root cause leads to a resolution - the fix or workaround that closes the incident."
+      },
+      {
+        "id": "rel-relates-to-6",
+        "name": "validatedBy",
+        "from": "new-entity-11",
+        "to": "new-entity-8",
+        "cardinality": "one-to-one",
+        "description": "The resolution is deployed to production through a governed change request, providing the audit trail."
+      },
+      {
+        "id": "rel-relates-to-5",
+        "name": "deployedVia",
+        "from": "new-entity-11",
+        "to": "new-entity-12",
+        "cardinality": "one-to-one",
+        "description": "The resolution is deployed to production through a governed change request, providing the audit trail."
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/incident-management/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}

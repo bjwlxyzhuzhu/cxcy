@@ -1,0 +1,353 @@
+{
+  "schemaVersion": 1,
+  "id": "official/zava-grove-to-shelf-step-4",
+  "ontology": {
+    "name": "Zava Grove-to-Shelf — Step 4: Retail Fulfillment",
+    "description": "Add RetailDC, Store, and Order to connect the supply chain to retail partners and revenue.",
+    "entityTypes": [
+      {
+        "id": "grower",
+        "name": "Grower",
+        "description": "A partner producer",
+        "icon": "👨‍🌾",
+        "color": "#498205",
+        "properties": [
+          {
+            "name": "growerId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "farm",
+        "name": "Farm",
+        "description": "A geographic site owned or contracted by a grower",
+        "icon": "🌾",
+        "color": "#6EAA1F",
+        "properties": [
+          {
+            "name": "farmId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "plot",
+        "name": "Plot",
+        "description": "A managed parcel within a farm",
+        "icon": "🌱",
+        "color": "#107C10",
+        "properties": [
+          {
+            "name": "plotId",
+            "type": "string",
+            "isIdentifier": true
+          }
+        ]
+      },
+      {
+        "id": "fruitvariety",
+        "name": "FruitVariety",
+        "description": "A commercial fruit or vegetable variety",
+        "icon": "🍊",
+        "color": "#FFB900",
+        "properties": [
+          {
+            "name": "varietyId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "commercialName",
+            "type": "string"
+          },
+          {
+            "name": "maxStorageTempC",
+            "type": "decimal",
+            "unit": "°C"
+          }
+        ]
+      },
+      {
+        "id": "harvestlot",
+        "name": "HarvestLot",
+        "description": "A traceable harvest event",
+        "icon": "📦",
+        "color": "#D83B01",
+        "properties": [
+          {
+            "name": "lotId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "kilograms",
+            "type": "decimal",
+            "unit": "kg"
+          },
+          {
+            "name": "qcGrade",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "qualitycheck",
+        "name": "QualityCheck",
+        "description": "One of the four-stage quality inspections",
+        "icon": "🔍",
+        "color": "#C239B3",
+        "properties": [
+          {
+            "name": "checkId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "stage",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "id": "shipment",
+        "name": "Shipment",
+        "description": "A reefer container or truck",
+        "icon": "🚛",
+        "color": "#0099BC",
+        "properties": [
+          {
+            "name": "shipmentId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "modality",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "coldchainsensor",
+        "name": "ColdChainSensor",
+        "description": "Temperature and humidity sensor on a shipment",
+        "icon": "🌡️",
+        "color": "#005A9E",
+        "properties": [
+          {
+            "name": "sensorId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "temperatureC",
+            "type": "decimal",
+            "unit": "°C"
+          }
+        ]
+      },
+      {
+        "id": "retaildc",
+        "name": "RetailDC",
+        "description": "A retailer's distribution centre receiving shipments",
+        "icon": "🏬",
+        "color": "#2D7D9A",
+        "properties": [
+          {
+            "name": "dcId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "type": "string"
+          },
+          {
+            "name": "retailerCode",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "store",
+        "name": "Store",
+        "description": "A retailer storefront supplied by a DC",
+        "icon": "🏪",
+        "color": "#5C2D91",
+        "properties": [
+          {
+            "name": "storeId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "retailerName",
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "order",
+        "name": "Order",
+        "description": "A purchase order placed by a store for a fruit variety",
+        "icon": "📋",
+        "color": "#0078D4",
+        "properties": [
+          {
+            "name": "orderId",
+            "type": "string",
+            "isIdentifier": true
+          },
+          {
+            "name": "kilograms",
+            "type": "decimal",
+            "unit": "kg"
+          },
+          {
+            "name": "orderDate",
+            "type": "date"
+          },
+          {
+            "name": "deliveryDate",
+            "type": "date"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "unitPriceEur",
+            "type": "decimal",
+            "unit": "EUR"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "grower-owns-farm",
+        "name": "GrowerOwnsFarm",
+        "from": "grower",
+        "to": "farm",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "farm-contains-plot",
+        "name": "FarmContainsPlot",
+        "from": "farm",
+        "to": "plot",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "plot-grows-fruitvariety",
+        "name": "PlotGrowsFruitVariety",
+        "from": "plot",
+        "to": "fruitvariety",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "harvestlot-fromplot-plot",
+        "name": "HarvestLotFromPlot",
+        "from": "harvestlot",
+        "to": "plot",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "harvestlot-ofvariety-fruitvariety",
+        "name": "HarvestLotOfVariety",
+        "from": "harvestlot",
+        "to": "fruitvariety",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "qualitycheck-checks-harvestlot",
+        "name": "QualityCheckChecksHarvestLot",
+        "from": "qualitycheck",
+        "to": "harvestlot",
+        "cardinality": "many-to-one"
+      },
+      {
+        "id": "shipment-carries-harvestlot",
+        "name": "ShipmentCarriesHarvestLot",
+        "from": "shipment",
+        "to": "harvestlot",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "shipment-monitoredby-coldchainsensor",
+        "name": "ShipmentMonitoredBySensor",
+        "from": "shipment",
+        "to": "coldchainsensor",
+        "cardinality": "one-to-many"
+      },
+      {
+        "id": "shipment-deliveredto-retaildc",
+        "name": "ShipmentDeliveredToRetailDC",
+        "from": "shipment",
+        "to": "retaildc",
+        "cardinality": "many-to-one",
+        "description": "A shipment is delivered to one retail DC"
+      },
+      {
+        "id": "retaildc-supplies-store",
+        "name": "RetailDCSuppliesStore",
+        "from": "retaildc",
+        "to": "store",
+        "cardinality": "one-to-many",
+        "description": "A DC supplies many retailer stores"
+      },
+      {
+        "id": "store-places-order",
+        "name": "StorePlacesOrder",
+        "from": "store",
+        "to": "order",
+        "cardinality": "one-to-many",
+        "description": "A store places one or more orders"
+      },
+      {
+        "id": "order-forvariety-fruitvariety",
+        "name": "OrderForVariety",
+        "from": "order",
+        "to": "fruitvariety",
+        "cardinality": "many-to-one",
+        "description": "Each order is for a specific fruit variety"
+      }
+    ],
+    "rdfMetadata": {
+      "ontologyIri": "http://example.org/ontology/zava-grove-to-shelf-step-4/",
+      "imports": [],
+      "preservedSourceFeatures": []
+    }
+  },
+  "bindings": []
+}
