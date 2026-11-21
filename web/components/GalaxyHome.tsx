@@ -271,7 +271,7 @@ export default function GalaxyHome({
   }
 
   return (
-    <>
+    <div className="theme-dark">
       <div className="deep" />
       <div className="neb n1" />
       <div className="neb n2" />
@@ -579,6 +579,6 @@ export default function GalaxyHome({
 
       {intro && <IntroSequence onDone={() => setIntro(false)} />}
       <Tour active={!intro} seenKey="home_tour_v3" steps={HOME_STEPS} />
-    </>
+    </div>
   );
 }

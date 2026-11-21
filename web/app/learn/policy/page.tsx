@@ -24,7 +24,7 @@ const MODULES: AgentModule[] = [
 export default function PolicyPage() {
   return (
     <LearnChrome emoji="🦒" title="政策解读" subtitle="选一个赛事/专题，进入专属对话 · AI 划重点">
-      <AgentModules modules={MODULES} accent="#22d3ee" askLabel="开始解读 →" />
+      <AgentModules modules={MODULES} accent="#0E7490" askLabel="开始解读 →" />
     </LearnChrome>
   );
 }

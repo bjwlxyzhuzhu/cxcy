@@ -12,26 +12,26 @@ const LINKS: Link[] = [
 export default function LinksPage() {
   return (
     <LearnChrome emoji="☄️" title="平台直达" subtitle="一键跳转攒经验、拿证书 · 合规导流">
-      <div style={{ display: "flex", gap: 10, padding: "12px 14px", borderRadius: 12, marginBottom: 20, background: "rgba(245,166,35,.08)", border: "1px solid rgba(245,166,35,.3)", fontSize: 12.5, color: "var(--ink)", lineHeight: 1.7 }}>
+      <div style={{ display: "flex", gap: 10, padding: "12px 14px", borderRadius: 12, marginBottom: 20, background: "rgba(245,166,35,.08)", border: "1px solid rgba(245,166,35,.3)", fontSize: 14, color: "var(--ink)", lineHeight: 1.7 }}>
         <span style={{ fontSize: 18 }}>⚠️</span>
         <span>本栏目仅提供<b>合规导流</b>：不代刷课、不代答题、不伪造证书。请遵守各平台规则与学术诚信，成果归你本人、AI 仅作辅助。</span>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 16 }}>
         {LINKS.map((l) => (
-          <div key={l.title} style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", backdropFilter: "blur(12px)", padding: 18, display: "flex", flexDirection: "column" }}>
+          <div key={l.title} style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", backdropFilter: "blur(12px)", padding: 18, display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
               <span style={{ fontSize: 24 }}>{l.icon}</span>
               <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>{l.title}</h3>
-              <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--cyan)", border: "1px solid rgba(34,211,238,.35)", borderRadius: 999, padding: "2px 9px" }}>{l.tag}</span>
+              <span style={{ marginLeft: "auto", fontSize: 14.5, color: "var(--cyan)", border: "1px solid rgba(34,211,238,.35)", borderRadius: 999, padding: "2px 9px" }}>{l.tag}</span>
             </div>
-            <p style={{ fontSize: 13, color: "var(--mut)", lineHeight: 1.65, marginBottom: 14, flex: 1 }}>{l.desc}</p>
+            <p style={{ fontSize: 14.5, color: "var(--mut)", lineHeight: 1.65, marginBottom: 14, flex: 1 }}>{l.desc}</p>
             {l.url ? (
               <a href={l.url} target="_blank" rel="noopener noreferrer"
-                style={{ alignSelf: "flex-start", padding: "9px 18px", borderRadius: 11, fontWeight: 700, fontSize: 13, color: "#05060f", background: "linear-gradient(120deg,var(--cyan),var(--violet))", textDecoration: "none" }}>
+                style={{ alignSelf: "flex-start", padding: "9px 18px", borderRadius: 11, fontWeight: 700, fontSize: 14.5, color: "#fff", background: "linear-gradient(120deg,var(--cyan),var(--violet))", textDecoration: "none" }}>
                 前往 →
               </a>
             ) : (
-              <span style={{ alignSelf: "flex-start", padding: "9px 18px", borderRadius: 11, fontWeight: 700, fontSize: 13, color: "var(--mut)", background: "rgba(255,255,255,.05)", border: "1px solid var(--line)" }}>
+              <span style={{ alignSelf: "flex-start", padding: "9px 18px", borderRadius: 11, fontWeight: 700, fontSize: 14.5, color: "var(--mut)", background: "#F1F5F9", border: "1px solid var(--line)" }}>
                 即将开放
               </span>
             )}

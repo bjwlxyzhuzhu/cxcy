@@ -47,7 +47,7 @@ export default function AdminConsole({ me }: { me: { id: string; name: string | 
               <button key={t.key} onClick={() => pick(t.key)}
                 style={{ padding: row === 1 ? "10px 18px" : "7px 14px", borderRadius: 999, fontSize: row === 1 ? 14 : 12.5, fontWeight: on ? 800 : 600, cursor: "pointer", fontFamily: "inherit",
                   border: "1px solid " + (on ? "rgba(34,211,238,.6)" : "var(--line)"),
-                  background: on ? "rgba(34,211,238,.16)" : "rgba(255,255,255,.04)", color: on ? "var(--cyan)" : "var(--ink)" }}>
+                  background: on ? "rgba(34,211,238,.16)" : "#F1F5F9", color: on ? "var(--cyan)" : "var(--ink)" }}>
                 {t.label}
               </button>
             );

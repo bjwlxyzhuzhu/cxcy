@@ -13,7 +13,7 @@ const SYSTEM = `你是“小创”，双创AI星际·创新中心的选题匹配
 export default function TopicPage() {
   return (
     <LearnChrome emoji="🦊" title="选题与赛道匹配" subtitle="小创主动问几轮，帮你锁定最合适的赛道 + 组别">
-      <p style={{ fontSize: 13, color: "var(--mut)", marginBottom: 16, lineHeight: 1.7 }}>
+      <p style={{ fontSize: 14.5, color: "var(--mut)", marginBottom: 16, lineHeight: 1.7 }}>
         小创会像导师一样跟你聊几轮，问清项目和团队情况，再依《国赛手册》给你推荐赛道、组别，并指出团队还缺哪类角色。
       </p>
       <CoachSession

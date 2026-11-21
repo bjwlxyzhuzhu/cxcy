@@ -4,9 +4,25 @@
 
 /* ===== 双创AI星际 · 银河探索 设计系统（移植自定稿原型） ===== */
 
-:root{--ink:#eef1fb;--mut:#9aa6c8;--cyan:#22d3ee;--violet:#7c5cff;--magenta:#ff5cf0;--line:rgba(255,255,255,.12)}
+/* ===== 浅色主题（清爽教育蓝，默认）：大字、高对比、留白；适合投影与年长评审阅读 ===== */
+:root{
+  --ink:#1F2937;--mut:#5B6577;--line:#E2E8F0;
+  --cyan:#0E7490;--violet:#5B21B6;--magenta:#BE185D;
+  --primary:#1E3A8A;--primary-2:#2E4BA8;--primary-soft:#EEF2FF;
+  --accent:#0891B2;--accent-soft:#ECFEFF;--orange:#EA580C;--orange-soft:#FFF7ED;
+  --ok:#15803D;--ok-soft:#F0FDF4;--warn:#B45309;--warn-soft:#FFFBEB;--danger:#B91C1C;--danger-soft:#FEF2F2;
+  --page:#F4F6FA;--card:#FFFFFF;--shadow:0 1px 2px rgba(15,23,42,.04),0 4px 14px rgba(15,23,42,.05);
+  --chart-1:#6366F1;--chart-2:#EC4899;--chart-3:#06B6D4;--chart-4:#F59E0B;--chart-5:#10B981;
+}
+/* 沉浸式页面（星系展示、创业星舰、对局大屏）保留深色 */
+.theme-dark{--ink:#eef1fb;--mut:#9aa6c8;--cyan:#22d3ee;--violet:#7c5cff;--magenta:#ff5cf0;--line:rgba(255,255,255,.12);--card:rgba(255,255,255,.04);--page:#05060f;color:var(--ink)}
+.theme-light{--ink:#1F2937;--mut:#5B6577;--line:#E2E8F0;--cyan:#0E7490;--violet:#5B21B6;--card:#fff;color:#1F2937}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:#05060f;overflow-x:hidden;line-height:1.6}
+body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:var(--page);overflow-x:hidden;line-height:1.7;font-size:16px}
+a{color:var(--primary)}
+select option{background:#fff;color:#1F2937}
+input::placeholder,textarea::placeholder{color:#94A3B8}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .deep{position:fixed;inset:0;z-index:-4;background:radial-gradient(120% 90% at 50% 28%,#0a1330,#05060f 70%);transition:background .8s}
 .neb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.5;z-index:-3;animation:drift 22s ease-in-out infinite;transition:background .8s}
 .n1{width:48vw;height:48vw;background:#1c4f9e;top:-8%;left:-6%}.n2{width:42vw;height:42vw;background:#0e6e8a;bottom:-10%;right:-6%;animation-delay:-8s}.n3{width:34vw;height:34vw;background:#2a3a9a;top:34%;left:40%;animation-delay:-14s}

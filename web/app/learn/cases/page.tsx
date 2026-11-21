@@ -67,9 +67,9 @@ export default function CasesPage() {
   }, [cases, q, cat, hasFilter]);
 
   const pill = (on: boolean): React.CSSProperties => ({
-    padding: "6px 13px", borderRadius: 999, fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap",
+    padding: "6px 13px", borderRadius: 999, fontSize: 14, cursor: "pointer", whiteSpace: "nowrap",
     border: "1px solid " + (on ? "rgba(34,211,238,.6)" : "var(--line)"),
-    background: on ? "rgba(34,211,238,.14)" : "rgba(255,255,255,.04)", color: on ? "var(--cyan)" : "var(--mut)",
+    background: on ? "rgba(34,211,238,.14)" : "#F1F5F9", color: on ? "var(--cyan)" : "var(--mut)",
   });
 
   return (
@@ -79,11 +79,11 @@ export default function CasesPage() {
       ) : (
         <>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="🔍 搜案例 / 产业 / 知识点…"
-            style={{ width: "min(360px,100%)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)", background: "rgba(255,255,255,.05)", color: "var(--ink)", fontSize: 14, outline: "none", marginBottom: 14 }} />
+            style={{ width: "min(360px,100%)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)", background: "#F1F5F9", color: "var(--ink)", fontSize: 14, outline: "none", marginBottom: 14 }} />
 
           {cats.length > 0 && (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 18, alignItems: "center" }}>
-              <span style={{ fontSize: 12, color: "var(--mut)", marginRight: 2 }}>产业</span>
+              <span style={{ fontSize: 15, color: "var(--mut)", marginRight: 2 }}>产业</span>
               {cats.map((it) => (<span key={it.name} style={pill(cat === it.name)} onClick={() => setCat(cat === it.name ? "" : it.name)}>{it.name}<span style={{ opacity: .6, marginLeft: 4 }}>{it.n}</span></span>))}
             </div>
           )}
@@ -100,14 +100,14 @@ export default function CasesPage() {
             <div style={{ color: "var(--mut)", padding: "40px 0", textAlign: "center" }}>没有匹配的案例，换个类目或关键词试试。</div>
           ) : (
             <>
-              <div style={{ fontSize: 12.5, color: "var(--mut)", marginBottom: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ fontSize: 14, color: "var(--mut)", marginBottom: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <span>{filtered.length} 个案例{cat && ` · ${cat}`}</span>
                 {(cat || q) && <span onClick={() => { setCat(""); setQ(""); }} style={{ cursor: "pointer", color: "var(--cyan)" }}>✕ 清除筛选</span>}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(248px,1fr))", gap: 14 }}>
                 {filtered.map((c) => (
                   <div key={c.id} onClick={() => setActive(c)}
-                    style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 16, cursor: "pointer", transition: "transform .15s, border-color .2s", display: "flex", flexDirection: "column", gap: 9, minHeight: 132 }}
+                    style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 16, cursor: "pointer", transition: "transform .15s, border-color .2s", display: "flex", flexDirection: "column", gap: 9, minHeight: 132 }}
                     onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "rgba(34,211,238,.5)"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = "var(--line)"; }}>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -115,8 +115,8 @@ export default function CasesPage() {
                       {c.industry && <Chip on>{c.industry}</Chip>}
                     </div>
                     <div style={{ fontWeight: 700, fontSize: 14.5, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{c.title}</div>
-                    {(c.points || []).length > 0 && <div style={{ fontSize: 11.5, color: "var(--mut)", lineHeight: 1.5 }}>🎯 {(c.points || []).slice(0, 3).join(" · ")}</div>}
-                    <span style={{ marginTop: "auto", fontSize: 12.5, fontWeight: 700, color: "var(--cyan)" }}>进入对话 →</span>
+                    {(c.points || []).length > 0 && <div style={{ fontSize: 14.5, color: "var(--mut)", lineHeight: 1.5 }}>🎯 {(c.points || []).slice(0, 3).join(" · ")}</div>}
+                    <span style={{ marginTop: "auto", fontSize: 14, fontWeight: 700, color: "var(--cyan)" }}>进入对话 →</span>
                   </div>
                 ))}
               </div>
@@ -131,14 +131,14 @@ export default function CasesPage() {
 }
 
 function Chip({ children, on }: { children: React.ReactNode; on?: boolean }) {
-  return <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 999, border: "1px solid " + (on ? "rgba(34,211,238,.4)" : "var(--line)"), color: on ? "var(--cyan)" : "var(--mut)" }}>{children}</span>;
+  return <span style={{ fontSize: 14.5, padding: "2px 9px", borderRadius: 999, border: "1px solid " + (on ? "rgba(34,211,238,.4)" : "var(--line)"), color: on ? "var(--cyan)" : "var(--mut)" }}>{children}</span>;
 }
 
 function Gate() {
   return (
-    <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: "40px 24px", textAlign: "center" }}>
+    <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: "40px 24px", textAlign: "center" }}>
       <div style={{ fontSize: 15, marginBottom: 14 }}>登录后即可浏览案例宝库 🐹</div>
-      <Link href="/login" style={{ padding: "10px 20px", borderRadius: 12, fontWeight: 700, color: "#05060f", background: "linear-gradient(120deg,var(--cyan),var(--violet))", textDecoration: "none" }}>去登录</Link>
+      <Link href="/login" style={{ padding: "10px 20px", borderRadius: 12, fontWeight: 700, color: "#fff", background: "linear-gradient(120deg,var(--cyan),var(--violet))", textDecoration: "none" }}>去登录</Link>
     </div>
   );
 }
@@ -157,8 +157,8 @@ function Detail({ c, onClose }: { c: Case; onClose: () => void }) {
           {c.region && <Chip>{c.region}</Chip>}{c.industry && <Chip on>{c.industry}</Chip>}
           {(c.points || []).map((p, i) => <Chip key={i}>{p}</Chip>)}
         </div>
-        {c.situation && <p style={{ fontSize: 13, color: "var(--mut)", lineHeight: 1.7, marginBottom: 12 }}>{c.situation}</p>}
-        <CoachSession key={c.code} system={system} greeting={greeting} accent="#22d3ee" multiline
+        {c.situation && <p style={{ fontSize: 14.5, color: "var(--mut)", lineHeight: 1.7, marginBottom: 12 }}>{c.situation}</p>}
+        <CoachSession key={c.code} system={system} greeting={greeting} accent="#0E7490" multiline
           exportTitle={`案例问答 · ${c.title}`}
           promptTags={["这个案例的商业模式是什么？", "它的目标用户和痛点是谁？", "我能学到哪些可复用的方法论？"]}
           placeholder="问这个案例，或说说你自己的项目让我帮你对照打磨…（📎 可传资料）"

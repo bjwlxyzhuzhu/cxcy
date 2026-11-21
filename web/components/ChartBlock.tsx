@@ -9,7 +9,7 @@ export type ChartSpec = {
   series: { name?: string; data: number[] }[];
 };
 
-const COLORS = ["#22d3ee", "#ff6b35", "#a78bfa", "#34d399", "#f5a623", "#f472b6", "#38bdf8"];
+const COLORS = ["#0E7490", "#C2410C", "#6D28D9", "#15803D", "#f5a623", "#BE185D", "#0369A1"];
 
 function parseSpec(raw: string): ChartSpec | null {
   try {
@@ -71,7 +71,7 @@ export function ChartSVG({ spec }: { spec: ChartSpec }) {
         {spec.labels.map((lb, i) => (
           <g key={i}>
             <rect x={cx + R + 26} y={PT + i * 18} width={10} height={10} rx={2} fill={COLORS[i % COLORS.length]} />
-            <text x={cx + R + 40} y={PT + i * 18 + 9} fontSize="11" fill="#c8d2ee">{lb} · {spec.series[0].data[i] ?? 0}</text>
+            <text x={cx + R + 40} y={PT + i * 18 + 9} fontSize="13" fill="#c8d2ee">{lb} · {spec.series[0].data[i] ?? 0}</text>
           </g>
         ))}
       </>
@@ -84,12 +84,12 @@ export function ChartSVG({ spec }: { spec: ChartSpec }) {
       <>
         {[0, 0.5, 1].map((r) => (
           <g key={r}>
-            <line x1={PL} y1={Y(maxV * r)} x2={W - PR} y2={Y(maxV * r)} stroke="rgba(255,255,255,.12)" strokeDasharray={r === 0 ? "" : "3 4"} />
-            <text x={PL - 5} y={Y(maxV * r)} fontSize="10" fill="#9aa6c8" textAnchor="end" dominantBaseline="middle">{Math.round(maxV * r)}</text>
+            <line x1={PL} y1={Y(maxV * r)} x2={W - PR} y2={Y(maxV * r)} stroke="#E2E8F0" strokeDasharray={r === 0 ? "" : "3 4"} />
+            <text x={PL - 5} y={Y(maxV * r)} fontSize="13" fill="#475569" textAnchor="end" dominantBaseline="middle">{Math.round(maxV * r)}</text>
           </g>
         ))}
         {spec.labels.map((lb, i) => (
-          <text key={i} x={PL + slot * i + slot / 2} y={H - PB + 16} fontSize="10.5" fill="#9aa6c8" textAnchor="middle">{lb.slice(0, 6)}</text>
+          <text key={i} x={PL + slot * i + slot / 2} y={H - PB + 16} fontSize="13" fill="#475569" textAnchor="middle">{lb.slice(0, 6)}</text>
         ))}
         {spec.type === "bar" && spec.series.map((s, si) =>
           s.data.map((v, i) => (
@@ -108,7 +108,7 @@ export function ChartSVG({ spec }: { spec: ChartSpec }) {
         {spec.series.some((s) => s.name) && spec.series.map((s, si) => (
           <g key={"lg" + si}>
             <rect x={PL + si * 90} y={4} width={10} height={10} rx={2} fill={COLORS[si % COLORS.length]} />
-            <text x={PL + si * 90 + 14} y={13} fontSize="10.5" fill="#c8d2ee">{s.name || `系列${si + 1}`}</text>
+            <text x={PL + si * 90 + 14} y={13} fontSize="13" fill="#c8d2ee">{s.name || `系列${si + 1}`}</text>
           </g>
         ))}
       </>
@@ -116,8 +116,8 @@ export function ChartSVG({ spec }: { spec: ChartSpec }) {
   }
 
   return (
-    <div style={{ border: "1px solid rgba(255,255,255,.14)", borderRadius: 12, background: "rgba(6,10,26,.55)", padding: "8px 6px", margin: "8px 0" }}>
-      {spec.title && <div style={{ fontSize: 12.5, fontWeight: 700, textAlign: "center", color: "#dce6ff", marginBottom: 2 }}>📈 {spec.title}</div>}
+    <div style={{ border: "1px solid #E2E8F0", borderRadius: 12, background: "rgba(6,10,26,.55)", padding: "8px 6px", margin: "8px 0" }}>
+      {spec.title && <div style={{ fontSize: 14, fontWeight: 700, textAlign: "center", color: "#dce6ff", marginBottom: 2 }}>📈 {spec.title}</div>}
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }}>{body}</svg>
     </div>
   );

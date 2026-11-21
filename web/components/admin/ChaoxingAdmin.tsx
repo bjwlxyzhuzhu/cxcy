@@ -32,25 +32,25 @@ export default function ChaoxingAdmin() {
   }
 
   const T = { ink: "var(--ink)", mut: "var(--mut)", line: "var(--line)" };
-  const box: React.CSSProperties = { border: `1px solid ${T.line}`, borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 18, marginTop: 16 };
-  const inp: React.CSSProperties = { width: "100%", padding: "9px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: "rgba(255,255,255,.05)", color: T.ink, fontSize: 13.5, outline: "none", fontFamily: "inherit", boxSizing: "border-box" };
-  const lbl: React.CSSProperties = { fontSize: 12, color: T.mut, margin: "10px 0 5px", display: "block" };
+  const box: React.CSSProperties = { border: `1px solid ${T.line}`, borderRadius: 16, background: "#F1F5F9", padding: 18, marginTop: 16 };
+  const inp: React.CSSProperties = { width: "100%", padding: "9px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: "#F1F5F9", color: T.ink, fontSize: 15, outline: "none", fontFamily: "inherit", boxSizing: "border-box" };
+  const lbl: React.CSSProperties = { fontSize: 15, color: T.mut, margin: "10px 0 5px", display: "block" };
   const Toggle = ({ on, set, text, hint }: { on: boolean; set: (v: boolean) => void; text: string; hint?: string }) => (
     <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", cursor: "pointer" }}>
-      <span onClick={() => set(!on)} style={{ width: 40, height: 22, borderRadius: 999, background: on ? "linear-gradient(120deg,#22d3ee,#7c5cff)" : "rgba(255,255,255,.12)", position: "relative", flex: "0 0 auto", transition: "background .2s" }}>
+      <span onClick={() => set(!on)} style={{ width: 40, height: 22, borderRadius: 999, background: on ? "linear-gradient(120deg,#0E7490,#7c5cff)" : "#E2E8F0", position: "relative", flex: "0 0 auto", transition: "background .2s" }}>
         <span style={{ position: "absolute", top: 2, left: on ? 20 : 2, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left .2s" }} />
       </span>
-      <span style={{ fontSize: 13.5, color: T.ink, fontWeight: 600 }}>{text}</span>
-      {hint && <span style={{ fontSize: 11.5, color: T.mut }}>{hint}</span>}
+      <span style={{ fontSize: 15, color: T.ink, fontWeight: 600 }}>{text}</span>
+      {hint && <span style={{ fontSize: 14.5, color: T.mut }}>{hint}</span>}
     </label>
   );
-  const btn = (bg: string): React.CSSProperties => ({ padding: "9px 18px", borderRadius: 10, border: bg === "ghost" ? `1px solid ${T.line}` : "none", cursor: "pointer", fontWeight: 700, fontSize: 13, color: bg === "ghost" ? T.ink : "#05060f", background: bg === "ghost" ? "transparent" : bg, fontFamily: "inherit" });
+  const btn = (bg: string): React.CSSProperties => ({ padding: "9px 18px", borderRadius: 10, border: bg === "ghost" ? `1px solid ${T.line}` : "none", cursor: "pointer", fontWeight: 700, fontSize: 14.5, color: bg === "ghost" ? T.ink : "#fff", background: bg === "ghost" ? "transparent" : bg, fontFamily: "inherit" });
 
-  if (loading) return <div style={{ color: T.mut, fontSize: 13 }}>加载配置中…</div>;
+  if (loading) return <div style={{ color: T.mut, fontSize: 14.5 }}>加载配置中…</div>;
 
   return (
     <div>
-      <div style={{ fontSize: 13, color: "#ffd9b0", background: "rgba(255,180,80,.1)", border: "1px solid rgba(255,180,80,.3)", borderRadius: 10, padding: "10px 13px" }}>
+      <div style={{ fontSize: 14.5, color: "#ffd9b0", background: "rgba(255,180,80,.1)", border: "1px solid rgba(255,180,80,.3)", borderRadius: 10, padding: "10px 13px" }}>
         🔗 超星（学习通）对接：填好机构与接口凭据即可对接学校超星平台。<b>「测试连接 / 同步名册」当前为演示</b>——真实对接需学校在超星开放平台开通并提供 AppKey/密钥，再按其接口联调。
       </div>
 
@@ -84,10 +84,10 @@ export default function ChaoxingAdmin() {
       </div>
 
       <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 16, flexWrap: "wrap" }}>
-        <button onClick={() => act("save", "保存")} disabled={!!busy} style={btn("linear-gradient(120deg,#22d3ee,#7c5cff)")}>{busy === "save" ? "保存中…" : "保存配置"}</button>
+        <button onClick={() => act("save", "保存")} disabled={!!busy} style={btn("linear-gradient(120deg,#0E7490,#7c5cff)")}>{busy === "save" ? "保存中…" : "保存配置"}</button>
         <button onClick={() => act("test", "测试连接")} disabled={!!busy} style={btn("ghost")}>{busy === "test" ? "测试中…" : "🔌 测试连接（演示）"}</button>
         <button onClick={() => act("sync-roster", "同步名册")} disabled={!!busy || !cfg.rosterSync} style={btn("ghost")}>{busy === "sync-roster" ? "同步中…" : "📥 同步名册（演示）"}</button>
-        {msg && <span style={{ fontSize: 13, color: msg.startsWith("✓") ? "#34d399" : "#ff9aa8" }}>{msg}</span>}
+        {msg && <span style={{ fontSize: 14.5, color: msg.startsWith("✓") ? "#15803D" : "#ff9aa8" }}>{msg}</span>}
       </div>
     </div>
   );

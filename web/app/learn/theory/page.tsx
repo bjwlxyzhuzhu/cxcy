@@ -27,7 +27,7 @@ const MODULES: AgentModule[] = [
 export default function TheoryPage() {
   return (
     <LearnChrome emoji="🐘" title="理论知识" subtitle="《创新创业基础》· 选一个模块，进入专属对话">
-      <AgentModules modules={MODULES} accent="#22d3ee" />
+      <AgentModules modules={MODULES} accent="#0E7490" />
     </LearnChrome>
   );
 }

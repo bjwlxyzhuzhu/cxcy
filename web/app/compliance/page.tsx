@@ -1,8 +1,8 @@
 import LearnChrome from "@/app/learn/LearnChrome";
 
-const card: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 20, marginBottom: 16 };
+const card: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 20, marginBottom: 16 };
 const h: React.CSSProperties = { fontSize: 15.5, fontWeight: 800, marginBottom: 10 };
-const li: React.CSSProperties = { fontSize: 13.5, color: "var(--ink)", lineHeight: 1.9 };
+const li: React.CSSProperties = { fontSize: 15, color: "var(--ink)", lineHeight: 1.9 };
 
 export default function CompliancePage() {
   return (

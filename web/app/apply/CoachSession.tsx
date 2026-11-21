@@ -18,7 +18,7 @@ export type EvidenceDesc = {
 
 /** 创新中心通用多轮对话面板（小创人设，接 RAG /api/ai/ask 含国赛手册）。选题/答辩/专家打磨共用。 */
 export default function CoachSession({
-  system, greeting, placeholder = "输入你的回答…", accent = "#ff6b35",
+  system, greeting, placeholder = "输入你的回答…", accent = "#C2410C",
   quickActions = [], onReply, multiline = false, exportTitle = "对话记录", promptTags = [], evidence,
 }: {
   system: string;
@@ -102,15 +102,15 @@ export default function CoachSession({
     msgs.map((m) => `\n**${m.role === "user" ? "🙋 我" : "🤖 助手"}：**\n\n${m.content}\n`).join("");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "min(64vh, 560px)", border: "1px solid var(--line)", borderRadius: 18, background: "rgba(10,14,34,.6)", backdropFilter: "blur(14px)", overflow: "hidden" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "min(64vh, 560px)", border: "1px solid var(--line)", borderRadius: 18, background: "#fff", backdropFilter: "blur(14px)", overflow: "hidden" }}>
       {hasChat && (
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderBottom: "1px solid var(--line)", flexWrap: "wrap" }}>
-          <span style={{ fontSize: 12, color: "var(--mut)" }}>导出问答：</span>
+          <span style={{ fontSize: 15, color: "var(--mut)" }}>导出问答：</span>
           {([["Markdown", () => { downloadMarkdown(fileBase + ".md", toMarkdown()); logClientEvidence("export_doc", { title: exportTitle, payload: { fmt: "md" } }); }],
              ["Word", () => { downloadWord(fileBase + ".doc", exportTitle, toMarkdown()); logClientEvidence("export_doc", { title: exportTitle, payload: { fmt: "word" } }); }],
              ["PDF", () => { printPdf(exportTitle, toMarkdown()); logClientEvidence("export_doc", { title: exportTitle, payload: { fmt: "pdf" } }); }]] as const).map(([lbl, fn]) => (
             <button key={lbl} onClick={fn}
-              style={{ fontSize: 11.5, padding: "5px 11px", borderRadius: 999, border: `1px solid ${accent}66`, background: `${accent}14`, color: accent, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>
+              style={{ fontSize: 14.5, padding: "5px 11px", borderRadius: 999, border: `1px solid ${accent}66`, background: `${accent}14`, color: accent, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>
               ⬇ {lbl}
             </button>
           ))}
@@ -120,20 +120,20 @@ export default function CoachSession({
         {msgs.map((m, i) => (
           <div key={i} style={{
             alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "86%",
-            padding: "10px 14px", borderRadius: 14, fontSize: 13.5, lineHeight: 1.7, whiteSpace: "pre-wrap",
-            color: m.role === "user" ? "#05060f" : "var(--ink)",
-            background: m.role === "user" ? `linear-gradient(120deg,${accent},#ffb657)` : "rgba(255,255,255,.05)",
+            padding: "10px 14px", borderRadius: 14, fontSize: 15, lineHeight: 1.7, whiteSpace: "pre-wrap",
+            color: m.role === "user" ? "#fff" : "var(--ink)",
+            background: m.role === "user" ? `linear-gradient(120deg,${accent},#ffb657)` : "#F1F5F9",
             border: m.role === "user" ? "none" : "1px solid var(--line)",
           }}>{m.content}</div>
         ))}
-        {sending && <div style={{ alignSelf: "flex-start", fontSize: 13, color: "var(--mut)" }}>小创思考中…</div>}
+        {sending && <div style={{ alignSelf: "flex-start", fontSize: 14.5, color: "var(--mut)" }}>小创思考中…</div>}
       </div>
 
       {quickActions.length > 0 && (
         <div style={{ display: "flex", gap: 8, padding: "0 12px 8px", flexWrap: "wrap" }}>
           {quickActions.map((a) => (
             <button key={a.label} onClick={() => send(a.message)} disabled={sending}
-              style={{ padding: "7px 14px", borderRadius: 999, border: `1px solid ${accent}88`, background: `${accent}1f`, color: accent, fontWeight: 700, fontSize: 12.5, cursor: sending ? "default" : "pointer", fontFamily: "inherit" }}>
+              style={{ padding: "7px 14px", borderRadius: 999, border: `1px solid ${accent}88`, background: `${accent}1f`, color: accent, fontWeight: 700, fontSize: 14, cursor: sending ? "default" : "pointer", fontFamily: "inherit" }}>
               {a.label}
             </button>
           ))}
@@ -142,10 +142,10 @@ export default function CoachSession({
 
       {promptTags.length > 0 && !input.trim() && (
         <div style={{ display: "flex", gap: 6, padding: "0 12px 8px", flexWrap: "wrap", alignItems: "center" }}>
-          <span style={{ fontSize: 11.5, color: "var(--mut)" }}>💡 试试问：</span>
+          <span style={{ fontSize: 14.5, color: "var(--mut)" }}>💡 试试问：</span>
           {promptTags.map((p) => (
             <button key={p} onClick={() => setInput(p)}
-              style={{ fontSize: 11.5, padding: "5px 11px", borderRadius: 999, border: "1px dashed var(--line)", background: "transparent", color: "var(--mut)", cursor: "pointer", fontFamily: "inherit" }}>
+              style={{ fontSize: 14.5, padding: "5px 11px", borderRadius: 999, border: "1px dashed var(--line)", background: "transparent", color: "var(--mut)", cursor: "pointer", fontFamily: "inherit" }}>
               {p}
             </button>
           ))}
@@ -161,22 +161,22 @@ export default function CoachSession({
           <textarea value={input} onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
             placeholder={placeholder} rows={2}
-            style={{ flex: 1, padding: "11px 14px", borderRadius: 12, border: "1px solid var(--line)", background: "rgba(255,255,255,.04)", color: "var(--ink)", fontSize: 14, outline: "none", resize: "vertical", minHeight: 46, fontFamily: "inherit", lineHeight: 1.6 }} />
+            style={{ flex: 1, padding: "11px 14px", borderRadius: 12, border: "1px solid var(--line)", background: "#F1F5F9", color: "var(--ink)", fontSize: 14, outline: "none", resize: "vertical", minHeight: 46, fontFamily: "inherit", lineHeight: 1.6 }} />
         ) : (
           <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send(input)}
             placeholder={placeholder}
-            style={{ flex: 1, padding: "11px 14px", borderRadius: 12, border: "1px solid var(--line)", background: "rgba(255,255,255,.04)", color: "var(--ink)", fontSize: 14, outline: "none" }} />
+            style={{ flex: 1, padding: "11px 14px", borderRadius: 12, border: "1px solid var(--line)", background: "#F1F5F9", color: "var(--ink)", fontSize: 14, outline: "none" }} />
         )}
         <button onClick={polish} disabled={polishing || sending || !input.trim()} title="一键润色：把你的提问改得更清晰、具体"
-          style={{ padding: "0 13px", height: 44, borderRadius: 12, border: `1px solid ${accent}66`, background: "transparent", color: accent, cursor: (polishing || sending || !input.trim()) ? "default" : "pointer", fontWeight: 700, fontSize: 12.5, whiteSpace: "nowrap", fontFamily: "inherit", opacity: !input.trim() ? 0.45 : 1 }}>
+          style={{ padding: "0 13px", height: 44, borderRadius: 12, border: `1px solid ${accent}66`, background: "transparent", color: accent, cursor: (polishing || sending || !input.trim()) ? "default" : "pointer", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap", fontFamily: "inherit", opacity: !input.trim() ? 0.45 : 1 }}>
           {polishing ? "润色中…" : "✨ 润色"}
         </button>
         <button onClick={() => send(input)} disabled={sending}
-          style={{ padding: "0 20px", height: 44, borderRadius: 12, border: "none", cursor: sending ? "default" : "pointer", fontWeight: 800, color: "#05060f", background: `linear-gradient(120deg,${accent},#ffb657)`, fontFamily: "inherit" }}>
+          style={{ padding: "0 20px", height: 44, borderRadius: 12, border: "none", cursor: sending ? "default" : "pointer", fontWeight: 800, color: "#fff", background: `linear-gradient(120deg,${accent},#ffb657)`, fontFamily: "inherit" }}>
           发送
         </button>
       </div>
-      <div style={{ fontSize: 10.5, color: "var(--mut)", textAlign: "center", padding: "0 12px 8px" }}>
+      <div style={{ fontSize: 14.5, color: "var(--mut)", textAlign: "center", padding: "0 12px 8px" }}>
         AI 辅助生成，请自行核验；最终判断与责任由师生承担
       </div>
     </div>

@@ -33,19 +33,19 @@ export default function DefensePage() {
     setScored({ axes, total: axes.reduce((s, a) => s + a.score, 0) });
   }
 
-  const sel: React.CSSProperties = { padding: "8px 12px", borderRadius: 10, border: "1px solid var(--line)", background: "rgba(255,255,255,.05)", color: "var(--ink)", fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" };
+  const sel: React.CSSProperties = { padding: "8px 12px", borderRadius: 10, border: "1px solid var(--line)", background: "#F1F5F9", color: "var(--ink)", fontSize: 15, cursor: "pointer", fontFamily: "inherit" };
 
   return (
     <LearnChrome emoji="🐺" title="模拟路演答辩" subtitle="评委 Agent 连环追问 · 按官方维度打分（雷达图）">
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 16 }}>
-        <span style={{ fontSize: 13, color: "var(--mut)" }}>选择赛道组别：</span>
+        <span style={{ fontSize: 14.5, color: "var(--mut)" }}>选择赛道组别：</span>
         <select value={track} onChange={(e) => setTrack(e.target.value)} style={sel}>
-          {TRACKS.map((t) => <option key={t.track} value={t.track} style={{ background: "#0a0e22" }}>{t.full || (t.alias ? `${t.track}（${t.alias}）` : t.track)}</option>)}
+          {TRACKS.map((t) => <option key={t.track} value={t.track} style={{ background: "#fff" }}>{t.full || (t.alias ? `${t.track}（${t.alias}）` : t.track)}</option>)}
         </select>
         <select value={group} onChange={(e) => setGroup(e.target.value)} style={sel}>
-          {groups.map((g) => <option key={g} value={g} style={{ background: "#0a0e22" }}>{g}</option>)}
+          {groups.map((g) => <option key={g} value={g} style={{ background: "#fff" }}>{g}</option>)}
         </select>
-        <span style={{ fontSize: 12, color: "var(--mut)" }}>评分维度：{rubric.map((d) => `${d.dim}${d.w}`).join(" / ")}</span>
+        <span style={{ fontSize: 15, color: "var(--mut)" }}>评分维度：{rubric.map((d) => `${d.dim}${d.w}`).join(" / ")}</span>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: scored ? "1fr 320px" : "1fr", gap: 18, alignItems: "start" }}>
@@ -61,10 +61,10 @@ export default function DefensePage() {
           evidence={{ kind: "defense_radar", title: `模拟答辩 · ${key}`, meta: { key }, rubric }}
         />
         {scored && (
-          <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 16 }}>
+          <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 16 }}>
             <div style={{ textAlign: "center", marginBottom: 6 }}>
-              <div style={{ fontSize: 12, color: "var(--mut)" }}>综合得分</div>
-              <div style={{ fontSize: 30, fontWeight: 800, color: "#ff6b35" }}>{scored.total}<span style={{ fontSize: 14, color: "var(--mut)" }}> / 100</span></div>
+              <div style={{ fontSize: 15, color: "var(--mut)" }}>综合得分</div>
+              <div style={{ fontSize: 30, fontWeight: 800, color: "#C2410C" }}>{scored.total}<span style={{ fontSize: 14, color: "var(--mut)" }}> / 100</span></div>
             </div>
             <RadarChart axes={scored.axes} />
           </div>

@@ -6,10 +6,10 @@ import { UNITS, LESSON_MARKS } from "@/lib/course";
 type Lesson = { id: string; class: string; unit_no: number; started_at: string; ended_at: string | null; marks: { key: string; label: string; at: string }[] };
 type Data = { scope: string; at: string; lessons: Lesson[]; stepReach: number[]; abilities: { key: string; label: string; avg: number }[]; stats: Record<string, number | null> };
 
-const card: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 16 };
-const th: React.CSSProperties = { textAlign: "left", padding: "8px 10px", fontSize: 12, color: "var(--mut)", borderBottom: "1px solid var(--line)", whiteSpace: "nowrap" };
-const td: React.CSSProperties = { padding: "8px 10px", borderBottom: "1px solid rgba(255,255,255,.05)", verticalAlign: "top", lineHeight: 1.6, fontSize: 12.5 };
-const sub: React.CSSProperties = { fontSize: 11.5, color: "var(--mut)", marginTop: 3 };
+const card: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 16 };
+const th: React.CSSProperties = { textAlign: "left", padding: "8px 10px", fontSize: 13.5, color: "var(--mut)", borderBottom: "1px solid var(--line)", whiteSpace: "nowrap" };
+const td: React.CSSProperties = { padding: "8px 10px", borderBottom: "1px solid #F1F5F9", verticalAlign: "top", lineHeight: 1.6, fontSize: 14 };
+const sub: React.CSSProperties = { fontSize: 13, color: "var(--mut)", marginTop: 3 };
 const mmss = (ms: number) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; };
 
 export default function TeachingRecord() {
@@ -24,10 +24,10 @@ export default function TeachingRecord() {
     return l.marks.map((m, i) => `${mmss(Date.parse(m.at) - t0)}–${mmss((l.marks[i + 1] ? Date.parse(l.marks[i + 1].at) : end) - t0)} ${m.label}`).join("\n");
   };
 
-  if (err) return <div style={{ ...card, color: "#ff7a8a" }}>{err}</div>;
+  if (err) return <div style={{ ...card, color: "#B91C1C" }}>{err}</div>;
   return (
     <div style={{ display: "grid", gap: 14 }}>
-      <div style={{ fontSize: 12.5, color: "var(--mut)" }}>统计范围：{d?.scope || "…"} · 截至 {d ? new Date(d.at).toLocaleString("zh-CN", { hour12: false }) : "…"} · 全部来自数据库真实记录</div>
+      <div style={{ fontSize: 14, color: "var(--mut)" }}>统计范围：{d?.scope || "…"} · 截至 {d ? new Date(d.at).toLocaleString("zh-CN", { hour12: false }) : "…"} · 全部来自数据库真实记录</div>
 
       <div style={card}>
         <b style={{ fontSize: 15 }}>教学成效统计</b>
@@ -35,10 +35,10 @@ export default function TeachingRecord() {
           {[["参与学生", v("students", " 人")], ["学生项目", v("projects", " 个")], ["已认证证据", v("evidence", " 条")], ["带用户原话的证据", v("quotes", " 条")], ["挂证据的决策", v("decisions", " 条")],
             ["发布 V0.2 的项目", v("versions2", " 个")], ["证伪并修正的假设", v("falsified", " 条")], ["教师确认的现实验证", v("verified", " 条")], ["AI 使用次数", v("aiUses", " 次")],
             ["学生核对认证", v("certifies", " 次")], ["驳回 AI 草稿", v("rejects", " 次")], ["干预卡回应率", v("cardRate", "%")]].map(([l, x]) => (
-            <div key={l} style={{ borderRadius: 12, padding: 10, border: "1px solid var(--line)" }}><div style={{ fontSize: 12, color: "var(--mut)" }}>{l}</div><div style={{ fontSize: 18, fontWeight: 900 }}>{x}</div></div>
+            <div key={l} style={{ borderRadius: 12, padding: 10, border: "1px solid var(--line)" }}><div style={{ fontSize: 13.5, color: "var(--mut)" }}>{l}</div><div style={{ fontSize: 18, fontWeight: 900 }}>{x}</div></div>
           ))}
         </div>
-        <div style={{ fontSize: 12.5, marginTop: 10, lineHeight: 1.8 }}>
+        <div style={{ fontSize: 14, marginTop: 10, lineHeight: 1.8 }}>
           对局中引用证据的比例：第 {v("roundFirst")} 轮 {v("citeFirst", "%")} → 第 {v("roundLast")} 轮 {v("citeLast", "%")}
           <br />五力（各项目平均条数）：{d?.abilities.map((a) => `${a.label} ${a.avg}`).join(" · ") || "暂无"}
         </div>
@@ -65,16 +65,16 @@ export default function TeachingRecord() {
 
       <div style={card}>
         <b style={{ fontSize: 15 }}>授课记录与环节时间轴</b>
-        <span style={{ fontSize: 12, color: "var(--mut)", marginLeft: 8 }}>在授课工作台上课时按环节打点生成</span>
-        {d?.lessons.length === 0 && <div style={{ fontSize: 13, color: "var(--mut)", marginTop: 8 }}>还没有授课记录。</div>}
+        <span style={{ fontSize: 13.5, color: "var(--mut)", marginLeft: 8 }}>在授课工作台上课时按环节打点生成</span>
+        {d?.lessons.length === 0 && <div style={{ fontSize: 14.5, color: "var(--mut)", marginTop: 8 }}>还没有授课记录。</div>}
         <div style={{ display: "grid", gap: 10, marginTop: 8 }}>
           {d?.lessons.map((l) => (
             <div key={l.id} style={{ borderTop: "1px solid var(--line)", paddingTop: 8 }}>
-              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", fontSize: 13 }}>
+              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", fontSize: 14.5 }}>
                 <b>第 {l.unit_no} 次课</b><span style={{ color: "var(--mut)" }}>{l.class || "未指定班级"} · {new Date(l.started_at).toLocaleString("zh-CN", { hour12: false })}</span>
-                {!l.ended_at && <span style={{ color: "#fbbf24" }}>上课中</span>}
+                {!l.ended_at && <span style={{ color: "#B45309" }}>上课中</span>}
                 <button onClick={async () => { try { await navigator.clipboard.writeText(timeline(l)); setCopied(l.id); setTimeout(() => setCopied(""), 1500); } catch { /* 忽略 */ } }}
-                  style={{ marginLeft: "auto", fontSize: 12, background: "none", border: "1px solid var(--line)", borderRadius: 8, color: "var(--ink)", cursor: "pointer", padding: "2px 8px", fontFamily: "inherit" }}>{copied === l.id ? "已复制" : "复制时间轴"}</button>
+                  style={{ marginLeft: "auto", fontSize: 13.5, background: "none", border: "1px solid var(--line)", borderRadius: 8, color: "var(--ink)", cursor: "pointer", padding: "2px 8px", fontFamily: "inherit" }}>{copied === l.id ? "已复制" : "复制时间轴"}</button>
               </div>
               <div style={{ display: "flex", height: 12, borderRadius: 4, overflow: "hidden", marginTop: 4 }}>
                 {l.marks.map((m, i) => {
@@ -83,7 +83,7 @@ export default function TeachingRecord() {
                   return <div key={i} title={m.label} style={{ flex: Math.max(1, w), minWidth: 2, background: LESSON_MARKS.find((x) => x.key === m.key)?.color || "#64748b" }} />;
                 })}
               </div>
-              <pre style={{ fontSize: 11.5, color: "var(--mut)", margin: "4px 0 0", whiteSpace: "pre-wrap", fontFamily: "monospace" }}>{timeline(l)}</pre>
+              <pre style={{ fontSize: 13, color: "var(--mut)", margin: "4px 0 0", whiteSpace: "pre-wrap", fontFamily: "monospace" }}>{timeline(l)}</pre>
             </div>
           ))}
         </div>

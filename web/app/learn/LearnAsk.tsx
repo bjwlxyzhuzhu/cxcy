@@ -37,25 +37,25 @@ export default function LearnAsk({ items, askLabel, system }: { items: AskItem[]
       {items.map((it, i) => {
         const a = ai[i];
         return (
-          <div key={i} style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", backdropFilter: "blur(12px)", padding: 18, display: "flex", flexDirection: "column" }}>
+          <div key={i} style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", backdropFilter: "blur(12px)", padding: 18, display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
               <span style={{ fontSize: 24 }}>{it.icon}</span>
               <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>{it.title}</h3>
             </div>
-            <p style={{ fontSize: 13, color: "var(--mut)", lineHeight: 1.65, marginBottom: it.points?.length ? 10 : 14 }}>{it.desc}</p>
+            <p style={{ fontSize: 14.5, color: "var(--mut)", lineHeight: 1.65, marginBottom: it.points?.length ? 10 : 14 }}>{it.desc}</p>
             {it.points && it.points.length > 0 && (
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
                 {it.points.map((p, k) => (
-                  <span key={k} style={{ fontSize: 11.5, color: "var(--cyan)", border: "1px solid rgba(34,211,238,.35)", borderRadius: 999, padding: "3px 10px" }}>{p}</span>
+                  <span key={k} style={{ fontSize: 14.5, color: "var(--cyan)", border: "1px solid rgba(34,211,238,.35)", borderRadius: 999, padding: "3px 10px" }}>{p}</span>
                 ))}
               </div>
             )}
             <button onClick={() => ask(i, it)} disabled={a?.loading}
-              style={{ marginTop: "auto", padding: "9px 16px", borderRadius: 11, border: "none", cursor: a?.loading ? "default" : "pointer", fontWeight: 700, fontSize: 13, color: "#05060f", background: "linear-gradient(120deg,var(--cyan),var(--violet))", alignSelf: "flex-start" }}>
+              style={{ marginTop: "auto", padding: "9px 16px", borderRadius: 11, border: "none", cursor: a?.loading ? "default" : "pointer", fontWeight: 700, fontSize: 14.5, color: "#fff", background: "linear-gradient(120deg,var(--cyan),var(--violet))", alignSelf: "flex-start" }}>
               {a?.loading ? "思考中…" : askLabel}
             </button>
             {a?.text && (
-              <div style={{ marginTop: 12, padding: 14, borderRadius: 12, background: "rgba(34,211,238,.06)", border: "1px solid rgba(34,211,238,.2)", fontSize: 13, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+              <div style={{ marginTop: 12, padding: 14, borderRadius: 12, background: "rgba(34,211,238,.06)", border: "1px solid rgba(34,211,238,.2)", fontSize: 14.5, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
                 {a.text}
               </div>
             )}

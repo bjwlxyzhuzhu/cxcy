@@ -37,21 +37,21 @@ export default function UsageStats() {
     };
   }, [logs]);
 
-  const card: React.CSSProperties = { flex: 1, minWidth: 150, border: "1px solid var(--line)", borderRadius: 14, background: "rgba(255,255,255,.04)", padding: "14px 16px" };
-  const box: React.CSSProperties = { flex: 1, minWidth: 300, border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 16 };
-  const th: React.CSSProperties = { textAlign: "left", padding: "7px 8px", fontSize: 12, color: "var(--mut)", fontWeight: 600, borderBottom: "1px solid var(--line)" };
-  const td: React.CSSProperties = { padding: "7px 8px", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,.05)" };
+  const card: React.CSSProperties = { flex: 1, minWidth: 150, border: "1px solid var(--line)", borderRadius: 14, background: "#F1F5F9", padding: "14px 16px" };
+  const box: React.CSSProperties = { flex: 1, minWidth: 300, border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 16 };
+  const th: React.CSSProperties = { textAlign: "left", padding: "7px 8px", fontSize: 13.5, color: "var(--mut)", fontWeight: 600, borderBottom: "1px solid var(--line)" };
+  const td: React.CSSProperties = { padding: "7px 8px", fontSize: 14.5, borderBottom: "1px solid #F1F5F9" };
 
   if (loading) return <div style={{ padding: 30, textAlign: "center", color: "var(--mut)" }}>加载中…</div>;
 
   return (
     <div>
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
-        <div style={card}><div style={{ fontSize: 12, color: "var(--mut)" }}>总调用次数</div><div style={{ fontSize: 26, fontWeight: 800, color: "var(--cyan)" }}>{agg.calls}</div></div>
-        <div style={card}><div style={{ fontSize: 12, color: "var(--mut)" }}>总消耗积分</div><div style={{ fontSize: 26, fontWeight: 800, color: "#ff8a5c" }}>{agg.cost}</div></div>
-        <div style={card}><div style={{ fontSize: 12, color: "var(--mut)" }}>活跃用户</div><div style={{ fontSize: 26, fontWeight: 800 }}>{new Set(logs.map((l) => l.user_id)).size}</div></div>
+        <div style={card}><div style={{ fontSize: 13.5, color: "var(--mut)" }}>总调用次数</div><div style={{ fontSize: 26, fontWeight: 800, color: "var(--cyan)" }}>{agg.calls}</div></div>
+        <div style={card}><div style={{ fontSize: 13.5, color: "var(--mut)" }}>总消耗积分</div><div style={{ fontSize: 26, fontWeight: 800, color: "#ff8a5c" }}>{agg.cost}</div></div>
+        <div style={card}><div style={{ fontSize: 13.5, color: "var(--mut)" }}>活跃用户</div><div style={{ fontSize: 26, fontWeight: 800 }}>{new Set(logs.map((l) => l.user_id)).size}</div></div>
       </div>
-      <div style={{ fontSize: 11.5, color: "var(--mut)", marginBottom: 14 }}>（基于最近 {logs.length} 条调用记录）</div>
+      <div style={{ fontSize: 13, color: "var(--mut)", marginBottom: 14 }}>（基于最近 {logs.length} 条调用记录）</div>
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
         <div style={box}>

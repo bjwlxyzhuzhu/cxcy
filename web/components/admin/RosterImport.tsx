@@ -77,12 +77,12 @@ export default function RosterImport() {
     setBusy(false);
   }
 
-  const inp: React.CSSProperties = { padding: "8px 12px", borderRadius: 10, border: "1px solid var(--line)", background: "rgba(255,255,255,.05)", color: "var(--ink)", fontSize: 13.5, outline: "none", fontFamily: "inherit" };
+  const inp: React.CSSProperties = { padding: "8px 12px", borderRadius: 10, border: "1px solid var(--line)", background: "#F1F5F9", color: "var(--ink)", fontSize: 15, outline: "none", fontFamily: "inherit" };
 
   return (
     <div>
-      <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 18, marginBottom: 18 }}>
-        <div style={{ fontSize: 13.5, color: "var(--mut)", lineHeight: 1.7, marginBottom: 14 }}>
+      <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 18, marginBottom: 18 }}>
+        <div style={{ fontSize: 15, color: "var(--mut)", lineHeight: 1.7, marginBottom: 14 }}>
           上传名单（CSV 或 XLSX），表头需包含 <b style={{ color: "var(--ink)" }}>学号（或工号）、姓名</b>，可选 <b style={{ color: "var(--ink)" }}>角色</b>（学生 / 教师 / 管理员，不填按下方默认）、班级、学院、专业。
           <br />学生与老师关联：教师行填 <b style={{ color: "var(--ink)" }}>授课班级</b>（多个用顿号隔开），或学生行填 <b style={{ color: "var(--ink)" }}>任课教师</b>（教师工号）。教师导入学生名单时，这些班级自动关联到本人；教师 / 管理员账号只能由管理员导入。已存在的账号会重置初始密码（可重复导入）。
           <div style={{ marginTop: 8 }}><button onClick={downloadTemplate} style={smallBtn}>⬇ 下载名单模板</button></div>
@@ -92,20 +92,20 @@ export default function RosterImport() {
             📎 选择文件
             <input type="file" accept=".csv,.xlsx,.xls" onChange={onFile} style={{ display: "none" }} />
           </label>
-          {fileName && <span style={{ fontSize: 12.5, color: "var(--mut)" }}>{fileName} · 解析到 {rows.length} 行</span>}
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--mut)" }}>默认角色
+          {fileName && <span style={{ fontSize: 14, color: "var(--mut)" }}>{fileName} · 解析到 {rows.length} 行</span>}
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "var(--mut)" }}>默认角色
             <select value={defaultRole} onChange={(e) => setDefaultRole(e.target.value)} style={{ ...inp, width: 100 }}>
-              {Object.entries(ROLE_LABEL).map(([v, l]) => <option key={v} value={v} style={{ background: "#0a0e22" }}>{l}</option>)}
+              {Object.entries(ROLE_LABEL).map(([v, l]) => <option key={v} value={v} style={{ background: "#fff" }}>{l}</option>)}
             </select></span>
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--mut)" }}><input type="checkbox" checked={randomPasswords} onChange={(e) => setRandomPasswords(e.target.checked)} /> 每人随机临时密码</label>
-          {!randomPasswords && <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--mut)" }}>统一初始密码 <input value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inp, width: 150 }} /></span>}
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--mut)" }}>初始积分 <input type="number" value={credits} onChange={(e) => setCredits(Math.max(0, parseInt(e.target.value) || 0))} style={{ ...inp, width: 90 }} /></span>
+          <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "var(--mut)" }}><input type="checkbox" checked={randomPasswords} onChange={(e) => setRandomPasswords(e.target.checked)} /> 每人随机临时密码</label>
+          {!randomPasswords && <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "var(--mut)" }}>统一初始密码 <input value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inp, width: 150 }} /></span>}
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "var(--mut)" }}>初始积分 <input type="number" value={credits} onChange={(e) => setCredits(Math.max(0, parseInt(e.target.value) || 0))} style={{ ...inp, width: 90 }} /></span>
           <button onClick={doImport} disabled={!rows.length || busy}
-            style={{ padding: "9px 18px", borderRadius: 10, border: "none", fontWeight: 800, fontSize: 13.5, color: "#05060f", cursor: (!rows.length || busy) ? "default" : "pointer", background: "linear-gradient(120deg,var(--cyan),var(--violet))", opacity: (!rows.length || busy) ? 0.5 : 1, fontFamily: "inherit" }}>
+            style={{ padding: "9px 18px", borderRadius: 10, border: "none", fontWeight: 800, fontSize: 15, color: "#fff", cursor: (!rows.length || busy) ? "default" : "pointer", background: "linear-gradient(120deg,var(--cyan),var(--violet))", opacity: (!rows.length || busy) ? 0.5 : 1, fontFamily: "inherit" }}>
             {busy ? "导入中…" : `确认导入 ${rows.length} 个账号`}
           </button>
         </div>
-        {err && <div style={{ color: "#ff7a8a", fontSize: 13, marginTop: 12 }}>{err}</div>}
+        {err && <div style={{ color: "#B91C1C", fontSize: 14.5, marginTop: 12 }}>{err}</div>}
       </div>
 
       {rows.length > 0 && !result && (
@@ -113,16 +113,16 @@ export default function RosterImport() {
       )}
 
       {result && (
-        <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 18 }}>
+        <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 18 }}>
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 10 }}>
-            导入完成：<span style={{ color: "var(--cyan)" }}>新建 {result.created}</span> · <span style={{ color: "var(--mut)" }}>已存在 {result.exists}</span>{result.failed > 0 && <> · <span style={{ color: "#ff7a8a" }}>失败 {result.failed}</span></>}
+            导入完成：<span style={{ color: "var(--cyan)" }}>新建 {result.created}</span> · <span style={{ color: "var(--mut)" }}>已存在 {result.exists}</span>{result.failed > 0 && <> · <span style={{ color: "#B91C1C" }}>失败 {result.failed}</span></>}
           </div>
-          {(result.linked || 0) > 0 && <div style={{ fontSize: 12.5, color: "#34d399", marginBottom: 6 }}>新建班级与教师关联 {result.linked} 条</div>}
-          {(result.missingTeachers?.length || 0) > 0 && <div style={{ fontSize: 12.5, color: "#fbbf24", marginBottom: 6 }}>这些任课教师工号还没有教师账号，未能关联：{result.missingTeachers!.join("、")}（先导入教师再重导学生即可）</div>}
-          <div style={{ fontSize: 12.5, color: "var(--mut)", marginBottom: 12 }}>{randomPasswords ? "已为每位生成独立临时密码，请下载凭据表后逐人发放；学生首次登录后须修改密码。" : <>所有账号初始密码：<b style={{ color: "var(--ink)" }}>{password}</b>，请通知首次登录后到「账户中心」修改。</>}</div>
+          {(result.linked || 0) > 0 && <div style={{ fontSize: 14, color: "#15803D", marginBottom: 6 }}>新建班级与教师关联 {result.linked} 条</div>}
+          {(result.missingTeachers?.length || 0) > 0 && <div style={{ fontSize: 14, color: "#B45309", marginBottom: 6 }}>这些任课教师工号还没有教师账号，未能关联：{result.missingTeachers!.join("、")}（先导入教师再重导学生即可）</div>}
+          <div style={{ fontSize: 14, color: "var(--mut)", marginBottom: 12 }}>{randomPasswords ? "已为每位生成独立临时密码，请下载凭据表后逐人发放；学生首次登录后须修改密码。" : <>所有账号初始密码：<b style={{ color: "var(--ink)" }}>{password}</b>，请通知首次登录后到「账户中心」修改。</>}</div>
           {randomPasswords && <button onClick={() => downloadCredentials(result.results)} style={{ ...smallBtn }}>⬇ 下载账号凭据 CSV</button>}
           {result.failed > 0 && (
-            <div style={{ fontSize: 12.5, color: "#ff9aa6" }}>
+            <div style={{ fontSize: 14, color: "#B91C1C" }}>
               失败明细：{result.results.filter((r) => r.status === "failed").map((r) => `${r.student_no || "(无学号)"}(${r.error})`).join("；")}
             </div>
           )}
@@ -144,15 +144,15 @@ function downloadTemplate() {
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" })); a.download = "名单模板.csv"; a.click(); URL.revokeObjectURL(a.href);
 }
 
-const smallBtn: React.CSSProperties = { padding: "7px 12px", borderRadius: 9, border: "1px solid var(--line)", background: "rgba(255,255,255,.06)", color: "var(--ink)", cursor: "pointer", fontFamily: "inherit" };
+const smallBtn: React.CSSProperties = { padding: "7px 12px", borderRadius: 9, border: "1px solid var(--line)", background: "#F1F5F9", color: "var(--ink)", cursor: "pointer", fontFamily: "inherit" };
 
 function Preview({ rows }: { rows: Row[] }) {
   const show = rows.slice(0, 8);
-  const th: React.CSSProperties = { textAlign: "left", padding: "8px 10px", fontSize: 12, color: "var(--mut)", fontWeight: 600, borderBottom: "1px solid var(--line)" };
-  const td: React.CSSProperties = { padding: "8px 10px", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,.05)" };
+  const th: React.CSSProperties = { textAlign: "left", padding: "8px 10px", fontSize: 13.5, color: "var(--mut)", fontWeight: 600, borderBottom: "1px solid var(--line)" };
+  const td: React.CSSProperties = { padding: "8px 10px", fontSize: 14.5, borderBottom: "1px solid #F1F5F9" };
   return (
-    <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 18, overflowX: "auto" }}>
-      <div style={{ fontSize: 13, color: "var(--mut)", marginBottom: 10 }}>预览（前 {show.length} / 共 {rows.length} 行）：</div>
+    <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 18, overflowX: "auto" }}>
+      <div style={{ fontSize: 14.5, color: "var(--mut)", marginBottom: 10 }}>预览（前 {show.length} / 共 {rows.length} 行）：</div>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead><tr><th style={th}>角色</th><th style={th}>学号/工号</th><th style={th}>姓名</th><th style={th}>班级</th><th style={th}>授课班级 / 任课教师</th><th style={th}>学院</th></tr></thead>
         <tbody>

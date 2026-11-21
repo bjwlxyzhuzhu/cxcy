@@ -2,7 +2,7 @@
 
 /** 纯 SVG 雷达图：每轴 score/max 归一化绘制。无第三方依赖。 */
 export default function RadarChart({
-  axes, size = 320, accent = "#ff6b35", valueText,
+  axes, size = 320, accent = "#C2410C", valueText,
 }: { axes: { label: string; score: number; max: number }[]; size?: number; accent?: string; valueText?: (i: number) => string }) {
   const cx = size / 2, cy = size / 2, R = size * 0.3;
   const N = Math.max(axes.length, 3);
@@ -15,16 +15,16 @@ export default function RadarChart({
   return (
     <svg viewBox={`0 0 ${size} ${size}`} style={{ width: "100%", maxWidth: size, display: "block", margin: "0 auto" }}>
       {[0.25, 0.5, 0.75, 1].map((rr, k) => (
-        <polygon key={k} points={poly(R * rr)} fill="none" stroke="rgba(255,255,255,.12)" />
+        <polygon key={k} points={poly(R * rr)} fill="none" stroke="#E2E8F0" />
       ))}
       {axes.map((a, i) => {
         const [x, y] = pt(i, R);
         const [lx, ly] = pt(i, R + 18);
         return (
           <g key={i}>
-            <line x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(255,255,255,.12)" />
-            <text x={lx} y={ly} fontSize="11" fill="#9aa6c8" textAnchor="middle" dominantBaseline="middle">{a.label}</text>
-            <text x={lx} y={ly + 13} fontSize="10" fontWeight="700" fill={accent} textAnchor="middle">{valueText ? valueText(i) : `${a.score}/${a.max}`}</text>
+            <line x1={cx} y1={cy} x2={x} y2={y} stroke="#E2E8F0" />
+            <text x={lx} y={ly} fontSize="13" fill="#475569" textAnchor="middle" dominantBaseline="middle">{a.label}</text>
+            <text x={lx} y={ly + 13} fontSize="13" fontWeight="700" fill={accent} textAnchor="middle">{valueText ? valueText(i) : `${a.score}/${a.max}`}</text>
           </g>
         );
       })}

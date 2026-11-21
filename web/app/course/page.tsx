@@ -40,23 +40,23 @@ export default function CoursePage() {
         <>
           <div style={{ ...box, display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
             <div>
-              <div style={{ fontSize: 12, color: "var(--mut)" }}>我的班级</div>
+              <div style={{ fontSize: 15, color: "var(--mut)" }}>我的班级</div>
               <b style={{ fontSize: 15 }}>{me?.class || "未分班"}</b>
-              <span style={{ fontSize: 12, color: "var(--mut)", marginLeft: 8 }}>{me?.teachers ? `已关联 ${me.teachers} 位任课教师` : "尚未关联任课教师（由教师或管理员导入名单时建立）"}</span>
+              <span style={{ fontSize: 15, color: "var(--mut)", marginLeft: 8 }}>{me?.teachers ? `已关联 ${me.teachers} 位任课教师` : "尚未关联任课教师（由教师或管理员导入名单时建立）"}</span>
             </div>
             <div>
-              <div style={{ fontSize: 12, color: "var(--mut)" }}>贯穿项目</div>
+              <div style={{ fontSize: 15, color: "var(--mut)" }}>贯穿项目</div>
               {pr ? <b style={{ fontSize: 15 }}>{pr.project.name}</b> : <Link href="/studio" style={{ color: "var(--cyan)", fontSize: 14 }}>先去项目工作台新建项目 →</Link>}
             </div>
             {pr && (
               <div style={{ flex: "1 1 240px" }}>
-                <div style={{ fontSize: 12, color: "var(--mut)", marginBottom: 4 }}>课程进度 {pr.done} / 8</div>
+                <div style={{ fontSize: 15, color: "var(--mut)", marginBottom: 4 }}>课程进度 {pr.done} / 8</div>
                 <div style={{ display: "flex", gap: 4 }}>
-                  {UNITS.map((u) => <span key={u.no} title={`第 ${u.no} 次课 · ${u.title}`} style={{ flex: 1, height: 10, borderRadius: 5, background: statusOf(u.no) === "done" ? u.color : statusOf(u.no) === "doing" ? u.color + "77" : "rgba(255,255,255,.08)" }} />)}
+                  {UNITS.map((u) => <span key={u.no} title={`第 ${u.no} 次课 · ${u.title}`} style={{ flex: 1, height: 10, borderRadius: 5, background: statusOf(u.no) === "done" ? u.color : statusOf(u.no) === "doing" ? u.color + "77" : "#F1F5F9" }} />)}
                 </div>
               </div>
             )}
-            <Link href="/studio" style={{ marginLeft: "auto", textDecoration: "none", fontWeight: 800, fontSize: 13.5, color: "#05060f", background: "linear-gradient(120deg,var(--cyan),var(--violet))", padding: "9px 16px", borderRadius: 999 }}>进入项目工作台 →</Link>
+            <Link href="/studio" style={{ marginLeft: "auto", textDecoration: "none", fontWeight: 800, fontSize: 15, color: "#fff", background: "linear-gradient(120deg,var(--cyan),var(--violet))", padding: "9px 16px", borderRadius: 999 }}>进入项目工作台 →</Link>
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
@@ -65,13 +65,13 @@ export default function CoursePage() {
               return (
                 <div key={u.no} style={{ ...box, padding: 0, overflow: "hidden", borderColor: on ? u.color : u.color + "44" }}>
                   <button onClick={() => setOpen(on ? 0 : u.no)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: `linear-gradient(90deg, ${u.color}26, transparent)`, border: "none", color: "var(--ink)", cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}>
-                    <span style={{ width: 34, height: 34, borderRadius: 17, display: "grid", placeItems: "center", fontWeight: 900, background: st === "done" ? u.color : "transparent", color: st === "done" ? "#04121c" : u.color, border: `2px solid ${u.color}` }}>{st === "done" ? "✓" : u.no}</span>
+                    <span style={{ width: 34, height: 34, borderRadius: 17, display: "grid", placeItems: "center", fontWeight: 900, background: st === "done" ? u.color : "transparent", color: st === "done" ? "#fff" : u.color, border: `2px solid ${u.color}` }}>{st === "done" ? "✓" : u.no}</span>
                     <span style={{ flex: 1 }}>
                       <b style={{ fontSize: 15.5 }}>第 {u.no} 次课 · {u.title}</b>
-                      <span style={{ fontSize: 12.5, color: "var(--mut)", marginLeft: 10 }}>{u.question}</span>
+                      <span style={{ fontSize: 14, color: "var(--mut)", marginLeft: 10 }}>{u.question}</span>
                     </span>
                     <Tag color={u.color}>主练{u.ability}</Tag>
-                    <Tag color={st === "done" ? "#34d399" : st === "doing" ? "#a78bfa" : "#94a3b8"}>{STEP_STATUS_LABEL[st]}</Tag>
+                    <Tag color={st === "done" ? "#15803D" : st === "doing" ? "#6D28D9" : "#475569"}>{STEP_STATUS_LABEL[st]}</Tag>
                   </button>
                   {on && (
                     <div style={{ padding: "4px 16px 16px" }}>
@@ -79,16 +79,16 @@ export default function CoursePage() {
                         {[u.pre, u.inClass, u.post].map((ph, i) => (
                           <div key={ph.label} style={{ display: "flex", gap: 6, alignItems: "center", flex: "1 1 260px" }}>
                             <div style={{ flex: 1, alignSelf: "stretch", borderRadius: 14, padding: 12, background: `${u.color}${["14", "24", "14"][i]}`, border: `1px solid ${u.color}66` }}>
-                              <div style={{ fontSize: 13, fontWeight: 900, color: u.color }}>{["① ", "② ", "③ "][i]}{ph.label}</div>
-                              <div style={{ fontSize: 13.5, lineHeight: 1.65, margin: "4px 0 6px" }}>{ph.task}</div>
-                              <div style={{ fontSize: 12, color: "var(--mut)", marginBottom: 8 }}>🤖 {ph.ai}</div>
-                              <Link href={ph.module.href} style={{ fontSize: 12.5, fontWeight: 800, color: u.color, textDecoration: "none", border: `1px solid ${u.color}77`, borderRadius: 999, padding: "4px 12px" }}>{ph.module.label} →</Link>
+                              <div style={{ fontSize: 14.5, fontWeight: 900, color: u.color }}>{["① ", "② ", "③ "][i]}{ph.label}</div>
+                              <div style={{ fontSize: 15, lineHeight: 1.65, margin: "4px 0 6px" }}>{ph.task}</div>
+                              <div style={{ fontSize: 15, color: "var(--mut)", marginBottom: 8 }}>🤖 {ph.ai}</div>
+                              <Link href={ph.module.href} style={{ fontSize: 14, fontWeight: 800, color: u.color, textDecoration: "none", border: `1px solid ${u.color}77`, borderRadius: 999, padding: "4px 12px" }}>{ph.module.label} →</Link>
                             </div>
                             {i < 2 && <span style={{ color: u.color, fontSize: 18, fontWeight: 900 }}>➜</span>}
                           </div>
                         ))}
                       </div>
-                      <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 10, fontSize: 12.5, color: "var(--mut)" }}>
+                      <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 10, fontSize: 14, color: "var(--mut)" }}>
                         <span>🏭 区域产业：{u.region}</span>
                         <span>🎗 课程思政：{u.values}</span>
                         {pr && <span>📌 对应项目第 {u.no} 步：已认证 {pr.steps[u.no - 1]?.certified || 0} 条</span>}
@@ -104,9 +104,9 @@ export default function CoursePage() {
             <b style={{ fontSize: 14 }}>选题方向参考（区域产业）</b>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10, marginTop: 8 }}>
               {REGION_THEMES.map((t) => (
-                <div key={t.key} style={{ borderRadius: 12, padding: 12, border: "1px solid var(--line)", background: "rgba(255,255,255,.03)" }}>
+                <div key={t.key} style={{ borderRadius: 12, padding: 12, border: "1px solid var(--line)", background: "#F1F5F9" }}>
                   <div style={{ fontSize: 14, fontWeight: 800 }}>{t.icon} {t.label}</div>
-                  <div style={{ fontSize: 12.5, color: "var(--mut)", marginTop: 4, lineHeight: 1.6 }}>{t.hint}</div>
+                  <div style={{ fontSize: 14, color: "var(--mut)", marginTop: 4, lineHeight: 1.6 }}>{t.hint}</div>
                 </div>
               ))}
             </div>

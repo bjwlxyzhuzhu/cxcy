@@ -42,10 +42,10 @@ export default function ProjectBar({ dark = true }: { dark?: boolean }) {
   const step = MODULE_STEP[path];
   const ink = dark ? "var(--ink)" : "#1f2937", mut = dark ? "var(--mut)" : "#6b7280";
   const wrap: React.CSSProperties = {
-    display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 12.5, color: ink,
-    padding: "7px 14px", borderRadius: 12, border: "1px solid rgba(34,211,238,.35)", background: "rgba(34,211,238,.07)",
+    display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", fontSize: 15, color: ink,
+    padding: "10px 16px", borderRadius: 12, border: dark ? "1px solid rgba(34,211,238,.35)" : "1px solid #BFDBFE", background: dark ? "rgba(34,211,238,.07)" : "#EFF6FF",
   };
-  const link: React.CSSProperties = { color: "#22d3ee", textDecoration: "none", fontWeight: 700, marginLeft: "auto" };
+  const link: React.CSSProperties = { color: dark ? "#0E7490" : "#1E3A8A", textDecoration: "none", fontWeight: 700, marginLeft: "auto" };
 
   if (st.kind === "teacher") return (
     <div style={wrap}><span style={{ color: mut }}>教师视角</span><Link href="/teacher" style={link}>教师工作台 →</Link></div>

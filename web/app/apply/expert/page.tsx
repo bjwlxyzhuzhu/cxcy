@@ -12,7 +12,7 @@ const SYSTEM = `你是“小创”，国赛项目“专家打磨”导师，扮�
 export default function ExpertPage() {
   return (
     <LearnChrome emoji="🦉" title="专家打磨" subtitle="把项目贴进来，AI 专家团按国赛标准逐项挑毛病、提亮点">
-      <p style={{ fontSize: 13, color: "var(--mut)", marginBottom: 16, lineHeight: 1.7 }}>
+      <p style={{ fontSize: 14.5, color: "var(--mut)", marginBottom: 16, lineHeight: 1.7 }}>
         粘贴你的商业计划书或项目摘要，小创会从【逻辑链 / 数据一致性 / 竞品盲点 / 亮点提炼 / 改进建议】五个方面给你打磨，对标国赛把项目磨成精品。
       </p>
       <CoachSession

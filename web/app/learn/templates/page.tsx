@@ -28,26 +28,26 @@ export default function TemplatesPage() {
   const filtered = useMemo(() => tpls.filter((t) => (!cat || (t.category || "其他") === cat) && (!q || (t.name + t.category).toLowerCase().includes(q.toLowerCase()))), [tpls, q, cat]);
 
   const pill = (on: boolean): React.CSSProperties => ({
-    padding: "6px 13px", borderRadius: 999, fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap",
+    padding: "6px 13px", borderRadius: 999, fontSize: 14, cursor: "pointer", whiteSpace: "nowrap",
     border: "1px solid " + (on ? "rgba(167,139,250,.6)" : "var(--line)"),
-    background: on ? "rgba(167,139,250,.16)" : "rgba(255,255,255,.04)", color: on ? "var(--violet)" : "var(--mut)",
+    background: on ? "rgba(167,139,250,.16)" : "#F1F5F9", color: on ? "var(--violet)" : "var(--mut)",
   });
 
   return (
     <LearnChrome emoji="🐨" title="模板宝库" subtitle="按类别选模板 · 下载之外，还能就地问「怎么用 / 按我的项目怎么填」">
       {authed === false ? (
-        <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: "40px 24px", textAlign: "center" }}>
+        <div style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: "40px 24px", textAlign: "center" }}>
           <div style={{ fontSize: 15, marginBottom: 14 }}>登录后即可使用模板宝库 🐨</div>
-          <Link href="/login" style={{ padding: "10px 20px", borderRadius: 12, fontWeight: 700, color: "#05060f", background: "linear-gradient(120deg,var(--cyan),var(--violet))", textDecoration: "none" }}>去登录</Link>
+          <Link href="/login" style={{ padding: "10px 20px", borderRadius: 12, fontWeight: 700, color: "#fff", background: "linear-gradient(120deg,var(--cyan),var(--violet))", textDecoration: "none" }}>去登录</Link>
         </div>
       ) : (
         <>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="🔍 搜模板…"
-            style={{ width: "min(360px,100%)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)", background: "rgba(255,255,255,.05)", color: "var(--ink)", fontSize: 14, outline: "none", marginBottom: 14 }} />
+            style={{ width: "min(360px,100%)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)", background: "#F1F5F9", color: "var(--ink)", fontSize: 14, outline: "none", marginBottom: 14 }} />
 
           {cats.length > 0 && (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 18, alignItems: "center" }}>
-              <span style={{ fontSize: 12, color: "var(--mut)", marginRight: 2 }}>类别</span>
+              <span style={{ fontSize: 15, color: "var(--mut)", marginRight: 2 }}>类别</span>
               <span style={pill(cat === "")} onClick={() => setCat("")}>全部</span>
               {cats.map((c) => (<span key={c} style={pill(cat === c)} onClick={() => setCat(c)}>{c}</span>))}
             </div>
@@ -61,17 +61,17 @@ export default function TemplatesPage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(264px,1fr))", gap: 14 }}>
               {filtered.map((t) => (
                 <div key={t.id} onClick={() => setActive(t)}
-                  style={{ border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 16, cursor: "pointer", transition: "transform .15s, border-color .2s", display: "flex", flexDirection: "column", gap: 9, minHeight: 128 }}
+                  style={{ border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 16, cursor: "pointer", transition: "transform .15s, border-color .2s", display: "flex", flexDirection: "column", gap: 9, minHeight: 128 }}
                   onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "rgba(167,139,250,.5)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = "var(--line)"; }}>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 999, border: "1px solid rgba(167,139,250,.4)", color: "var(--violet)" }}>{t.category || "其他"}</span>
-                    <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 999, border: "1px solid var(--line)", color: "var(--mut)" }}>{t.ext.toUpperCase()} · {t.size_kb} KB</span>
+                    <span style={{ fontSize: 14.5, padding: "2px 9px", borderRadius: 999, border: "1px solid rgba(167,139,250,.4)", color: "var(--violet)" }}>{t.category || "其他"}</span>
+                    <span style={{ fontSize: 14.5, padding: "2px 9px", borderRadius: 999, border: "1px solid var(--line)", color: "var(--mut)" }}>{t.ext.toUpperCase()} · {t.size_kb} KB</span>
                   </div>
                   <div style={{ fontWeight: 700, fontSize: 14.5, lineHeight: 1.5 }}>{t.name}</div>
                   <div style={{ marginTop: "auto", display: "flex", gap: 10, alignItems: "center" }}>
-                    <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--violet)" }}>进入对话 →</span>
-                    <a href={t.file} download onClick={(e) => e.stopPropagation()} style={{ marginLeft: "auto", fontSize: 12, color: "var(--cyan)", textDecoration: "none", border: "1px solid rgba(34,211,238,.4)", borderRadius: 999, padding: "4px 11px" }}>⬇ 下载</a>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "var(--violet)" }}>进入对话 →</span>
+                    <a href={t.file} download onClick={(e) => e.stopPropagation()} style={{ marginLeft: "auto", fontSize: 15, color: "var(--cyan)", textDecoration: "none", border: "1px solid rgba(34,211,238,.4)", borderRadius: 999, padding: "4px 11px" }}>⬇ 下载</a>
                   </div>
                 </div>
               ))}
@@ -96,11 +96,11 @@ function Detail({ t, onClose }: { t: Tpl; onClose: () => void }) {
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--mut)", fontSize: 24, cursor: "pointer", lineHeight: 1 }}>×</button>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14, alignItems: "center" }}>
-          <span style={{ fontSize: 11.5, padding: "3px 10px", borderRadius: 999, border: "1px solid rgba(167,139,250,.4)", color: "var(--violet)" }}>{t.category || "其他"}</span>
-          <span style={{ fontSize: 11.5, padding: "3px 10px", borderRadius: 999, border: "1px solid var(--line)", color: "var(--mut)" }}>{t.ext.toUpperCase()} · {t.size_kb} KB</span>
-          <a href={t.file} download style={{ marginLeft: "auto", fontSize: 12.5, color: "#05060f", textDecoration: "none", fontWeight: 700, borderRadius: 999, padding: "6px 14px", background: "linear-gradient(120deg,var(--cyan),var(--violet))" }}>⬇ 下载原始文件</a>
+          <span style={{ fontSize: 14.5, padding: "3px 10px", borderRadius: 999, border: "1px solid rgba(167,139,250,.4)", color: "var(--violet)" }}>{t.category || "其他"}</span>
+          <span style={{ fontSize: 14.5, padding: "3px 10px", borderRadius: 999, border: "1px solid var(--line)", color: "var(--mut)" }}>{t.ext.toUpperCase()} · {t.size_kb} KB</span>
+          <a href={t.file} download style={{ marginLeft: "auto", fontSize: 14, color: "#fff", textDecoration: "none", fontWeight: 700, borderRadius: 999, padding: "6px 14px", background: "linear-gradient(120deg,var(--cyan),var(--violet))" }}>⬇ 下载原始文件</a>
         </div>
-        <CoachSession key={t.id} system={system} greeting={greeting} accent="#a78bfa" multiline
+        <CoachSession key={t.id} system={system} greeting={greeting} accent="#6D28D9" multiline
           exportTitle={`模板问答 · ${t.name}`}
           promptTags={["这个模板每部分该写什么？", "按我的项目带我填一遍", "评委看这部分最看重什么？"]}
           placeholder="问这个模板怎么用，或说说你的项目让我带你填…（📎 可传草稿）"

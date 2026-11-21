@@ -37,7 +37,7 @@ export default function DailyBonus() {
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 18px", borderRadius: 999, background: "linear-gradient(120deg, rgba(16,22,48,.96), rgba(28,18,52,.96))", border: "1px solid rgba(255,210,120,.5)", boxShadow: "0 12px 36px rgba(0,0,0,.5), 0 0 24px rgba(255,200,90,.25)", color: "#ffe9c2", fontSize: 14.5, fontWeight: 700, whiteSpace: "nowrap" }}>
         <span style={{ fontSize: 18 }}>🎁</span>
         今日登录 <b style={{ color: "#ffd24a", fontSize: 16 }}>+{toast.added}</b> 积分
-        <span style={{ color: "#a9bbe0", fontWeight: 500, fontSize: 12.5 }}>· 余额 {toast.credits}</span>
+        <span style={{ color: "#a9bbe0", fontWeight: 500, fontSize: 14 }}>· 余额 {toast.credits}</span>
       </div>
       <style>{`@keyframes dbIn{from{opacity:0;transform:translate(-50%,-14px)}to{opacity:1;transform:translate(-50%,0)}}`}</style>
     </div>

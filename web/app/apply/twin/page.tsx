@@ -20,7 +20,7 @@ function CardView({ p }: { p: Persona }) {
     const t = Array.isArray(v) ? v.filter(Boolean) : v;
     if (!t || (Array.isArray(t) && !t.length)) return null;
     return (
-      <div style={{ fontSize: 12.5, lineHeight: 1.7, marginTop: 4 }}>
+      <div style={{ fontSize: 14, lineHeight: 1.7, marginTop: 4 }}>
         <span style={{ color: "var(--mut)" }}>{k}：</span>
         {Array.isArray(t) ? t.join("；") : t}
       </div>
@@ -30,9 +30,9 @@ function CardView({ p }: { p: Persona }) {
     <div>
       {row("身份", c.identity)}{row("场景", c.context)}{row("痛点", c.pains)}{row("目标", c.goals)}
       {row("预算", c.budget)}{row("决策逻辑", c.decision_logic)}{row("顾虑", c.objections)}{row("关注重点", c.focus)}
-      {c.quotes?.length ? <div style={{ fontSize: 12.5, marginTop: 6, color: "#fbbf24" }}>{c.quotes.map((q, i) => <div key={i}>“{q}”</div>)}</div> : null}
+      {c.quotes?.length ? <div style={{ fontSize: 14, marginTop: 6, color: "#B45309" }}>{c.quotes.map((q, i) => <div key={i}>“{q}”</div>)}</div> : null}
       {c.source && (c.source.method || c.source.date) ? (
-        <div style={{ fontSize: 11.5, color: "var(--mut)", marginTop: 6 }}>来源：{[c.source.method, c.source.date, c.source.n ? `样本 ${c.source.n}` : ""].filter(Boolean).join(" · ")}</div>
+        <div style={{ fontSize: 14.5, color: "var(--mut)", marginTop: 6 }}>来源：{[c.source.method, c.source.date, c.source.n ? `样本 ${c.source.n}` : ""].filter(Boolean).join(" · ")}</div>
       ) : null}
     </div>
   );
@@ -120,7 +120,7 @@ function TwinStage({ p, onEdit }: { p: Persona; onEdit: () => void }) {
         <Tag color={col}>{t?.label}</Tag>
         <Tag color={t?.stance === "support" ? C.green : C.orange}>{t?.stance === "support" ? "协作方" : "对抗方"}</Tag>
         {p.team_code && <Tag color={C.cyan}>{p.team_code} 队调研</Tag>}
-        {c.source && (c.source.method || c.source.date) && <span style={{ marginLeft: "auto", fontSize: 12.5, color: C.mut }}>来源：{[c.source.method, c.source.date, c.source.n ? `样本 ${c.source.n}` : ""].filter(Boolean).join(" · ")}</span>}
+        {c.source && (c.source.method || c.source.date) && <span style={{ marginLeft: "auto", fontSize: 14, color: C.mut }}>来源：{[c.source.method, c.source.date, c.source.n ? `样本 ${c.source.n}` : ""].filter(Boolean).join(" · ")}</span>}
       </div>
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
         {!role && (
@@ -129,7 +129,7 @@ function TwinStage({ p, onEdit }: { p: Persona; onEdit: () => void }) {
             {stat("调研扎实度", String(solid), solid / 100, C.cyan)}
             {stat("访谈原话", `${quotes} 条`, quotes / 5, C.amber)}
             {stat("资料覆盖", `${filled} / ${WALK.length}`, filled / WALK.length, C.violet)}
-            <div style={{ fontSize: 13, color: C.mut, lineHeight: 1.6 }}>别的队伍和它交锋后证伪了假设，你的战队 +1</div>
+            <div style={{ fontSize: 14.5, color: C.mut, lineHeight: 1.6 }}>别的队伍和它交锋后证伪了假设，你的战队 +1</div>
           </div>
         )}
         <Fighter src={avatarOf(p.role_type)} size={narrow ? 130 : 200} color={col} side="l" talking lunge title={p.label}
@@ -237,17 +237,17 @@ export default function TwinPage() {
           <div key={p.id} style={{ ...box, opacity: p.enabled ? 1 : 0.55 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <Avatar src={avatarOf(p.role_type)} size={44} /><b>{p.label}</b>
-              <Tag color={t?.stance === "challenge" ? "#f87171" : "#34d399"}>{t?.stance === "challenge" ? "对抗方" : "协作方"}</Tag>
-              {p.kind === "twin" && p.team_code && <Tag color="#a78bfa">{p.team_code}</Tag>}
-              {showOwner && <Tag color="#94a3b8">{p.kind === "role" ? "教师角色" : "学生分身"}</Tag>}
+              <Tag color={t?.stance === "challenge" ? "#B91C1C" : "#15803D"}>{t?.stance === "challenge" ? "对抗方" : "协作方"}</Tag>
+              {p.kind === "twin" && p.team_code && <Tag color="#6D28D9">{p.team_code}</Tag>}
+              {showOwner && <Tag color="#475569">{p.kind === "role" ? "教师角色" : "学生分身"}</Tag>}
             </div>
             {editing === p.id ? <div style={{ marginTop: 10 }}><Editor p={p} onSaved={() => { setEditing(null); load(); }} onCancel={() => setEditing(null)} /></div> : <CardView p={p} />}
             {editing !== p.id && (
               <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
                 <Btn small onClick={() => { setSelId(p.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}>上台校对</Btn>
                 <Btn small ghost onClick={() => setEditing(p.id)}>修改</Btn>
-                <Btn small ghost color="#fbbf24" onClick={() => toggle(p)}>{p.enabled ? "停用" : "启用"}</Btn>
-                <Btn small ghost color="#f87171" onClick={() => del(p.id)}>删除</Btn>
+                <Btn small ghost color="#B45309" onClick={() => toggle(p)}>{p.enabled ? "停用" : "启用"}</Btn>
+                <Btn small ghost color="#B91C1C" onClick={() => del(p.id)}>删除</Btn>
               </div>
             )}
           </div>
@@ -259,8 +259,8 @@ export default function TwinPage() {
   return (
     <LearnChrome emoji="🧬" title="分身工坊 · 创建角色" subtitle="把真实调研注入数字分身 · 分身是假设，不是证据">
       {sel && <TwinStage p={sel} onEdit={() => setEditing(sel.id)} />}
-      <div style={{ ...box, borderColor: "#fbbf2466", marginBottom: 16, fontSize: 13, lineHeight: 1.8 }}>
-        <b style={{ color: "#fbbf24" }}>虚实闭环原则</b>：分身只会说你调研里真实出现过的话；资料没有的，它会直说“我的资料里没有，去现实中问问”。
+      <div style={{ ...box, borderColor: "#B4530966", marginBottom: 16, fontSize: 14.5, lineHeight: 1.8 }}>
+        <b style={{ color: "#B45309" }}>虚实闭环原则</b>：分身只会说你调研里真实出现过的话；资料没有的，它会直说“我的资料里没有，去现实中问问”。
         在对局里，分身“同意”不等于验证通过——所有结论都要回到现实中验证，经老师确认才计高分。你做的分身越扎实，越能让别的队伍证伪假设，你的队伍也会得分。
       </div>
 
@@ -270,10 +270,10 @@ export default function TwinPage() {
           {TWIN_TYPES.map((t) => (
             <button key={t.key} onClick={() => setRt(t.key)} style={{
               padding: "8px 12px", borderRadius: 12, cursor: "pointer", fontFamily: "inherit", textAlign: "left",
-              border: `1px solid ${rt === t.key ? "#22d3ee" : "var(--line)"}`, background: rt === t.key ? "rgba(34,211,238,.12)" : "rgba(255,255,255,.03)", color: "var(--ink)",
+              border: `1px solid ${rt === t.key ? "#0E7490" : "var(--line)"}`, background: rt === t.key ? "rgba(34,211,238,.12)" : "#F1F5F9", color: "var(--ink)",
             }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, fontSize: 13.5 }}><Avatar src={avatarOf(t.key)} size={40} />{t.label}</div>
-              <div style={{ fontSize: 11.5, color: "var(--mut)" }}>{t.hint}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, fontSize: 15 }}><Avatar src={avatarOf(t.key)} size={40} />{t.label}</div>
+              <div style={{ fontSize: 14.5, color: "var(--mut)" }}>{t.hint}</div>
             </button>
           ))}
         </div>
@@ -282,35 +282,35 @@ export default function TwinPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 10 }}>
           <div><span style={lab}>角色名（原型，不写真名）</span><input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="如：钛材厂采购经理A" style={field} /></div>
           <div><span style={lab}>所在队伍编号</span><input value={teamCode} onChange={(e) => setTeamCode(e.target.value.toUpperCase())} placeholder="T1" style={field} /></div>
-          <div><span style={lab}>调研方式</span><select value={method} onChange={(e) => setMethod(e.target.value)} style={field}>{SOURCE_METHODS.map((m) => <option key={m} style={{ background: "#0a0e22" }}>{m}</option>)}</select></div>
+          <div><span style={lab}>调研方式</span><select value={method} onChange={(e) => setMethod(e.target.value)} style={field}>{SOURCE_METHODS.map((m) => <option key={m} style={{ background: "#fff" }}>{m}</option>)}</select></div>
           <div><span style={lab}>调研时间</span><input value={date} onChange={(e) => setDate(e.target.value)} placeholder="2026-11" style={field} /></div>
           <div><span style={lab}>样本数</span><input value={n} onChange={(e) => setN(e.target.value)} placeholder="如：3人" style={field} /></div>
-          <div><span style={lab}>可见范围</span><select value={vis} onChange={(e) => setVis(e.target.value)} style={field}><option value="class" style={{ background: "#0a0e22" }}>全班（可被别队挑战）</option><option value="team" style={{ background: "#0a0e22" }}>仅本队预演</option></select></div>
+          <div><span style={lab}>可见范围</span><select value={vis} onChange={(e) => setVis(e.target.value)} style={field}><option value="class" style={{ background: "#fff" }}>全班（可被别队挑战）</option><option value="team" style={{ background: "#fff" }}>仅本队预演</option></select></div>
         </div>
         <div style={{ marginTop: 10 }}>
           <span style={lab}>访谈记录 / 问卷结果 / 观察笔记（至少 80 字；也可上传 docx/pdf/txt）</span>
           <textarea rows={8} value={text} onChange={(e) => setText(e.target.value)} style={{ ...field, resize: "vertical" }}
             placeholder={"例：\n问：你们现在怎么做钛棒表面质检？\n答：两个老师傅拿灯照，一班下来眼睛受不了，漏检大概每月有十几根……"} />
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6 }}>
-            <label style={{ fontSize: 12.5, color: "var(--cyan)", cursor: "pointer" }}>📎 上传文件<input type="file" accept={ACCEPT} multiple hidden onChange={(e) => onFile(e.target.files)} /></label>
-            <span style={{ fontSize: 12, color: "var(--mut)" }}>{text.length} 字</span>
+            <label style={{ fontSize: 14, color: "var(--cyan)", cursor: "pointer" }}>📎 上传文件<input type="file" accept={ACCEPT} multiple hidden onChange={(e) => onFile(e.target.files)} /></label>
+            <span style={{ fontSize: 15, color: "var(--mut)" }}>{text.length} 字</span>
           </div>
         </div>
 
         <h3 style={{ fontSize: 16, fontWeight: 800, margin: "18px 0 8px" }}>③ 逐条确认</h3>
         {CONSENT_ITEMS.map((c, i) => (
-          <label key={i} style={{ display: "flex", gap: 8, fontSize: 13, marginTop: 6, cursor: "pointer" }}>
+          <label key={i} style={{ display: "flex", gap: 8, fontSize: 14.5, marginTop: 6, cursor: "pointer" }}>
             <input type="checkbox" checked={consent[i]} onChange={(e) => setConsent(consent.map((x, j) => (j === i ? e.target.checked : x)))} />{c}
           </label>
         ))}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 14 }}>
           <Btn onClick={build} disabled={!ready}>{busy ? "生成中…" : "生成数字分身"}</Btn>
-          {msg && <span style={{ fontSize: 12.5, color: "var(--mut)" }}>{msg}</span>}
+          {msg && <span style={{ fontSize: 14, color: "var(--mut)" }}>{msg}</span>}
         </div>
       </div>
 
       <h3 style={{ fontSize: 16, fontWeight: 800, margin: "8px 0 10px" }}>我做的分身（{mine.filter((p) => p.kind === "twin").length}）</h3>
-      {mine.filter((p) => p.kind === "twin").length ? list(mine.filter((p) => p.kind === "twin")) : <p style={{ fontSize: 13, color: "var(--mut)" }}>还没有。先去做一次真实访谈吧。</p>}
+      {mine.filter((p) => p.kind === "twin").length ? list(mine.filter((p) => p.kind === "twin")) : <p style={{ fontSize: 14.5, color: "var(--mut)" }}>还没有。先去做一次真实访谈吧。</p>}
 
       {teacher && (
         <div style={{ marginTop: 28 }}>
@@ -318,10 +318,10 @@ export default function TwinPage() {
           <div style={{ ...box, marginBottom: 12 }}>
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
               <Btn onClick={seed}>一键注入默认角色（评委 / 投资人 / 导师 / 伦理 / 商业 / 合规 / 钛产业）</Btn>
-              <span style={{ fontSize: 12, color: "var(--mut)" }}>已有的不会重复注入；注入后可逐个修改关注重点。</span>
+              <span style={{ fontSize: 15, color: "var(--mut)" }}>已有的不会重复注入；注入后可逐个修改关注重点。</span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr 1.4fr auto", gap: 8, marginTop: 12, alignItems: "end" }}>
-              <div><span style={lab}>类型</span><select value={role.role_type} onChange={(e) => setRole({ ...role, role_type: e.target.value })} style={field}>{ROLE_TYPES.map((t) => <option key={t.key} value={t.key} style={{ background: "#0a0e22" }}>{t.label}</option>)}</select></div>
+              <div><span style={lab}>类型</span><select value={role.role_type} onChange={(e) => setRole({ ...role, role_type: e.target.value })} style={field}>{ROLE_TYPES.map((t) => <option key={t.key} value={t.key} style={{ background: "#fff" }}>{t.label}</option>)}</select></div>
               <div><span style={lab}>角色名</span><input value={role.label} onChange={(e) => setRole({ ...role, label: e.target.value })} style={field} /></div>
               <div><span style={lab}>身份说明</span><input value={role.identity} onChange={(e) => setRole({ ...role, identity: e.target.value })} style={field} /></div>
               <div><span style={lab}>关注重点</span><input value={role.focus} onChange={(e) => setRole({ ...role, focus: e.target.value })} style={field} /></div>

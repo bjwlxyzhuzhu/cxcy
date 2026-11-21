@@ -44,31 +44,31 @@ export default function DigitalHuman({ name, img, color, greet, system, hint }: 
     <>
       <button onClick={() => setOpen((o) => !o)} title={hint || `和${name}聊聊`} aria-label={`数字人${name}`}
         style={{ position: "fixed", right: 18, bottom: 18, width: 68, height: 68, borderRadius: 34, padding: 0, cursor: "pointer", zIndex: 60,
-          border: `2px solid ${color}`, boxShadow: `0 0 22px ${color}99`, background: "#0a0e22", overflow: "hidden" }}>
+          border: `2px solid ${color}`, boxShadow: `0 0 22px ${color}99`, background: "#fff", overflow: "hidden" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={img} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       </button>
       {open && (
-        <div style={{ position: "fixed", right: 18, bottom: 96, width: "min(380px, calc(100vw - 36px))", height: "min(520px, calc(100vh - 140px))", zIndex: 60,
-          display: "flex", flexDirection: "column", borderRadius: 18, overflow: "hidden", background: "rgba(10,14,34,.96)", border: `1px solid ${color}88`, boxShadow: "0 18px 48px rgba(0,0,0,.5)" }}>
+        <div className="theme-light" style={{ position: "fixed", right: 18, bottom: 96, width: "min(380px, calc(100vw - 36px))", height: "min(520px, calc(100vh - 140px))", zIndex: 60,
+          display: "flex", flexDirection: "column", borderRadius: 18, overflow: "hidden", background: "#fff", border: `1px solid ${color}88`, boxShadow: "0 18px 48px rgba(15,23,42,.18)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: `linear-gradient(90deg, ${color}44, transparent)` }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img} alt="" style={{ width: 34, height: 34, borderRadius: 17, objectFit: "cover" }} />
             <b style={{ color: "#fff" }}>{name}</b>
-            <button onClick={() => setSpeak((v) => !v)} title="朗读回答" style={{ marginLeft: "auto", background: "none", border: "1px solid rgba(255,255,255,.2)", borderRadius: 999, color: "#fff", cursor: "pointer", padding: "2px 10px", fontSize: 12, fontFamily: "inherit" }}>{speak ? "🔊 朗读开" : "🔈 朗读关"}</button>
-            <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", color: "#cbd5ff", cursor: "pointer", fontSize: 18 }}>×</button>
+            <button onClick={() => setSpeak((v) => !v)} title="朗读回答" style={{ marginLeft: "auto", background: "none", border: "1px solid rgba(255,255,255,.2)", borderRadius: 999, color: "#fff", cursor: "pointer", padding: "2px 10px", fontSize: 15, fontFamily: "inherit" }}>{speak ? "🔊 朗读开" : "🔈 朗读关"}</button>
+            <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", color: "#1F2937", cursor: "pointer", fontSize: 18 }}>×</button>
           </div>
           <div ref={listRef} style={{ flex: 1, overflowY: "auto", padding: 12, display: "grid", gap: 8, alignContent: "start" }}>
             {msgs.map((m, i) => (
-              <div key={i} style={{ justifySelf: m.role === "user" ? "end" : "start", maxWidth: "86%", whiteSpace: "pre-wrap", fontSize: 13.5, lineHeight: 1.65, padding: "8px 11px", borderRadius: 12,
-                background: m.role === "user" ? color : "rgba(255,255,255,.07)", color: m.role === "user" ? "#05060f" : "#e6ecff" }}>{m.content}</div>
+              <div key={i} style={{ justifySelf: m.role === "user" ? "end" : "start", maxWidth: "86%", whiteSpace: "pre-wrap", fontSize: 15, lineHeight: 1.65, padding: "8px 11px", borderRadius: 12,
+                background: m.role === "user" ? color : "#F1F5F9", color: m.role === "user" ? "#fff" : "#1F2937" }}>{m.content}</div>
             ))}
-            {busy && <div style={{ fontSize: 12.5, color: "#94a3c8" }}>{name}正在想…</div>}
+            {busy && <div style={{ fontSize: 14, color: "#5B6577" }}>{name}正在想…</div>}
           </div>
-          <div style={{ display: "flex", gap: 6, padding: 10, borderTop: "1px solid rgba(255,255,255,.08)" }}>
+          <div style={{ display: "flex", gap: 6, padding: 10, borderTop: "1px solid #F1F5F9" }}>
             <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) send(); }}
-              placeholder={`问${name}…`} style={{ flex: 1, padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.15)", background: "rgba(255,255,255,.05)", color: "#fff", fontFamily: "inherit", fontSize: 13.5, outline: "none" }} />
-            <button onClick={send} disabled={busy || !input.trim()} style={{ padding: "0 14px", borderRadius: 10, border: "none", background: color, color: "#05060f", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", opacity: busy || !input.trim() ? 0.5 : 1 }}>发送</button>
+              placeholder={`问${name}…`} style={{ flex: 1, padding: "9px 12px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#F1F5F9", color: "#fff", fontFamily: "inherit", fontSize: 15, outline: "none" }} />
+            <button onClick={send} disabled={busy || !input.trim()} style={{ padding: "0 14px", borderRadius: 10, border: "none", background: color, color: "#fff", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", opacity: busy || !input.trim() ? 0.5 : 1 }}>发送</button>
           </div>
         </div>
       )}

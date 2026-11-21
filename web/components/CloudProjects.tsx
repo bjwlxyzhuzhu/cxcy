@@ -39,7 +39,7 @@ export default function CloudProjects({ dark, onLoad, onClose }: { dark: boolean
 
   const ink = dark ? "#e8f0ff" : "#16233c", mut = dark ? "#9fb6e0" : "#5a6b86";
   const panel: React.CSSProperties = { width: "min(520px,94vw)", maxHeight: "84vh", overflowY: "auto", padding: 18, borderRadius: 16, border: `1px solid ${dark ? "rgba(120,200,255,.22)" : "rgba(80,120,200,.28)"}`, background: dark ? "rgba(7,9,26,.92)" : "rgba(255,255,255,.96)", backdropFilter: "blur(12px)", color: ink };
-  const rowBtn: React.CSSProperties = { padding: "6px 11px", borderRadius: 8, border: `1px solid ${dark ? "rgba(120,200,255,.3)" : "rgba(80,120,200,.3)"}`, background: "transparent", color: ink, fontSize: 12, cursor: "pointer", fontFamily: "inherit" };
+  const rowBtn: React.CSSProperties = { padding: "6px 11px", borderRadius: 8, border: `1px solid ${dark ? "rgba(120,200,255,.3)" : "rgba(80,120,200,.3)"}`, background: "transparent", color: ink, fontSize: 15, cursor: "pointer", fontFamily: "inherit" };
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 55, display: "grid", placeItems: "center", background: "rgba(4,3,15,.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
@@ -47,19 +47,19 @@ export default function CloudProjects({ dark, onLoad, onClose }: { dark: boolean
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
           <span style={{ fontSize: 18 }}>☁</span>
           <b style={{ fontSize: 15 }}>我的项目 · 云端</b>
-          <span style={{ fontSize: 11.5, color: mut }}>换设备可续、教师后台可查</span>
+          <span style={{ fontSize: 14.5, color: mut }}>换设备可续、教师后台可查</span>
           <button onClick={onClose} style={{ ...rowBtn, marginLeft: "auto" }}>✕ 关闭</button>
         </div>
-        {loading && <div style={{ fontSize: 13, color: mut, padding: "16px 0", textAlign: "center" }}>加载中…</div>}
-        {!loading && msg && <div style={{ fontSize: 12.5, color: "#ffb066", lineHeight: 1.7, padding: "10px 12px", borderRadius: 10, background: dark ? "rgba(255,176,102,.1)" : "rgba(255,176,102,.14)" }}>{msg}</div>}
-        {!loading && !msg && items.length === 0 && <div style={{ fontSize: 13, color: mut, padding: "16px 0", textAlign: "center" }}>还没有云端项目。生成 BP 后点「☁ 保存到云」即可。</div>}
+        {loading && <div style={{ fontSize: 14.5, color: mut, padding: "16px 0", textAlign: "center" }}>加载中…</div>}
+        {!loading && msg && <div style={{ fontSize: 14, color: "#C2410C", lineHeight: 1.7, padding: "10px 12px", borderRadius: 10, background: dark ? "rgba(255,176,102,.1)" : "rgba(255,176,102,.14)" }}>{msg}</div>}
+        {!loading && !msg && items.length === 0 && <div style={{ fontSize: 14.5, color: mut, padding: "16px 0", textAlign: "center" }}>还没有云端项目。生成 BP 后点「☁ 保存到云」即可。</div>}
         {!loading && items.map((it) => (
           <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 4px", borderBottom: `1px solid ${dark ? "rgba(120,200,255,.12)" : "rgba(80,120,200,.14)"}` }}>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.name || "（未命名）"}</div>
-              <div style={{ fontSize: 11, color: mut }}>{new Date(it.updated_at).toLocaleString("zh-CN")}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.name || "（未命名）"}</div>
+              <div style={{ fontSize: 14.5, color: mut }}>{new Date(it.updated_at).toLocaleString("zh-CN")}</div>
             </div>
-            <button onClick={() => load(it.id)} disabled={!!busy} style={{ ...rowBtn, color: "#7aa8ff", borderColor: "#7aa8ff66" }}>{busy === it.id ? "…" : "载入"}</button>
+            <button onClick={() => load(it.id)} disabled={!!busy} style={{ ...rowBtn, color: "#1D4ED8", borderColor: "#1D4ED866" }}>{busy === it.id ? "…" : "载入"}</button>
             <button onClick={() => del(it.id)} disabled={!!busy} style={{ ...rowBtn, color: "#ff8a96", borderColor: "rgba(255,138,150,.4)" }}>删除</button>
           </div>
         ))}

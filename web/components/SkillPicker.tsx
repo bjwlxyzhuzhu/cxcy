@@ -7,7 +7,7 @@ import { BUILTIN_SKILLS, STORE_SKILLS, SCOPE_LABEL, SKILL_BY_ID, type Skill } fr
 import { PLUGINS, PLUGIN_BY_ID, pluginInstr } from "@/lib/plugins";
 
 export default function SkillPicker({
-  toolbox, activeSkillIds, onToggleSkill, activePluginIds, onTogglePlugin, accent = "#7aa8ff", storeHref = "/apply/skills",
+  toolbox, activeSkillIds, onToggleSkill, activePluginIds, onTogglePlugin, accent = "#1D4ED8", storeHref = "/apply/skills",
 }: {
   toolbox: Toolbox | null;
   activeSkillIds: string[];
@@ -46,13 +46,13 @@ export default function SkillPicker({
 
   const chip = (on: boolean): React.CSSProperties => ({
     display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 10px", borderRadius: 999, cursor: "pointer",
-    fontSize: 12, fontFamily: "inherit", border: `1px solid ${on ? accent : "rgba(120,200,255,.25)"}`,
-    background: on ? accent : "rgba(255,255,255,.05)", color: on ? "#04030f" : "#dce6ff", fontWeight: on ? 700 : 400,
+    fontSize: 15, fontFamily: "inherit", border: `1px solid ${on ? accent : "rgba(120,200,255,.25)"}`,
+    background: on ? accent : "#F1F5F9", color: on ? "#fff" : "#dce6ff", fontWeight: on ? 700 : 400,
   });
 
   const skillGroup = (label: string, list: Skill[]) => list.length ? (
     <div style={{ marginTop: 10 }}>
-      <div style={{ fontSize: 10.5, fontWeight: 700, color: "#8aa0cc", letterSpacing: ".5px", marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 14.5, fontWeight: 700, color: "#8aa0cc", letterSpacing: ".5px", marginBottom: 6 }}>{label}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {list.map((s) => {
           const on = activeSkillIds.includes(s.id);
@@ -69,20 +69,20 @@ export default function SkillPicker({
   return (
     <div ref={wrapRef} style={{ display: "inline-flex" }}>
       <button ref={btnRef} type="button" onClick={toggle}
-        style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 34, padding: "0 12px", borderRadius: 10, cursor: "pointer", fontFamily: "inherit", fontSize: 12.5,
-          border: `1px solid ${open || nActive ? accent : "var(--line)"}`, background: nActive ? "rgba(122,168,255,.14)" : "rgba(255,255,255,.04)", color: "var(--ink)" }}>
-        🧩 技能{nActive ? <span style={{ minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: accent, color: "#04030f", fontSize: 10.5, fontWeight: 800, display: "grid", placeItems: "center" }}>{nActive}</span> : null}
+        style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 34, padding: "0 12px", borderRadius: 10, cursor: "pointer", fontFamily: "inherit", fontSize: 14,
+          border: `1px solid ${open || nActive ? accent : "var(--line)"}`, background: nActive ? "rgba(122,168,255,.14)" : "#F1F5F9", color: "var(--ink)" }}>
+        🧩 技能{nActive ? <span style={{ minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: accent, color: "#fff", fontSize: 14.5, fontWeight: 800, display: "grid", placeItems: "center" }}>{nActive}</span> : null}
       </button>
 
       {open && (
         <div style={{ ...panelPos, maxHeight: 440, overflowY: "auto", padding: 12, borderRadius: 14, border: "1px solid rgba(120,200,255,.32)", background: "rgba(10,14,32,.98)", backdropFilter: "blur(14px)", boxShadow: "0 18px 50px rgba(0,0,0,.6)" }}>
-          <div style={{ fontSize: 11.5, color: "#aebbe0" }}>点亮技能 = 本次启用（注入对应专家）。选好直接开始协作即可。</div>
+          <div style={{ fontSize: 14.5, color: "#aebbe0" }}>点亮技能 = 本次启用（注入对应专家）。选好直接开始协作即可。</div>
           {skillGroup("内置技能", BUILTIN_SKILLS)}
           {skillGroup("更多技能", STORE_SKILLS)}
           {skillGroup("我的技能", mine)}
 
           <div style={{ marginTop: 12 }}>
-            <div style={{ fontSize: 10.5, fontWeight: 700, color: "#8aa0cc", letterSpacing: ".5px", marginBottom: 6 }}>🔌 插件（真实调用）</div>
+            <div style={{ fontSize: 14.5, fontWeight: 700, color: "#8aa0cc", letterSpacing: ".5px", marginBottom: 6 }}>🔌 插件（真实调用）</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {PLUGINS.map((p) => {
                 const on = activePluginIds.includes(p.id);
@@ -95,7 +95,7 @@ export default function SkillPicker({
             </div>
           </div>
 
-          <a href={storeHref} style={{ display: "block", marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(120,200,255,.18)", fontSize: 12, color: accent, textDecoration: "none", fontWeight: 600 }}>＋ 沉淀我的技能 / 管理（技能商店）→</a>
+          <a href={storeHref} style={{ display: "block", marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(120,200,255,.18)", fontSize: 15, color: accent, textDecoration: "none", fontWeight: 600 }}>＋ 沉淀我的技能 / 管理（技能商店）→</a>
         </div>
       )}
     </div>

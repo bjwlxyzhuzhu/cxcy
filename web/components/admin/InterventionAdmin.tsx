@@ -13,10 +13,10 @@ type Card = {
 
 const STATUS: Record<string, { label: string; color: string }> = {
   open: { label: "待学生回应", color: "#9aa6c8" },
-  accepted: { label: "已接受", color: "#34d399" },
-  improved: { label: "已改进", color: "#22d3ee" },
+  accepted: { label: "已接受", color: "#15803D" },
+  improved: { label: "已改进", color: "#0E7490" },
   disputed: { label: "申诉中", color: "#f5a623" },
-  retracted: { label: "已撤回", color: "#f87171" },
+  retracted: { label: "已撤回", color: "#B91C1C" },
 };
 
 export default function InterventionAdmin() {
@@ -47,14 +47,14 @@ export default function InterventionAdmin() {
     load();
   };
 
-  if (err) return <p style={{ color: "#f87171", fontSize: 14 }}>{err}</p>;
+  if (err) return <p style={{ color: "#B91C1C", fontSize: 14 }}>{err}</p>;
   if (cards === null) return <p style={{ color: "var(--mut)", fontSize: 14 }}>加载中…</p>;
   if (!cards.length) return <p style={{ color: "var(--mut)", fontSize: 14 }}>还没有督导卡。学生打开「成长星图」时系统会自动体检其证据链，命中风险模式即发卡。</p>;
 
   const disputed = cards.filter((c) => c.status === "disputed");
   const rest = cards.filter((c) => c.status !== "disputed");
   const btn = (color: string): React.CSSProperties => ({
-    fontSize: 12, fontWeight: 700, padding: "6px 12px", borderRadius: 999, cursor: "pointer",
+    fontSize: 15, fontWeight: 700, padding: "6px 12px", borderRadius: 999, cursor: "pointer",
     border: `1px solid ${color}66`, background: `${color}18`, color, fontFamily: "inherit",
   });
 
@@ -62,25 +62,25 @@ export default function InterventionAdmin() {
     const s = STATUS[c.status] || { label: c.status, color: "#9aa6c8" };
     const who = c.student ? `${c.student.name || "（未命名）"}${c.student.student_no ? " · " + c.student.student_no : ""}` : c.user_id.slice(0, 8);
     return (
-      <div key={c.id} style={{ border: `1px solid ${hot ? "rgba(245,166,35,.5)" : "var(--line)"}`, borderRadius: 14, background: hot ? "rgba(245,166,35,.06)" : "rgba(255,255,255,.03)", padding: 14, marginBottom: 10 }}>
+      <div key={c.id} style={{ border: `1px solid ${hot ? "rgba(245,166,35,.5)" : "var(--line)"}`, borderRadius: 14, background: hot ? "rgba(245,166,35,.06)" : "#F1F5F9", padding: 14, marginBottom: 10 }}>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 6 }}>
-          <b style={{ fontSize: 13.5 }}>🦉 {who}</b>
-          <span style={{ fontSize: 11, color: s.color, border: `1px solid ${s.color}66`, borderRadius: 999, padding: "2px 9px", fontWeight: 700 }}>{s.label}</span>
-          <span style={{ fontSize: 11, color: "var(--mut)" }}>{new Date(c.created_at).toLocaleString("zh-CN")}</span>
-          <Link href={`/me/growth?user=${c.user_id}`} style={{ marginLeft: "auto", fontSize: 12, color: "var(--cyan)", textDecoration: "none" }}>查看其成长星图 →</Link>
+          <b style={{ fontSize: 15 }}>🦉 {who}</b>
+          <span style={{ fontSize: 14.5, color: s.color, border: `1px solid ${s.color}66`, borderRadius: 999, padding: "2px 9px", fontWeight: 700 }}>{s.label}</span>
+          <span style={{ fontSize: 14.5, color: "var(--mut)" }}>{new Date(c.created_at).toLocaleString("zh-CN")}</span>
+          <Link href={`/me/growth?user=${c.user_id}`} style={{ marginLeft: "auto", fontSize: 15, color: "var(--cyan)", textDecoration: "none" }}>查看其成长星图 →</Link>
         </div>
-        <p style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 4 }}>“{c.sharp}”</p>
-        <p style={{ fontSize: 12, color: "var(--mut)", lineHeight: 1.7 }}>📌 {c.evidence}</p>
-        {c.student_note && <p style={{ fontSize: 12.5, color: "#f5a623", lineHeight: 1.7, marginTop: 4 }}>✋ 学生申诉：{c.student_note}</p>}
-        {c.teacher_note && <p style={{ fontSize: 12.5, color: "#22d3ee", lineHeight: 1.7, marginTop: 4 }}>👩‍🏫 教师裁决：{c.teacher_note}</p>}
+        <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>“{c.sharp}”</p>
+        <p style={{ fontSize: 15, color: "var(--mut)", lineHeight: 1.7 }}>📌 {c.evidence}</p>
+        {c.student_note && <p style={{ fontSize: 14, color: "#f5a623", lineHeight: 1.7, marginTop: 4 }}>✋ 学生申诉：{c.student_note}</p>}
+        {c.teacher_note && <p style={{ fontSize: 14, color: "#0E7490", lineHeight: 1.7, marginTop: 4 }}>👩‍🏫 教师裁决：{c.teacher_note}</p>}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 8 }}>
-          <button style={btn("#f87171")} disabled={busy} onClick={() => act(c.id, "retract", note || "教师复核后撤回本卡")}>撤回卡片</button>
-          <button style={btn("#22d3ee")} disabled={busy} onClick={() => setNoteFor(noteFor === c.id ? null : c.id)}>写裁决备注</button>
+          <button style={btn("#B91C1C")} disabled={busy} onClick={() => act(c.id, "retract", note || "教师复核后撤回本卡")}>撤回卡片</button>
+          <button style={btn("#0E7490")} disabled={busy} onClick={() => setNoteFor(noteFor === c.id ? null : c.id)}>写裁决备注</button>
           {noteFor === c.id && (
             <span style={{ display: "flex", gap: 6, flex: 1, minWidth: 240 }}>
               <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="裁决意见（学生可见）…"
-                style={{ flex: 1, padding: "6px 12px", borderRadius: 999, border: "1px solid var(--line)", background: "rgba(255,255,255,.05)", color: "var(--ink)", fontSize: 12, outline: "none" }} />
-              <button style={btn("#22d3ee")} disabled={busy || !note.trim()} onClick={() => act(c.id, "note", note.trim())}>提交</button>
+                style={{ flex: 1, padding: "6px 12px", borderRadius: 999, border: "1px solid var(--line)", background: "#F1F5F9", color: "var(--ink)", fontSize: 15, outline: "none" }} />
+              <button style={btn("#0E7490")} disabled={busy || !note.trim()} onClick={() => act(c.id, "note", note.trim())}>提交</button>
             </span>
           )}
         </div>
@@ -90,7 +90,7 @@ export default function InterventionAdmin() {
 
   return (
     <div>
-      <p style={{ fontSize: 12.5, color: "var(--mut)", marginBottom: 14, lineHeight: 1.7 }}>
+      <p style={{ fontSize: 14, color: "var(--mut)", marginBottom: 14, lineHeight: 1.7 }}>
         系统按学生证据链实时发卡（AI 辅助评判，仅供参考）。学生点「不同意」的申诉卡置顶，请老师裁决：撤回=学生有理；备注=维持意见并说明。
       </p>
       {disputed.length > 0 && (

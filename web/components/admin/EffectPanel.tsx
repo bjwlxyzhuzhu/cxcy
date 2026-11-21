@@ -21,7 +21,7 @@ export default function EffectPanel() {
       .catch((e) => setErr(e instanceof Error ? e.message : "网络错误"));
   }, []);
 
-  if (err) return <p style={{ color: "#f87171", fontSize: 14 }}>{err}</p>;
+  if (err) return <p style={{ color: "#B91C1C", fontSize: 14 }}>{err}</p>;
   if (!d) return <p style={{ color: "var(--mut)", fontSize: 14 }}>正在统计…</p>;
 
   const sixth =
@@ -37,12 +37,12 @@ export default function EffectPanel() {
 
   const G = (title: string, items: [string, string | number][]) => (
     <div style={{ border: "1px solid var(--line)", borderRadius: 14, background: "rgba(255,255,255,.035)", padding: 16 }}>
-      <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 10 }}>{title}</div>
+      <div style={{ fontSize: 14.5, fontWeight: 800, marginBottom: 10 }}>{title}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(110px,1fr))", gap: 10 }}>
         {items.map(([lb, v]) => (
           <div key={lb}>
             <div style={{ fontSize: 22, fontWeight: 800, color: "var(--cyan)" }}>{v}</div>
-            <div style={{ fontSize: 11.5, color: "var(--mut)" }}>{lb}</div>
+            <div style={{ fontSize: 14.5, color: "var(--mut)" }}>{lb}</div>
           </div>
         ))}
       </div>
@@ -51,7 +51,7 @@ export default function EffectPanel() {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <p style={{ fontSize: 12.5, color: "var(--mut)", lineHeight: 1.7 }}>
+      <p style={{ fontSize: 14, color: "var(--mut)", lineHeight: 1.7 }}>
         说明书第六节「应用成效」所有指标的实时自动统计（更新于 {new Date(d.updatedAt).toLocaleString("zh-CN")}）。全部来自证据链与用量日志真实聚合——评委要看原始数据，管理端随时可查。
       </p>
       {G("📡 覆盖与使用", [["累计访问", d.coverage.visits], ["注册学生", d.coverage.students], ["活跃使用", d.coverage.activeUsers], ["累计对话", d.coverage.chats], ["人均对话", d.coverage.chatsPerUser]])}
@@ -61,12 +61,12 @@ export default function EffectPanel() {
 
       <div style={{ border: "1px solid rgba(52,211,153,.4)", borderRadius: 14, background: "rgba(52,211,153,.06)", padding: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-          <b style={{ fontSize: 13 }}>📋 说明书第六节 · 一键成文</b>
-          <button onClick={copy} style={{ marginLeft: "auto", fontSize: 12, fontWeight: 700, padding: "6px 14px", borderRadius: 999, border: "1px solid rgba(52,211,153,.5)", background: "rgba(52,211,153,.15)", color: "#8ef0c0", cursor: "pointer", fontFamily: "inherit" }}>
+          <b style={{ fontSize: 14.5 }}>📋 说明书第六节 · 一键成文</b>
+          <button onClick={copy} style={{ marginLeft: "auto", fontSize: 15, fontWeight: 700, padding: "6px 14px", borderRadius: 999, border: "1px solid rgba(52,211,153,.5)", background: "rgba(52,211,153,.15)", color: "#15803D", cursor: "pointer", fontFamily: "inherit" }}>
             {copied ? "✓ 已复制" : "复制文案"}
           </button>
         </div>
-        <p style={{ fontSize: 12.5, lineHeight: 1.9, color: "var(--ink)" }}>{sixth}</p>
+        <p style={{ fontSize: 14, lineHeight: 1.9, color: "var(--ink)" }}>{sixth}</p>
       </div>
     </div>
   );

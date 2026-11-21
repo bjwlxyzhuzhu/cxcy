@@ -43,12 +43,12 @@ export default function ModelSelect({
       <button ref={btnRef} type="button" onClick={toggle}
         style={{
           width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "9px 11px", borderRadius: 10,
-          border: `1px solid ${open ? accent : "var(--line)"}`, background: "rgba(255,255,255,.04)",
-          color: selected ? "var(--ink)" : "var(--mut)", fontSize: 13, fontFamily: "inherit", cursor: "pointer",
+          border: `1px solid ${open ? accent : "var(--line)"}`, background: "#F1F5F9",
+          color: selected ? "var(--ink)" : "var(--mut)", fontSize: 14.5, fontFamily: "inherit", cursor: "pointer",
           textAlign: "left", outline: "none", boxShadow: open ? "0 0 0 3px rgba(34,211,238,.16)" : "none", transition: "border-color .15s",
         }}>
         <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{selected ? selected.label : placeholder}</span>
-        <span style={{ color: accent, transform: open ? "rotate(180deg)" : "none", transition: "transform .15s", fontSize: 11 }}>▾</span>
+        <span style={{ color: accent, transform: open ? "rotate(180deg)" : "none", transition: "transform .15s", fontSize: 14.5 }}>▾</span>
       </button>
       {open && (
         <div style={{
@@ -58,20 +58,20 @@ export default function ModelSelect({
         }}>
           {grps.map((g, gi) => (
             <div key={gi} style={{ marginTop: gi ? 4 : 0 }}>
-              {g.label && <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".5px", color: "var(--mut)", padding: "6px 10px 4px" }}>{g.label}</div>}
+              {g.label && <div style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: ".5px", color: "var(--mut)", padding: "6px 10px 4px" }}>{g.label}</div>}
               {g.options.map((o) => {
                 const on = o.value === value;
                 return (
                   <button key={o.value || "__none"} type="button" onClick={() => { onChange(o.value); setOpen(false); }}
                     style={{
                       width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8,
-                      border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 13, textAlign: "left",
-                      color: on ? "#04030f" : "var(--ink)", background: on ? accent : "transparent", fontWeight: on ? 700 : 400,
+                      border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 14.5, textAlign: "left",
+                      color: on ? "#fff" : "var(--ink)", background: on ? accent : "transparent", fontWeight: on ? 700 : 400,
                     }}
-                    onMouseEnter={(e) => { if (!on) e.currentTarget.style.background = "rgba(255,255,255,.08)"; }}
+                    onMouseEnter={(e) => { if (!on) e.currentTarget.style.background = "#F1F5F9"; }}
                     onMouseLeave={(e) => { if (!on) e.currentTarget.style.background = "transparent"; }}>
                     <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{o.label}</span>
-                    {on && <span style={{ fontSize: 12 }}>✓</span>}
+                    {on && <span style={{ fontSize: 15 }}>✓</span>}
                   </button>
                 );
               })}

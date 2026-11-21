@@ -58,34 +58,34 @@ export default function KnowledgeAdmin() {
     if (!res.ok) setMsg("✗ " + (data.error || res.status)); else { setTpls((l) => [...l, data.template as TplRow]); setNt({ name: "", category: "计划书", ext: "docx", file: "" }); setMsg("✓ 已新增模板"); loadStats(); }
   }
 
-  const card: React.CSSProperties = { flex: 1, minWidth: 140, border: "1px solid var(--line)", borderRadius: 14, background: "rgba(255,255,255,.04)", padding: "14px 16px" };
-  const box: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 16, background: "rgba(255,255,255,.04)", padding: 16, marginTop: 16 };
-  const del: React.CSSProperties = { padding: "3px 9px", borderRadius: 8, border: "1px solid rgba(225,29,72,.4)", background: "transparent", color: "#ff7a8a", fontSize: 11.5, cursor: "pointer", fontFamily: "inherit" };
-  const inp: React.CSSProperties = { padding: "7px 10px", borderRadius: 9, border: "1px solid var(--line)", background: "rgba(255,255,255,.05)", color: "var(--ink)", fontSize: 13, outline: "none", fontFamily: "inherit" };
+  const card: React.CSSProperties = { flex: 1, minWidth: 140, border: "1px solid var(--line)", borderRadius: 14, background: "#F1F5F9", padding: "14px 16px" };
+  const box: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 16, background: "#F1F5F9", padding: 16, marginTop: 16 };
+  const del: React.CSSProperties = { padding: "3px 9px", borderRadius: 8, border: "1px solid rgba(225,29,72,.4)", background: "transparent", color: "#B91C1C", fontSize: 14.5, cursor: "pointer", fontFamily: "inherit" };
+  const inp: React.CSSProperties = { padding: "7px 10px", borderRadius: 9, border: "1px solid var(--line)", background: "#F1F5F9", color: "var(--ink)", fontSize: 14.5, outline: "none", fontFamily: "inherit" };
 
   if (loading) return <div style={{ padding: 30, textAlign: "center", color: "var(--mut)" }}>加载中…</div>;
 
   return (
     <div>
-      {msg && <div style={{ fontSize: 12.5, marginBottom: 12, color: msg.startsWith("✓") ? "var(--cyan)" : "#ff7a8a" }}>{msg}</div>}
+      {msg && <div style={{ fontSize: 14, marginBottom: 12, color: msg.startsWith("✓") ? "var(--cyan)" : "#B91C1C" }}>{msg}</div>}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <div style={card}><div style={{ fontSize: 12, color: "var(--mut)" }}>知识块（向量）</div><div style={{ fontSize: 26, fontWeight: 800, color: "var(--cyan)" }}>{stats?.knowledge ?? "—"}</div></div>
-        <div style={card}><div style={{ fontSize: 12, color: "var(--mut)" }}>案例</div><div style={{ fontSize: 26, fontWeight: 800 }}>{stats?.cases ?? "—"}</div></div>
-        <div style={card}><div style={{ fontSize: 12, color: "var(--mut)" }}>模板</div><div style={{ fontSize: 26, fontWeight: 800 }}>{stats?.templates ?? "—"}</div></div>
+        <div style={card}><div style={{ fontSize: 15, color: "var(--mut)" }}>知识块（向量）</div><div style={{ fontSize: 26, fontWeight: 800, color: "var(--cyan)" }}>{stats?.knowledge ?? "—"}</div></div>
+        <div style={card}><div style={{ fontSize: 15, color: "var(--mut)" }}>案例</div><div style={{ fontSize: 26, fontWeight: 800 }}>{stats?.cases ?? "—"}</div></div>
+        <div style={card}><div style={{ fontSize: 15, color: "var(--mut)" }}>模板</div><div style={{ fontSize: 26, fontWeight: 800 }}>{stats?.templates ?? "—"}</div></div>
       </div>
 
       <div style={box}>
         <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>知识库来源（按来源管理）</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {(stats?.sources || []).map((s) => (
-            <div key={s.source} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+            <div key={s.source} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14.5, padding: "5px 0", borderBottom: "1px solid #F1F5F9" }}>
               <span style={{ flex: 1 }}>{s.source}</span>
-              <span style={{ color: "var(--mut)", fontSize: 12 }}>{s.n} 块</span>
+              <span style={{ color: "var(--mut)", fontSize: 15 }}>{s.n} 块</span>
               <button onClick={() => delSource(s.source, s.n)} style={del}>删除该来源</button>
             </div>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: "var(--mut)", marginTop: 8 }}>※ 新增知识请用入库脚本（含切块+向量化），后台只做查看与按来源清理。</div>
+        <div style={{ fontSize: 14.5, color: "var(--mut)", marginTop: 8 }}>※ 新增知识请用入库脚本（含切块+向量化），后台只做查看与按来源清理。</div>
       </div>
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -93,20 +93,20 @@ export default function KnowledgeAdmin() {
           <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>案例（{cases.length}）</div>
           <div style={{ maxHeight: 280, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4 }}>
             {cases.map((c) => (
-              <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, padding: "4px 0" }}>
+              <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, padding: "4px 0" }}>
                 <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.title}</span>
                 <button onClick={() => delCase(c)} style={del}>删</button>
               </div>
             ))}
           </div>
-          <div style={{ fontSize: 11.5, color: "var(--mut)", marginTop: 8 }}>※ 新增案例请用入库脚本（同时建向量）。</div>
+          <div style={{ fontSize: 14.5, color: "var(--mut)", marginTop: 8 }}>※ 新增案例请用入库脚本（同时建向量）。</div>
         </div>
 
         <div style={{ ...box, flex: 1, minWidth: 300 }}>
           <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>模板（{tpls.length}）</div>
           <div style={{ maxHeight: 200, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4, marginBottom: 12 }}>
             {tpls.map((t) => (
-              <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, padding: "4px 0" }}>
+              <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, padding: "4px 0" }}>
                 <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name} <span style={{ color: "var(--mut)" }}>· {t.category}</span></span>
                 <button onClick={() => delTpl(t)} style={del}>删</button>
               </div>
@@ -117,7 +117,7 @@ export default function KnowledgeAdmin() {
             <input placeholder="类别" value={nt.category} onChange={(e) => setNt({ ...nt, category: e.target.value })} style={{ ...inp, width: 80 }} />
             <input placeholder="ext" value={nt.ext} onChange={(e) => setNt({ ...nt, ext: e.target.value })} style={{ ...inp, width: 64 }} />
             <input placeholder="文件URL(可选)" value={nt.file} onChange={(e) => setNt({ ...nt, file: e.target.value })} style={{ ...inp, width: 130 }} />
-            <button onClick={addTpl} style={{ padding: "7px 14px", borderRadius: 9, border: "none", fontWeight: 700, fontSize: 12.5, color: "#05060f", cursor: "pointer", background: "linear-gradient(120deg,var(--cyan),var(--violet))", fontFamily: "inherit" }}>新增</button>
+            <button onClick={addTpl} style={{ padding: "7px 14px", borderRadius: 9, border: "none", fontWeight: 700, fontSize: 14, color: "#fff", cursor: "pointer", background: "linear-gradient(120deg,var(--cyan),var(--violet))", fontFamily: "inherit" }}>新增</button>
           </div>
         </div>
       </div>
