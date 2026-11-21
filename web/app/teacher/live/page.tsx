@@ -3,6 +3,11 @@
 // 屏幕上只出现席位号与虚拟头像，不出现学生姓名；所有数字来自数据库真实记录，每 8 秒刷新。
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import type { CampusTeam } from "@/components/campus/Campus3D";
+
+// 3D 园区只在浏览器里加载（three.js 按需打包，其他页面不受影响）
+const Campus3D = dynamic(() => import("@/components/campus/Campus3D"), { ssr: false, loading: () => <div style={{ padding: 40, color: "#5B6577" }}>正在加载园区…</div> });
 import RadarChart from "../../apply/RadarChart";
 import { api } from "@/components/arena/ui";
 import { UNITS, LESSON_MARKS, unitOf } from "@/lib/course";
@@ -10,7 +15,7 @@ import { UNITS, LESSON_MARKS, unitOf } from "@/lib/course";
 type Seat = { seat: number; avatar: number; online: boolean; hasProject: boolean; done: number; current: number; evidenceToday: number; aiToday: number; openCards: number; inArena: boolean };
 type Mark = { key: string; label: string; at: string };
 type Live = {
-  classes: string[]; pick: string; seats: Seat[]; stepDist: number[]; abilities: { key: string; label: string; avg: number }[];
+  classes: string[]; pick: string; seats: Seat[]; teams: CampusTeam[]; loners: number[]; stepDist: number[]; abilities: { key: string; label: string; avg: number }[];
   lesson: { id: string; class: string; unit_no: number; started_at: string; marks: Mark[] } | null;
   arena: { id: string; title: string; status: string; round: number; rounds: number; code: string; turns: number; evidence: number; verifying: number } | null;
   summary: { size: number; online: number; withProject: number; projects: number; evidenceToday: number; aiToday: number; openCards: number };
@@ -26,6 +31,9 @@ export default function LivePage() {
   const [err, setErr] = useState("");
   const [now, setNow] = useState(0); // 0 = 尚未挂载，避免服务端与浏览器时间不一致导致水合报错
   const [pickSeat, setPickSeat] = useState<Seat | null>(null);
+  const [view, setView] = useState<"campus" | "seats">("campus");
+  const [team, setTeam] = useState<string | null>(null);
+  const [no3d, setNo3d] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -106,9 +114,52 @@ export default function LivePage() {
           </div>
         </div>
 
-        {/* 中：虚拟教室 */}
-        <div style={{ ...panel, padding: 0, overflow: "hidden", position: "relative", minHeight: 520, background: "linear-gradient(180deg,#dfe7f5 0%,#c9d5ea 38%,#aebcd8 100%)" }}>
-          <div style={{ margin: "18px auto 0", width: "72%", borderRadius: 10, background: "#1f4d3a", border: "8px solid #6b4f2a", padding: "14px 18px", color: "#eafff3", boxShadow: "0 8px 24px rgba(0,0,0,.35)" }}>
+        {/* 中：班级园区（3D）/ 席位（2D） */}
+        <div style={{ ...panel, padding: 0, overflow: "hidden", position: "relative", minHeight: 560, background: view === "campus" && !no3d ? "#EEF2F7" : "linear-gradient(180deg,#dfe7f5 0%,#c9d5ea 38%,#aebcd8 100%)" }}>
+          <div style={{ position: "absolute", top: 10, left: 10, zIndex: 5, display: "flex", gap: 4, background: "#fff", border: "1px solid #E2E8F0", borderRadius: 10, padding: 3 }}>
+            {([["campus", "班级园区"], ["seats", "席位"]] as const).map(([k, l]) => (
+              <button key={k} onClick={() => { setView(k); setTeam(null); }} style={{ border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 14.5, fontWeight: 700, padding: "6px 14px", borderRadius: 8,
+                background: view === k ? "#1E3A8A" : "transparent", color: view === k ? "#fff" : "#475569" }}>{l}</button>
+            ))}
+          </div>
+          {view === "campus" && !no3d && d && (
+            <>
+              <Campus3D teams={d.teams || []} loners={(d.loners || []).length} selected={team} onPick={setTeam} onFail={() => setNo3d(true)} />
+              <div style={{ position: "absolute", top: 10, right: 10, zIndex: 5, background: "#fff", border: "1px solid #E2E8F0", borderRadius: 10, padding: "8px 12px", fontSize: 13.5, color: "#475569", lineHeight: 1.8 }}>
+                <div><b style={{ color: "#1F2937" }}>第 {u.no} 次课 · {u.title}</b></div>
+                <div><span style={{ color: "#16A34A" }}>●</span> 已完成的步 <span style={{ color: "#2563EB", marginLeft: 8 }}>●</span> 当前步 <span style={{ color: "#EA580C", marginLeft: 8 }}>◆</span> 有卡点</div>
+                <div>小人在打字 = 今天有学习记录或 AI 使用 · 拖动旋转、滚轮缩放</div>
+              </div>
+              {(d.teams || []).length === 0 && <div style={{ position: "absolute", left: 0, right: 0, bottom: 60, textAlign: "center", color: "#475569", zIndex: 5 }}>这个班级还没有项目团队。学生在“项目工作台”新建项目后，园区里会出现他们的平台。</div>}
+              {team && (() => {
+                const tm = (d.teams || []).find((x) => x.id === team);
+                if (!tm) return null;
+                return (
+                  <div style={{ position: "absolute", left: 10, bottom: 10, zIndex: 6, width: "min(360px, calc(100% - 20px))", background: "#fff", border: "1px solid #E2E8F0", borderRadius: 14, padding: 16, boxShadow: "0 10px 30px rgba(15,23,42,.15)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <b style={{ fontSize: 18, color: "#111827" }}>{tm.name}</b>
+                      <button onClick={() => setTeam(null)} style={{ marginLeft: "auto", border: "none", background: "none", fontSize: 20, cursor: "pointer", color: "#64748B" }} aria-label="关闭">×</button>
+                    </div>
+                    <div style={{ fontSize: 14.5, color: "#475569", margin: "4px 0 10px" }}>席位 {tm.seats.join("、")} · 今日在线 {tm.online} 人</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 4 }}>
+                      {UNITS.map((x, i) => (
+                        <div key={x.no} title={x.title} style={{ textAlign: "center", fontSize: 13, padding: "5px 0", borderRadius: 6, fontWeight: 700,
+                          background: tm.steps[i] === "done" ? "#16A34A" : i + 1 === tm.current ? "#1E3A8A" : "#F1F5F9", color: tm.steps[i] === "done" || i + 1 === tm.current ? "#fff" : "#64748B" }}>{x.no}</div>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: 15, margin: "10px 0", color: tm.blockers ? "#C2410C" : "#15803D" }}>{tm.blockers ? `有 ${tm.blockers} 个卡点，需要引导` : tm.done >= 8 ? "已完成全部 8 步" : `正在第 ${tm.current} 步：${UNITS[tm.current - 1]?.title || ""}`}</div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <Link href={`/apply/ontology?project=${tm.id}`} style={{ ...btn, background: "#1E3A8A", textDecoration: "none" }}>看项目本体</Link>
+                      <Link href="/teacher#panel" style={{ ...btn, background: "#fff", color: "#1E3A8A", border: "1px solid #CBD5E1", textDecoration: "none" }}>起草干预卡</Link>
+                    </div>
+                  </div>
+                );
+              })()}
+            </>
+          )}
+          {(view === "seats" || no3d) && <>
+          {no3d && view === "campus" && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 5, fontSize: 13.5, color: "#B45309", background: "#fff", padding: "4px 10px", borderRadius: 8 }}>这台电脑不支持 3D，已显示席位图</div>}
+          <div style={{ margin: "58px auto 0", width: "72%", borderRadius: 10, background: "#1f4d3a", border: "8px solid #6b4f2a", padding: "14px 18px", color: "#eafff3", boxShadow: "0 8px 24px rgba(0,0,0,.35)" }}>
             <div style={{ fontSize: 13.5, opacity: 0.8 }}>第 {u.no} 次课 · 主练{u.ability}</div>
             <div style={{ fontSize: 24, fontWeight: 900, margin: "2px 0" }}>{u.title}</div>
             <div style={{ fontSize: 14 }}>{u.question}</div>
@@ -137,6 +188,7 @@ export default function LivePage() {
             {d && d.seats.length === 0 && <div style={{ textAlign: "center", color: "#334155", marginTop: 40 }}>这个班级还没有学生。请到“管理后台 → 名单导入”导入学生名单。</div>}
           </div>
           <div style={{ position: "absolute", left: 12, bottom: 8, fontSize: 13, color: "#334155" }}>亮色 = 今日在线 · ⚔️ 在对局中 · 📮 有待回应的干预卡 · 圆点 = 项目已完成步数</div>
+          </>}
         </div>
 
         {/* 右：本节课流程、打点、对局、五力 */}

@@ -17,6 +17,7 @@
     "pdf-parse": "^2.4.5",
     "react": "^18",
     "react-dom": "^18",
+    "three": "0.170.0",
     "undici": "^8.5.0",
     "xlsx": "^0.18.5",
     "zod": "^4.4.3"
@@ -26,6 +27,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/three": "0.170.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "mammoth": "^1.12.0",

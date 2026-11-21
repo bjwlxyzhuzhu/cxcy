@@ -46,10 +46,10 @@ export async function GET(req: Request) {
   // 每名学生所在的第一个项目（加入最早的那个）
   const projOf: Record<string, string> = {};
   if (ids.length) for (const r of c.prepare(`select user_id, project_id from project_members where user_id in (${inList}) order by rowid`).all(...ids) as { user_id: string; project_id: string }[]) projOf[r.user_id] ||= r.project_id;
-  const progressCache: Record<string, { done: number; current: number }> = {};
+  const progressCache: Record<string, { done: number; current: number; steps: string[]; blockers: number }> = {};
   const prog = (pid?: string) => {
-    if (!pid) return { done: 0, current: 0 };
-    if (!progressCache[pid]) { const p = computeProgress(c, pid); progressCache[pid] = { done: p.done, current: p.current }; }
+    if (!pid) return { done: 0, current: 0, steps: [] as string[], blockers: 0 };
+    if (!progressCache[pid]) { const p = computeProgress(c, pid); progressCache[pid] = { done: p.done, current: p.current, steps: p.steps.map((s) => s.status), blockers: p.blockers.length }; }
     return progressCache[pid];
   };
 
@@ -64,6 +64,18 @@ export async function GET(req: Request) {
   });
 
   const projectIds = [...new Set(Object.values(projOf))];
+  // 园区视图：每个项目团队一块平台（只给项目名与席位号，不给学生姓名）
+  const pname = (id: string) => (c.prepare("select name from projects where id = ?").get(id) as { name: string } | undefined)?.name || "未命名项目";
+  const teams = projectIds.map((pid) => {
+    const mem = seats.filter((s, i) => projOf[students[i].id] === pid);
+    const p = prog(pid);
+    return {
+      id: pid, name: pname(pid), seats: mem.map((m) => m.seat), avatars: mem.map((m) => m.avatar),
+      done: p.done, current: p.current, steps: p.steps, blockers: p.blockers,
+      active: mem.some((m) => m.evidenceToday > 0 || m.aiToday > 0 || m.inArena), online: mem.filter((m) => m.online).length,
+    };
+  });
+  const loners = seats.filter((s) => !s.hasProject).map((s) => s.seat);
   const stepDist = Array.from({ length: 9 }, (_, k) => projectIds.filter((pid) => prog(pid).done === k).length);
   const abilitySum: Record<string, { label: string; total: number }> = {};
   for (const pid of projectIds) for (const a of computeAbilities(c, pid)) (abilitySum[a.key] ||= { label: a.label, total: 0 }).total += a.count;
@@ -80,7 +92,7 @@ export async function GET(req: Request) {
   } : null;
 
   return NextResponse.json({
-    classes: options, pick, seats, lesson, arena, stepDist, abilities,
+    classes: options, pick, seats, teams, loners, lesson, arena, stepDist, abilities,
     summary: {
       size: seats.length, online: seats.filter((s) => s.online).length, withProject: seats.filter((s) => s.hasProject).length,
       projects: projectIds.length, evidenceToday: seats.reduce((n, s) => n + s.evidenceToday, 0), aiToday: seats.reduce((n, s) => n + s.aiToday, 0),
